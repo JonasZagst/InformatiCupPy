@@ -3,7 +3,7 @@ class Lane:
     def __init__(self, id, connected_stations, length, capacity):
         self.id = id
         # Array of fixed length 2 of both end stations.
-        self.connected_stations = list(str)(connected_stations)
+        self.connected_stations = connected_stations
         # Decimal length of the lane
         self.length = length
         # Capacity in trains at the same time

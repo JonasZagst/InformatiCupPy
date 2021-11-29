@@ -63,18 +63,18 @@ class InputParser:
                 passenger = False
             if passenger == True:
                 passenger_str = line.split(" ")
-                passengers.append(Passenger(passenger_str[0], passenger_str[1], passenger_str[2], passenger_str[3], passenger_str[4]))
+                passengers.append(Passenger(passenger_str[0],
+                                            passenger_str[1],
+                                            passenger_str[2],
+                                            passenger_str[3],
+                                            passenger_str[4]))
+
             if line == "[Passengers]":
                 passenger = True
 
-            return passengers
+        return passengers
 
     def parse_input(self):
-        objects = []
-
-        objects.append(self.parse_stations())
-        objects.append(self.parse_lanes())
-        objects.append(self.parse_trains())
-        objects.append(self.parse_passengers())
+        objects = [self.parse_stations(), self.parse_lanes(), self.parse_trains(), self.parse_passengers()]
 
         return objects
