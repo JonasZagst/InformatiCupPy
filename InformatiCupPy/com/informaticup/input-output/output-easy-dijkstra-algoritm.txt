@@ -1,1 +1,8 @@
-result
+
+0 Board T1
+1 Depart T1
+8 Detrain T1
+9 Depart T1
+19 Board T1
+20 Depart T1
+31 Detrain T1

@@ -27,6 +27,5 @@ T2 S2 1 1
 # Passagiere: str(ID) str(Startbahnhof) str(Zielbahnhof) int(Gruppengröße) int(Ankunftszeit)
 [Passengers]
 P1 S1 S2 1 4
-P2 S1 S2 1 4
-P3 S1 S2 1 4
+P2 S3 S4 1 4
 

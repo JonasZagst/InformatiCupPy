@@ -6,7 +6,7 @@ class Train:
         # number of passenger, which can travel with this train
         self.capacity = capacity
         # passengers of this train
-        # self.passengers
+        self.passengers = None
         # speed of this train
         self.speed = speed
         # current position of this train

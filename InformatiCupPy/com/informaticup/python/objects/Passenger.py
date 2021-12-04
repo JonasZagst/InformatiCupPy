@@ -11,6 +11,8 @@ class Passenger:
         self.group_size= group_size
         # the target time of arrival
         self.target_time = target_time
+        # the current position of the passenger
+        self.position = initial_station
 
     def to_string(self):
         return "%s %s %s %s %s" % (self.id, self.initial_station, self.target_station, self.group_size, self.target_time)

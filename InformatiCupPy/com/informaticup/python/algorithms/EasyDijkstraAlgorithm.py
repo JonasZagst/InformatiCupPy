@@ -11,7 +11,8 @@ class EasyDijkstraAlgorithm(ISolver):
         trains = input[2]
         passengers = input[3]
 
-        result = "result"
+        result = ""
+        time = 0
 
         # setting up the Graph
         graph = Graph()
@@ -20,19 +21,28 @@ class EasyDijkstraAlgorithm(ISolver):
         for l in lanes:
             graph.add_edge(l.connected_stations[0], l.connected_stations[1], int(l.length))
 
-        print(self.calculateShortestPath(graph, 'S6', 'S5'))
+        # only for demo reasons
+        print(self.calculateShortestPath(graph, 'S1', 'S6'))
 
         # uses only one train to transport all passengers
         for p in passengers:
             # moving train to passenger
             if trains[0].position != p.initial_station:
                 length, listOfPath = self.calculateShortestPath(graph, trains[0].position, p.initial_station)
-                self.travelSelectedPath(length, listOfPath, trains[0].id, None)
+                result = result + "\n" + str(time) + " Depart " + trains[0].id
+                time += self.travelSelectedPath(length, listOfPath, trains[0], None)
 
             # getting the passenger to his target station
             if trains[0].position == p.initial_station:
                 length, listOfPath = self.calculateShortestPath(graph, trains[0].position, p.target_station)
-                self.travelSelectedPath(length, listOfPath, trains[0].id, p.id)
+                result = result + "\n" + str(time) + " Board " + trains[0].id
+                time += 1
+                result = result + "\n" + str(time) + " Depart " + trains[0].id
+                time += self.travelSelectedPath(length, listOfPath, trains[0], p)
+                result = result + "\n" + str(time) + " Detrain " + trains[0].id
+                time +=1
+                if p.position == p.target_station:
+                    print("Passenger " + p.id + " arrived at "+ p.position)
             else:
                 print("something went wrong... your train didn't travel to the passenger")
 
@@ -42,6 +52,7 @@ class EasyDijkstraAlgorithm(ISolver):
     def calculateShortestPath(self, graph, start, target):
         visited, paths = self.dijkstra(graph, start)
         full_path = deque()
+        print(paths)
         _target = paths[target]
 
         while _target != start:
@@ -54,6 +65,7 @@ class EasyDijkstraAlgorithm(ISolver):
         return visited[target], list(full_path)
 
     # calculates the shortest distance of every node to the initial node in the given graph
+    # inspired by: https://gist.github.com/mdsrosa/c71339cb23bc51e711d8
     def dijkstra(self, graph, initial):
         # lists every station and its distance to the initial node
         visited = {initial: 0}
@@ -86,7 +98,16 @@ class EasyDijkstraAlgorithm(ISolver):
         return visited, path
 
     def travelSelectedPath(self, length, listOfPath, train, passenger):
-        print("TODO")
+        '''
+        just an easy implementation of this method to serve this primitive algorithm
+        (only cares about start and target without iterating through the whole path)
+        '''
+        train.position = listOfPath[-1]
+        if (passenger is not None):
+            passenger.position = listOfPath[-1]
+        time = length/int(train.speed)
+
+        return int(time)
 
     def get_name(self):
         return "easy-dijkstra-algoritm"
