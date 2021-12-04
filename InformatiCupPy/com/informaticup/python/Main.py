@@ -119,5 +119,3 @@ def travelSelectedPath(length, listOfPath, train, passenger):
 
 
 main()
-
-
