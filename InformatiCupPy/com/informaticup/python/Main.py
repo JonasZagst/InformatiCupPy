@@ -23,7 +23,6 @@ def main():
     for i in input:
         for j in i:
             print(j.to_string())
-    print(input)
 
     solvers = [SimpleAlgorithmSolver(), EasyDijkstraAlgorithm()]
     OutputParser.parse_output_files(solvers, input)

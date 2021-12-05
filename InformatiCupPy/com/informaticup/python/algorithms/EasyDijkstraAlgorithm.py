@@ -22,7 +22,7 @@ class EasyDijkstraAlgorithm(ISolver):
             graph.add_edge(l.connected_stations[0], l.connected_stations[1], int(l.length))
 
         # only for demo reasons
-        print(self.calculateShortestPath(graph, 'S1', 'S6'))
+        print(self.calculateShortestPath(graph, 'S6', 'S2'))
 
         # uses only one train to transport all passengers
         for p in passengers:
@@ -52,7 +52,6 @@ class EasyDijkstraAlgorithm(ISolver):
     def calculateShortestPath(self, graph, start, target):
         visited, paths = self.dijkstra(graph, start)
         full_path = deque()
-        print(paths)
         _target = paths[target]
 
         while _target != start:
@@ -86,11 +85,15 @@ class EasyDijkstraAlgorithm(ISolver):
             nodes.remove(min_node)
             current_weight = visited[min_node]
 
+            # calculates the distance to each adjacent node and evaluates if it means an improvement
             for edge in graph.edges[min_node]:
                 try:
                     weight = current_weight + graph.distances[(min_node, edge)]
                 except:
-                    continue
+                    try:
+                        weight = current_weight + graph.distances[(edge, min_node)]
+                    except:
+                        continue
                 if edge not in visited or weight < visited[edge]:
                     visited[edge] = weight
                     path[edge] = min_node
