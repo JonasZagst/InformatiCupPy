@@ -19,11 +19,6 @@ def main():
 
     # creates a list (length 4) of lists (length x), which contains several object parsed from the input file
     input = InputParser("../input-output/input.txt").parse_input()
-
-    for i in input:
-        for j in i:
-            print(j.to_string())
-
     solvers = [SimpleAlgorithmSolver(), EasyDijkstraAlgorithm()]
     OutputParser.parse_output_files(solvers, input)
 
