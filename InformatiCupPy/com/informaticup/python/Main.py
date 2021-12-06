@@ -23,8 +23,4 @@ def main():
     OutputParser.parse_output_files(solvers, input)
 
 
-
-
-
-
 main()

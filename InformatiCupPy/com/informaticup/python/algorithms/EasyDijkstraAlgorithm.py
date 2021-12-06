@@ -1,53 +1,55 @@
-from InformatiCupPy.com.informaticup.python.algorithms.ISolver import ISolver
-from InformatiCupPy.com.informaticup.python.algorithms.Graph import Graph
 from collections import deque
+
+from InformatiCupPy.com.informaticup.python.algorithms.Graph import Graph
+from InformatiCupPy.com.informaticup.python.algorithms.ISolver import ISolver
 
 
 class EasyDijkstraAlgorithm(ISolver):
 
-    def solve(self, input):
-        stations = input[0]
-        lanes = input[1]
-        trains = input[2]
-        passengers = input[3]
+    def __init__(self, input_from_file):
+        self.stations = input_from_file[0]
+        self.lanes = input_from_file[1]
+        self.trains = input_from_file[2]
+        self.passengers = input_from_file[3]
 
-        result = ""
+    def solve(self):
         time = 0
 
         # setting up the Graph
         graph = Graph()
-        for s in stations:
+        for s in self.stations:
             graph.add_node(s.id)
-        for l in lanes:
+        for l in self.lanes:
             graph.add_edge(l.connected_stations[0], l.connected_stations[1], int(l.length))
 
         # only for demo reasons
         print(self.calculateShortestPath(graph, 'S6', 'S2'))
 
         # uses only one train to transport all passengers
-        for p in passengers:
+        for p in self.passengers:
             # moving train to passenger
-            if trains[0].position != p.initial_station:
-                length, listOfPath = self.calculateShortestPath(graph, trains[0].position, p.initial_station)
-                result = result + "\n" + str(time) + " Depart " + trains[0].id
-                time += self.travelSelectedPath(length, listOfPath, trains[0], None)
+            if self.trains[0].position != p.initial_station:
+                length, listOfPath = self.calculateShortestPath(graph, self.trains[0].position, p.initial_station)
+                # TODO: please replace with: p.journey_history[time] = trains[0].id   if it was meant to wirte a Passenger (then board would be needed)
+                # result = result + "\n" + str(time) + " Depart " + trains[0].id
+                time += self.travelSelectedPath(length, listOfPath, self.trains[0], None)
 
             # getting the passenger to his target station
-            if trains[0].position == p.initial_station:
-                length, listOfPath = self.calculateShortestPath(graph, trains[0].position, p.target_station)
-                result = result + "\n" + str(time) + " Board " + trains[0].id
+            if self.trains[0].position == p.initial_station:
+                length, listOfPath = self.calculateShortestPath(graph, self.trains[0].position, p.target_station)
+                # TODO: s.o.
+                # result = result + "\n" + str(time) + " Board " + trains[0].id
                 time += 1
-                result = result + "\n" + str(time) + " Depart " + trains[0].id
-                time += self.travelSelectedPath(length, listOfPath, trains[0], p)
-                result = result + "\n" + str(time) + " Detrain " + trains[0].id
-                time +=1
+                # TODO: s.o.
+                # result = result + "\n" + str(time) + " Depart " + trains[0].id
+                time += self.travelSelectedPath(length, listOfPath, self.trains[0], p)
+                # TODO: s.o.
+                # result = result + "\n" + str(time) + " Detrain " + trains[0].id
+                time += 1
                 if p.position == p.target_station:
-                    print("Passenger " + p.id + " arrived at "+ p.position)
+                    print("Passenger " + p.id + " arrived at " + p.position)
             else:
                 print("something went wrong... your train didn't travel to the passenger")
-
-        return result
-
 
     def calculateShortestPath(self, graph, start, target):
         visited, paths = self.dijkstra(graph, start)
@@ -108,9 +110,12 @@ class EasyDijkstraAlgorithm(ISolver):
         train.position = listOfPath[-1]
         if (passenger is not None):
             passenger.position = listOfPath[-1]
-        time = length/int(train.speed)
+        time = length / int(train.speed)
 
         return int(time)
 
     def get_name(self):
         return "easy-dijkstra-algoritm"
+
+    def get_trains_and_passengers(self) -> list[list(), list()]:
+        return [self.trains, self.passengers]

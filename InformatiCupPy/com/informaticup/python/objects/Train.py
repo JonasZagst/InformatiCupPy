@@ -15,7 +15,33 @@ class Train:
         # self.position_type
         # self.plan
         # self.boarding_possible
+        self.initial_position = position
+        self.fixed_start = True
+        self.journey_histroy = {}
+        if position == "*":
+            self.fixed_start = False
+
+    """Returns objects properties as String fitting the input format."""
 
     def to_string(self):
         return "%s %s %s %s" % (self.id, self.position, self.speed, self.capacity)
 
+    """Returns objects properties as String fitting the output format."""
+
+    def to_output(self):
+        output = "[Train:%s]" % self.id
+
+        # check if dictionary is empty
+        if not self.journey_histroy:
+            return output
+
+        # check if start was fixed
+        # if start was fixed it hast to be in the output file
+        # if not it isn´t allowed to be in the output file
+        if not self.fixed_start:
+            output += "\n0 Start %s" % self.initial_position
+
+        for time, line in self.journey_histroy:
+            output += "\n%s Depart %s" % (str(time), line)
+
+        return output + "\n"
