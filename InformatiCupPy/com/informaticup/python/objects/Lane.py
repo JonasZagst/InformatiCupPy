@@ -15,3 +15,15 @@ class Lane:
                                    self.connected_stations[1],
                                    self.length,
                                    self.capacity)
+
+    def id(self):
+        return self.id()
+
+    def connected_stations(self):
+        return self.connected_stations()
+
+    def length(self):
+        return self.length()
+
+    def capacity(self):
+        return self.capacity()
