@@ -25,6 +25,13 @@ class EasyDijkstraAlgorithm(ISolver):
         # only for demo reasons
         print(self.calculateShortestPath(graph, 'S6', 'S2'))
 
+        # evaluate if first train has a initial position
+        if not self.trains[0].fixed_start:
+            # TODO: evaluate capacity
+            initial_position = self.passengers[0].initial_station
+            self.trains[0].initial_position = initial_position
+            self.trains[0].position = initial_position
+
         # uses only one train to transport all passengers
         for p in self.passengers:
             # moving train to passenger
@@ -101,6 +108,7 @@ class EasyDijkstraAlgorithm(ISolver):
         just an easy implementation of this method to serve this primitive algorithm
         (only cares about start and target without iterating through the whole path)
         '''
+        # TODO: evaluate capacity
         train.position = listOfPath[-1]
         if (passenger is not None):
             passenger.position = listOfPath[-1]

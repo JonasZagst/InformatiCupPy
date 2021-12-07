@@ -1,4 +1,5 @@
 [Train:T1]
+0 Start S1
 1 Depart L1
 9 Depart L1
 20 Depart L1
