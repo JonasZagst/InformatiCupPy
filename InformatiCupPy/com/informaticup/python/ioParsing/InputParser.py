@@ -11,7 +11,7 @@ class InputParser:
 
     """Parses stations form input and creates station objects with the input parameters and returns them as list."""
 
-    def parse_stations(self) -> list[Passenger]:
+    def parse_stations(self):
         stations = []
         station = False
 
@@ -28,7 +28,7 @@ class InputParser:
 
     """Parses lanes form input and creates lane objects with the input parameters and returns them as list."""
 
-    def parse_lanes(self) -> list[Lane]:
+    def parse_lanes(self):
         lanes = []
         lane = False
 
@@ -46,7 +46,7 @@ class InputParser:
 
     """Parses trains form input and creates train objects with the input parameters and returns them as list."""
 
-    def parse_trains(self) -> list[Train]:
+    def parse_trains(self):
         trains = []
         train = False
 
@@ -62,7 +62,7 @@ class InputParser:
 
     """Parses passengers form input and creates passenger objects with the input parameters and returns them as list."""
 
-    def parse_passengers(self) -> list[Passenger]:
+    def parse_passengers(self):
         passengers = []
         passenger = False
 
@@ -84,7 +84,7 @@ class InputParser:
 
     """Parses stations, lanes, trains and passengers from input and returns a list of those objects as list."""
 
-    def parse_input(self) -> list[list[Station], list[Lane], list[Train], list[Passenger]]:
+    def parse_input(self):
         objects = [self.parse_stations(), self.parse_lanes(), self.parse_trains(), self.parse_passengers()]
 
         return objects

@@ -20,6 +20,6 @@ class ISolver:
         pass
 
     @abstractmethod
-    def get_trains_and_passengers(self) -> list[list(), list()]:
+    def get_trains_and_passengers(self) -> list:
         """Returns the instances of trains and passengers for the output."""
         pass

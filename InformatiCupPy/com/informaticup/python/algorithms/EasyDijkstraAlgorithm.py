@@ -12,7 +12,7 @@ class EasyDijkstraAlgorithm(ISolver):
         self.trains = input_from_file[2]
         self.passengers = input_from_file[3]
 
-    def solve(self):
+    def solve(self, input):
         time = 0
 
         # setting up the Graph
@@ -30,24 +30,18 @@ class EasyDijkstraAlgorithm(ISolver):
             # moving train to passenger
             if self.trains[0].position != p.initial_station:
                 length, listOfPath = self.calculateShortestPath(graph, self.trains[0].position, p.initial_station)
-                # TODO: please replace with: p.journey_history[time] = trains[0].id   if it was meant to wirte a Passenger (then board would be needed)
-                # result = result + "\n" + str(time) + " Depart " + trains[0].id
+                self.trains[0].journey_history[time] = self.lanes[0].id
                 time += self.travelSelectedPath(length, listOfPath, self.trains[0], None)
 
             # getting the passenger to his target station
             if self.trains[0].position == p.initial_station:
                 length, listOfPath = self.calculateShortestPath(graph, self.trains[0].position, p.target_station)
-                # TODO: s.o.
-                # result = result + "\n" + str(time) + " Board " + trains[0].id
+                p.journey_history[time] = self.trains[0].id
                 time += 1
-                # TODO: s.o.
-                # result = result + "\n" + str(time) + " Depart " + trains[0].id
+                self.trains[0].journey_history[time] = self.lanes[0].id
                 time += self.travelSelectedPath(length, listOfPath, self.trains[0], p)
-                # TODO: s.o.
-                # result = result + "\n" + str(time) + " Detrain " + trains[0].id
+                p.journey_history[time] = "Detrain"
                 time += 1
-                if p.position == p.target_station:
-                    print("Passenger " + p.id + " arrived at " + p.position)
             else:
                 print("something went wrong... your train didn't travel to the passenger")
 
@@ -117,5 +111,5 @@ class EasyDijkstraAlgorithm(ISolver):
     def get_name(self):
         return "easy-dijkstra-algoritm"
 
-    def get_trains_and_passengers(self) -> list[list(), list()]:
+    def get_trains_and_passengers(self) -> list:
         return [self.trains, self.passengers]

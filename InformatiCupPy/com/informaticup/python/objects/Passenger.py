@@ -31,12 +31,12 @@ class Passenger:
 
         # check if dictionary is empty
         if not self.journey_history:
-            return output
+            return output + "\n\n"
 
-        for time, train in self.journey_history:
-            if train == "Detrain":
-                output += "\n%s Detrain" % time
+        for key, value in self.journey_history.items():
+            if value == "Detrain":
+                output += "\n%s Detrain" % key
             else:
-                output += "\n%s Board %s" % (str(time), train)
+                output += "\n%s Board %s" % (str(key), value)
 
-        return output + "\n"
+        return output + "\n\n"

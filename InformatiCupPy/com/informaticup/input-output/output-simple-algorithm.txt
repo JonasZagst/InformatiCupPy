@@ -1,1 +1,12 @@
-result
+[Train:T1]
+
+[Train:T2]
+
+[Passenger:P1]
+
+[Passenger:P2]
+
+[Passenger:P3]
+
+[Passenger:P4]
+
