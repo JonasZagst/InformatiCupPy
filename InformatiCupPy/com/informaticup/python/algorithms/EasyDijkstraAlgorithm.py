@@ -37,21 +37,25 @@ class EasyDijkstraAlgorithm(ISolver):
                 print("not enough space for an additional wildcard train")
                 # TODO: this will be the end of this algorithm, because train[0] has to be used
 
+            train_placed = False
+
             # first check for initial station of the first passenger
             for s in self.stations:
                 if s.id == self.passengers[0].initial_station and self.check_station_capacity(s) >= 1:
                     initial_position = self.passengers[0].initial_station
                     self.trains[0].initial_position = initial_position
                     self.trains[0].position = initial_position
+                    train_placed = True
                     break
 
             # evaluate capacity of all other stations
-            for s in self.stations:
-                if self.check_station_capacity(s) >= 1:
-                    initial_position = s.id
-                    self.trains[0].initial_position = initial_position
-                    self.trains[0].position = initial_position
-                    break
+            if not train_placed:
+                for s in self.stations:
+                    if self.check_station_capacity(s) >= 1:
+                        initial_position = s.id
+                        self.trains[0].initial_position = initial_position
+                        self.trains[0].position = initial_position
+                        break
 
         # uses only one train to transport all passengers
         for p in self.passengers:
@@ -125,15 +129,19 @@ class EasyDijkstraAlgorithm(ISolver):
         return visited, path
 
     def travelSelectedPath(self, length, listOfPath, train, passenger):
-        '''
-        just an easy implementation of this method to serve this primitive algorithm
-        (only cares about start and target without iterating through the whole path)
-        '''
-        # TODO: evaluate capacity
+        time = 0
+        # TODO: evaluate capacity --> Question: can a train stop while travelling on a line
+        for l in listOfPath:
+            for s in self.stations:
+                if s.id == l:
+                    l = s
+                    break
+            if self.check_station_capacity(l) < 1:
+                print("a train blocks the way")
         train.position = listOfPath[-1]
-        if (passenger is not None):
+        if passenger is not None:
             passenger.position = listOfPath[-1]
-        time = length / int(train.speed)
+        time += length / int(train.speed)
 
         return int(time)
 
@@ -141,8 +149,9 @@ class EasyDijkstraAlgorithm(ISolver):
         trains_at_station = 0
         for t in self.trains:
             if t.position == station.id:
-                trains_at_station += trains_at_station
+                trains_at_station += 1
         return int(station.capacity) - trains_at_station
+
 
     def get_name(self):
         return "easy-dijkstra-algoritm"
