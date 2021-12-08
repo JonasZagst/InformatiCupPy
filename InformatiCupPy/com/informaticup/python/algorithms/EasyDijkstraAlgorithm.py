@@ -23,14 +23,35 @@ class EasyDijkstraAlgorithm(ISolver):
             graph.add_edge(l.connected_stations[0], l.connected_stations[1], int(l.length))
 
         # only for demo reasons
-        print(self.calculateShortestPath(graph, 'S6', 'S2'))
+        print(self.calculateShortestPath(graph, 'S2', 'S6'))
 
-        # evaluate if first train has a initial position
+        # care for wildcard trains
         if not self.trains[0].fixed_start:
-            # TODO: evaluate capacity
-            initial_position = self.passengers[0].initial_station
-            self.trains[0].initial_position = initial_position
-            self.trains[0].position = initial_position
+            # check if there is enough space in the whole graph for an additional wildcard train
+            stations_with_capacity = 0
+            for s in self.stations:
+                if self.check_station_capacity(s) >= 1:
+                    stations_with_capacity += 1
+
+            if stations_with_capacity <= 1:
+                print("not enough space for an additional wildcard train")
+                # TODO: this will be the end of this algorithm, because train[0] has to be used
+
+            # first check for initial station of the first passenger
+            for s in self.stations:
+                if s.id == self.passengers[0].initial_station and self.check_station_capacity(s) >= 1:
+                    initial_position = self.passengers[0].initial_station
+                    self.trains[0].initial_position = initial_position
+                    self.trains[0].position = initial_position
+                    break
+
+            # evaluate capacity of all other stations
+            for s in self.stations:
+                if self.check_station_capacity(s) >= 1:
+                    initial_position = s.id
+                    self.trains[0].initial_position = initial_position
+                    self.trains[0].position = initial_position
+                    break
 
         # uses only one train to transport all passengers
         for p in self.passengers:
@@ -115,6 +136,13 @@ class EasyDijkstraAlgorithm(ISolver):
         time = length / int(train.speed)
 
         return int(time)
+
+    def check_station_capacity(self, station):
+        trains_at_station = 0
+        for t in self.trains:
+            if t.position == station.id:
+                trains_at_station += trains_at_station
+        return int(station.capacity) - trains_at_station
 
     def get_name(self):
         return "easy-dijkstra-algoritm"
