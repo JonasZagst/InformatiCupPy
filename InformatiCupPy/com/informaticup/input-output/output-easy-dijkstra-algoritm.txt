@@ -1,30 +1,30 @@
 [Train:T1]
 0 Start S1
-1 Depart L1
-9 Depart L1
-20 Depart L1
-32 Depart L1
-46 Depart L1
-58 Depart L1
-66 Depart L1
+2 Depart L1
+10 Depart L1
+21 Depart L1
+33 Depart L1
+47 Depart L1
+59 Depart L1
+67 Depart L1
 
 [Train:T2]
 
 [Train:T3]
 
 [Passenger:P1]
-0 Board T1
-8 Detrain
+1 Board T1
+9 Detrain
 
 [Passenger:P2]
-19 Board T1
-31 Detrain
+20 Board T1
+32 Detrain
 
 [Passenger:P3]
-45 Board T1
-57 Detrain
+46 Board T1
+58 Detrain
 
 [Passenger:P4]
-65 Board T1
-76 Detrain
+66 Board T1
+77 Detrain
 

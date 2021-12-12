@@ -23,3 +23,5 @@ class ISolver:
     def get_trains_and_passengers(self) -> list:
         """Returns the instances of trains and passengers for the output."""
         pass
+
+    # TODO: new abstract method for delay time

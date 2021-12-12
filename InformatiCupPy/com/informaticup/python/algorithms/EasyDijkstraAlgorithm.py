@@ -13,6 +13,7 @@ class EasyDijkstraAlgorithm(ISolver):
         self.passengers = input_from_file[3]
 
     def solve(self, input):
+        # TODO: write comments
         time = 0
 
         # setting up the Graph
@@ -57,9 +58,12 @@ class EasyDijkstraAlgorithm(ISolver):
                         self.trains[0].position = initial_position
                         break
 
+        time = 1
+
         # uses only one train to transport all passengers
         for p in self.passengers:
             # moving train to passenger
+            # TODO: evaluate passenger capacity
             if self.trains[0].position != p.initial_station:
                 length, listOfPath = self.calculateShortestPath(graph, self.trains[0].position, p.initial_station)
                 self.trains[0].journey_history[time] = self.lanes[0].id
@@ -75,6 +79,7 @@ class EasyDijkstraAlgorithm(ISolver):
                 p.journey_history[time] = "Detrain"
                 time += 1
             else:
+                # TODO: Calculate individual delay
                 print("something went wrong... your train didn't travel to the passenger")
 
     def calculateShortestPath(self, graph, start, target):
@@ -130,7 +135,7 @@ class EasyDijkstraAlgorithm(ISolver):
 
     def travelSelectedPath(self, length, listOfPath, train, passenger):
         time = 0
-        # TODO: evaluate capacity --> Question: can a train stop while travelling on a line
+        # TODO: evaluate capacity --> Question: can a train stop while travelling on a line --> idea: train from goal station meets train[0] in last round before arriving
         for l in listOfPath:
             for s in self.stations:
                 if s.id == l:

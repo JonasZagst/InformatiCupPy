@@ -1,11 +1,11 @@
 # Bahnhöfe: str(ID) int(Kapazität)
 [Stations]
-S1 1
-S2 2
-S3 2
-S4 1
-S5 1
-S6 1
+S1 3
+S2 3
+S3 3
+S4 3
+S5 3
+S6 3
 
 # Strecken: str(ID) str(Anfang) str(Ende) dec(Länge) int(Kapazität)
 [Lines]
