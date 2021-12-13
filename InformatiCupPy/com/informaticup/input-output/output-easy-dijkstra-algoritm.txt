@@ -1,5 +1,4 @@
 [Train:T1]
-0 Start S1
 2 Depart L1
 10 Depart L1
 21 Depart L1
@@ -9,8 +8,6 @@
 67 Depart L1
 
 [Train:T2]
-
-[Train:T3]
 
 [Passenger:P1]
 1 Board T1

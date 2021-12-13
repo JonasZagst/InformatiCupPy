@@ -21,7 +21,7 @@ class EasyDijkstraAlgorithm(ISolver):
         for s in self.stations:
             graph.add_node(s.id)
         for l in self.lanes:
-            graph.add_edge(l.connected_stations[0], l.connected_stations[1], int(l.length))
+            graph.add_edge(l.connected_stations[0], l.connected_stations[1], int(l.length), l.id)
 
         # only for demo reasons
         print(self.calculateShortestPath(graph, 'S2', 'S6'))
@@ -65,17 +65,17 @@ class EasyDijkstraAlgorithm(ISolver):
             # moving train to passenger
             # TODO: evaluate passenger capacity
             if self.trains[0].position != p.initial_station:
-                length, listOfPath = self.calculateShortestPath(graph, self.trains[0].position, p.initial_station)
+                length, list_of_path, list_of_lines = self.calculateShortestPath(graph, self.trains[0].position, p.initial_station)
                 self.trains[0].journey_history[time] = self.lanes[0].id
-                time += self.travelSelectedPath(length, listOfPath, self.trains[0], None)
+                time += self.travelSelectedPath(length, list_of_path, self.trains[0], None)
 
             # getting the passenger to his target station
             if self.trains[0].position == p.initial_station:
-                length, listOfPath = self.calculateShortestPath(graph, self.trains[0].position, p.target_station)
+                length, list_of_path, list_of_lines = self.calculateShortestPath(graph, self.trains[0].position, p.target_station)
                 p.journey_history[time] = self.trains[0].id
                 time += 1
                 self.trains[0].journey_history[time] = self.lanes[0].id
-                time += self.travelSelectedPath(length, listOfPath, self.trains[0], p)
+                time += self.travelSelectedPath(length, list_of_path, self.trains[0], p)
                 p.journey_history[time] = "Detrain"
                 time += 1
             else:
@@ -83,18 +83,22 @@ class EasyDijkstraAlgorithm(ISolver):
                 print("something went wrong... your train didn't travel to the passenger")
 
     def calculateShortestPath(self, graph, start, target):
-        visited, paths = self.dijkstra(graph, start)
+        visited, paths, names = self.dijkstra(graph, start)
         full_path = deque()
-        _target = paths[target]
+        full_names = deque()
 
+        _target = paths[target]
         while _target != start:
             full_path.appendleft(_target)
+            _start_target = _target
             _target = paths[_target]
+            full_names.appendleft(names[_start_target, _target])
 
         full_path.appendleft(start)
         full_path.append(target)
+        full_names.append(names[full_path[-2], full_path[-1]])
 
-        return visited[target], list(full_path)
+        return visited[target], list(full_path), list(full_names)
 
     # calculates the shortest distance of every node to the initial node in the given graph
     # inspired by: https://gist.github.com/mdsrosa/c71339cb23bc51e711d8
@@ -131,7 +135,9 @@ class EasyDijkstraAlgorithm(ISolver):
                     visited[edge] = weight
                     path[edge] = min_node
 
-        return visited, path
+        names = graph.names
+
+        return visited, path, names
 
     def travelSelectedPath(self, length, listOfPath, train, passenger):
         time = 0
@@ -139,10 +145,11 @@ class EasyDijkstraAlgorithm(ISolver):
         for l in listOfPath:
             for s in self.stations:
                 if s.id == l:
-                    l = s
+                    if self.check_station_capacity(s) < 1:
+                        print("a train blocks the way")
+                    # TODO train.journey_history[time] must be set to lane id at specific time
                     break
-            if self.check_station_capacity(l) < 1:
-                print("a train blocks the way")
+
         train.position = listOfPath[-1]
         if passenger is not None:
             passenger.position = listOfPath[-1]
