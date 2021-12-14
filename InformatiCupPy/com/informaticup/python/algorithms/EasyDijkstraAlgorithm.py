@@ -148,7 +148,6 @@ class EasyDijkstraAlgorithm(ISolver):
 
     def travelSelectedPath(self, time, list_of_path, list_of_lines, train, passenger):
         count = 0
-        # TODO: evaluate capacity --> idea: train from goal station meets train[0] in last round before arriving
 
         # putting station objects in instead of id's in resulting string of shortest path algorithm
         for n, i in enumerate(list_of_path):
@@ -161,10 +160,13 @@ class EasyDijkstraAlgorithm(ISolver):
             for all_lines in self.lines:
                 if all_lines.id == visited_lines:
                     visited_lines = all_lines
-                    if self.check_station_capacity(list_of_path[count]) < 1:
-                        print("a train blocks the way")
                     train.journey_history[int(time)] = visited_lines.id
                     time += int(visited_lines.length) / int(train.speed)
+                    if self.check_station_capacity(list_of_path[count]) < 1:
+                        print("a train blocks the way")
+                        # TODO: evaluate capacity --> idea: train from goal station meets train[0] in last round before arriving
+                        # TODO: not working yet: first idea recursive use of travelSelectedPath (overthink!)
+                        self.check_trains_at_station(list_of_path[count])[0].journey_history[int(time)-1] = visited_lines.id
                     train.position = list_of_path[count].id
                     if passenger is not None:
                         passenger.position = list_of_path[count].id
@@ -172,12 +174,15 @@ class EasyDijkstraAlgorithm(ISolver):
 
         return int(time)
 
-    def check_station_capacity(self, station):
-        trains_at_station = 0
+    def check_trains_at_station(self, station):
+        trains_at_station = []
         for t in self.trains:
             if t.position == station.id:
-                trains_at_station += 1
-        return int(station.capacity) - trains_at_station
+                trains_at_station.append(t)
+        return trains_at_station
+
+    def check_station_capacity(self, station):
+        return int(station.capacity) - len(self.check_trains_at_station(station))
 
     def get_name(self):
         return "easy-dijkstra-algoritm"
