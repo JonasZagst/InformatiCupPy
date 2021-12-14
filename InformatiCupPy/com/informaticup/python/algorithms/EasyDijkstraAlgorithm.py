@@ -13,7 +13,8 @@ class EasyDijkstraAlgorithm(ISolver):
         self.passengers = input_from_file[3]
 
     def solve(self, input):
-        # TODO: write comments
+        # TODO: write (doc)comments for methods
+        file_solvable = True
         time = 0
 
         # setting up the Graph
@@ -34,10 +35,8 @@ class EasyDijkstraAlgorithm(ISolver):
                 if self.check_station_capacity(s) >= 1:
                     stations_with_capacity += 1
 
-            if stations_with_capacity <= 1:
-                print("not enough space for an additional wildcard train")
-                # TODO: this will be the end of this algorithm, because train[0] has to be used
-
+            if stations_with_capacity < 1:
+                file_solvable = False
             train_placed = False
 
             # first check for initial station of the first passenger
@@ -61,26 +60,34 @@ class EasyDijkstraAlgorithm(ISolver):
         time = 1
 
         # uses only one train to transport all passengers
-        for p in self.passengers:
-            # moving train to passenger
-            # TODO: evaluate passenger capacity
-            if self.trains[0].position != p.initial_station:
-                length, list_of_path, list_of_lines = self.calculateShortestPath(graph, self.trains[0].position,
-                                                                                 p.initial_station)
-                time = self.travelSelectedPath(time, list_of_path, list_of_lines, self.trains[0], None)
+        if file_solvable:
+            for p in self.passengers:
+                # evaluate passenger group size
+                if self.trains[0].capacity < p.group_size:
+                    print("Passenger", p.id, "cannot be transported by the used train. "
+                                              "It will be skipped, because this algorithm provides no "
+                                              "optional solution.")
+                else:
+                    # moving train to passenger
+                    if self.trains[0].position != p.initial_station:
+                        length, list_of_path, list_of_lines = self.calculateShortestPath(graph, self.trains[0].position,
+                                                                                         p.initial_station)
+                        time = self.travelSelectedPath(time, list_of_path, list_of_lines, self.trains[0], None)
 
-            # getting the passenger to his target station
-            if self.trains[0].position == p.initial_station:
-                length, list_of_path, list_of_lines = self.calculateShortestPath(graph, self.trains[0].position,
-                                                                                 p.target_station)
-                p.journey_history[time] = self.trains[0].id
-                time += 1
-                time = self.travelSelectedPath(time, list_of_path, list_of_lines, self.trains[0], p)
-                p.journey_history[time] = "Detrain"
-                time += 1
-            else:
-                # TODO: Calculate individual delay
-                print("something went wrong... your train didn't travel to the passenger")
+                    # getting the passenger to his target station
+                    if self.trains[0].position == p.initial_station:
+                        length, list_of_path, list_of_lines = self.calculateShortestPath(graph, self.trains[0].position,
+                                                                                         p.target_station)
+                        p.journey_history[time] = self.trains[0].id
+                        time += 1
+                        time = self.travelSelectedPath(time, list_of_path, list_of_lines, self.trains[0], p)
+                        p.journey_history[time] = "Detrain"
+                        time += 1
+                    else:
+                        # TODO: Calculate individual delay
+                        print("something went wrong... your train didn't travel to the passenger")
+        else:
+            print("Input file is not solvable")
 
     def calculateShortestPath(self, graph, start, target):
         visited, paths, names = self.dijkstra(graph, start)
