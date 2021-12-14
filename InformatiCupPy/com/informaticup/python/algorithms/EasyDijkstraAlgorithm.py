@@ -8,7 +8,7 @@ class EasyDijkstraAlgorithm(ISolver):
 
     def __init__(self, input_from_file):
         self.stations = input_from_file[0]
-        self.lanes = input_from_file[1]
+        self.lines = input_from_file[1]
         self.trains = input_from_file[2]
         self.passengers = input_from_file[3]
 
@@ -20,7 +20,7 @@ class EasyDijkstraAlgorithm(ISolver):
         graph = Graph()
         for s in self.stations:
             graph.add_node(s.id)
-        for l in self.lanes:
+        for l in self.lines:
             graph.add_edge(l.connected_stations[0], l.connected_stations[1], int(l.length), l.id)
 
         # only for demo reasons
@@ -65,17 +65,17 @@ class EasyDijkstraAlgorithm(ISolver):
             # moving train to passenger
             # TODO: evaluate passenger capacity
             if self.trains[0].position != p.initial_station:
-                length, list_of_path, list_of_lines = self.calculateShortestPath(graph, self.trains[0].position, p.initial_station)
-                self.trains[0].journey_history[time] = self.lanes[0].id
-                time += self.travelSelectedPath(length, list_of_path, self.trains[0], None)
+                length, list_of_path, list_of_lines = self.calculateShortestPath(graph, self.trains[0].position,
+                                                                                 p.initial_station)
+                time = self.travelSelectedPath(time, list_of_path, list_of_lines, self.trains[0], None)
 
             # getting the passenger to his target station
             if self.trains[0].position == p.initial_station:
-                length, list_of_path, list_of_lines = self.calculateShortestPath(graph, self.trains[0].position, p.target_station)
+                length, list_of_path, list_of_lines = self.calculateShortestPath(graph, self.trains[0].position,
+                                                                                 p.target_station)
                 p.journey_history[time] = self.trains[0].id
                 time += 1
-                self.trains[0].journey_history[time] = self.lanes[0].id
-                time += self.travelSelectedPath(length, list_of_path, self.trains[0], p)
+                time = self.travelSelectedPath(time, list_of_path, list_of_lines, self.trains[0], p)
                 p.journey_history[time] = "Detrain"
                 time += 1
             else:
@@ -139,21 +139,29 @@ class EasyDijkstraAlgorithm(ISolver):
 
         return visited, path, names
 
-    def travelSelectedPath(self, length, listOfPath, train, passenger):
-        time = 0
-        # TODO: evaluate capacity --> Question: can a train stop while travelling on a line --> idea: train from goal station meets train[0] in last round before arriving
-        for l in listOfPath:
-            for s in self.stations:
-                if s.id == l:
-                    if self.check_station_capacity(s) < 1:
-                        print("a train blocks the way")
-                    # TODO train.journey_history[time] must be set to lane id at specific time
-                    break
+    def travelSelectedPath(self, time, list_of_path, list_of_lines, train, passenger):
+        count = 0
+        # TODO: evaluate capacity --> idea: train from goal station meets train[0] in last round before arriving
 
-        train.position = listOfPath[-1]
-        if passenger is not None:
-            passenger.position = listOfPath[-1]
-        time += length / int(train.speed)
+        # putting station objects in instead of id's in resulting string of shortest path algorithm
+        for n, i in enumerate(list_of_path):
+            for s in self.stations:
+                if s.id == i:
+                    list_of_path[n] = s
+
+        for visited_lines in list_of_lines:
+            count += 1
+            for all_lines in self.lines:
+                if all_lines.id == visited_lines:
+                    visited_lines = all_lines
+                    if self.check_station_capacity(list_of_path[count]) < 1:
+                        print("a train blocks the way")
+                    train.journey_history[int(time)] = visited_lines.id
+                    time += int(visited_lines.length) / int(train.speed)
+                    train.position = list_of_path[count].id
+                    if passenger is not None:
+                        passenger.position = list_of_path[count].id
+                    break
 
         return int(time)
 
@@ -163,7 +171,6 @@ class EasyDijkstraAlgorithm(ISolver):
             if t.position == station.id:
                 trains_at_station += 1
         return int(station.capacity) - trains_at_station
-
 
     def get_name(self):
         return "easy-dijkstra-algoritm"
