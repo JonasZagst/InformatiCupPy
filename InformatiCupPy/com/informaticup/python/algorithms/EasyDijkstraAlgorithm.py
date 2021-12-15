@@ -1,3 +1,4 @@
+import math
 from collections import deque
 
 from InformatiCupPy.com.informaticup.python.algorithms.Graph import Graph
@@ -161,12 +162,13 @@ class EasyDijkstraAlgorithm(ISolver):
                 if all_lines.id == visited_lines:
                     visited_lines = all_lines
                     train.journey_history[int(time)] = visited_lines.id
-                    time += int(visited_lines.length) / int(train.speed)
+                    time_temp = float(visited_lines.length)/float(train.speed)
+                    time += int(math.ceil(time_temp))
                     if self.check_station_capacity(list_of_path[count]) < 1:
-                        print("a train blocks the way")
                         # TODO: evaluate capacity --> idea: train from goal station meets train[0] in last round before arriving
-                        # TODO: not working yet: first idea recursive use of travelSelectedPath (overthink!)
+                        # TODO: not working yet for multi lane use
                         self.check_trains_at_station(list_of_path[count])[0].journey_history[int(time)-1] = visited_lines.id
+                        self.check_trains_at_station(list_of_path[count])[0].position = list_of_path[count]
                     train.position = list_of_path[count].id
                     if passenger is not None:
                         passenger.position = list_of_path[count].id

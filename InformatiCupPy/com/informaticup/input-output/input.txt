@@ -21,7 +21,7 @@ L9 S2 S4 15 1
 
 # Züge: str(ID) str(Startbahnhof)/* dec(Geschwindigkeit) int(Kapazität)
 [Trains]
-T1 * 1 20
+T1 S1 2 20
 T2 S2 1 20
 T3 S3 1 20
 T4 S4 1 20
@@ -32,5 +32,6 @@ T6 S6 1 20
 
 # Passagiere: str(ID) str(Startbahnhof) str(Zielbahnhof) int(Gruppengröße) int(Ankunftszeit)
 [Passengers]
-P1 S1 S2 20 4
+P1 S1 S4 20 4
+
 
