@@ -110,7 +110,8 @@ class EasyDijkstraAlgorithm(ISolver):
 
     # calculates the shortest distance of every node to the initial node in the given graph
     # inspired by: https://gist.github.com/mdsrosa/c71339cb23bc51e711d8
-    def dijkstra(self, graph, initial):
+    @staticmethod
+    def dijkstra(graph, initial):
         # lists every station and its distance to the initial node
         visited = {initial: 0}
         path = {}
