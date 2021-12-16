@@ -26,7 +26,7 @@ class EasyDijkstraAlgorithm(ISolver):
             graph.add_edge(l.connected_stations[0], l.connected_stations[1], int(l.length), l.id)
 
         # only for demo reasons
-        print(self.calculateShortestPath(graph, 'S2', 'S6'))
+        #print(self.calculateShortestPath(graph, 'S2', 'S6'))
 
         # care for wildcard trains
         if not self.trains[0].fixed_start:
@@ -109,6 +109,7 @@ class EasyDijkstraAlgorithm(ISolver):
         return visited[target], list(full_path), list(full_names)
 
     # calculates the shortest distance of every node to the initial node in the given graph
+    # TODO: work with objects instead of id's
     # inspired by: https://gist.github.com/mdsrosa/c71339cb23bc51e711d8
     @staticmethod
     def dijkstra(graph, initial):
@@ -160,6 +161,7 @@ class EasyDijkstraAlgorithm(ISolver):
         for visited_lines in list_of_lines:
             count += 1
             for all_lines in self.lines:
+                # TODO: fix odd line number calculation
                 if all_lines.id == visited_lines:
                     visited_lines = all_lines
                     train.journey_history[int(time)] = visited_lines.id
