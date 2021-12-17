@@ -102,7 +102,8 @@ class EasyDijkstraAlgorithm(ISolver):
         else:
             print("Input file is not solvable")
 
-    def calculate_shortest_path(self, graph, start, target):
+    @staticmethod
+    def calculate_shortest_path(graph, start, target):
         """
         uses the dijkstra algorithm to calculate the shortest path from an initial station to all others
         and creates based on the return data an easy to read and handle output for one station
@@ -111,7 +112,7 @@ class EasyDijkstraAlgorithm(ISolver):
         :param target: station where the calculation should end
         :return: distance as whole, visited stations and visited lines
         """
-        visited, paths, names = self.dijkstra(graph, start)
+        visited, paths, names = EasyDijkstraAlgorithm.dijkstra(graph, start)
         full_path = deque()
         full_names = deque()
 
