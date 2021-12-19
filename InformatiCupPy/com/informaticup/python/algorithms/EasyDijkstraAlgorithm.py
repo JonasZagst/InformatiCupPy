@@ -4,7 +4,8 @@ from collections import deque
 from InformatiCupPy.com.informaticup.python.algorithms.Graph import Graph
 from InformatiCupPy.com.informaticup.python.algorithms.ISolver import ISolver
 
-
+# TODO: implement better searching algorithms
+# TODO: database for already calculated shortest paths
 class EasyDijkstraAlgorithm(ISolver):
     """ Primitive Algorithm, which iterates through a list of all passengers and uses one train to bring them
     separately to their distinct destinations. To calculate the shortest path between two stations the
@@ -39,6 +40,7 @@ class EasyDijkstraAlgorithm(ISolver):
         # only for demo reasons
         # print(self.calculateShortestPath(graph, 'S2', 'S6'))
 
+        # TODO: must every wildcard train be placed
         # care for wildcard trains
         if not self.trains[0].fixed_start:
             # check if there is enough space in the whole graph for an additional wildcard train
@@ -96,8 +98,8 @@ class EasyDijkstraAlgorithm(ISolver):
                         time += 1
                         time = self.travelSelectedPath(time, list_of_path, list_of_lines, self.trains[0], p)
                         p.journey_history[time] = "Detrain"
-                        if int(p.target_time) - time > 0:
-                            delay_cumulated += int(p.target_time) - time
+                        if time - int(p.target_time) > 0:
+                            delay_cumulated += time - int(p.target_time)
 
                         time += 1
                     else:
@@ -107,6 +109,7 @@ class EasyDijkstraAlgorithm(ISolver):
 
         return delay_cumulated
 
+    # TODO: throws exception if start == target --> to fix
     @staticmethod
     def calculate_shortest_path(graph, start, target):
         """
@@ -251,7 +254,7 @@ class EasyDijkstraAlgorithm(ISolver):
         name of the algorithm (used to name the output file)
         :return: name of the algorithm
         """
-        return "easy-dijkstra-algoritm"
+        return "easy-dijkstra-algorithm"
 
     def get_trains_and_passengers(self) -> list:
         """

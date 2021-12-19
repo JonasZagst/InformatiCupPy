@@ -5,7 +5,7 @@ class ISolver:
     """ Interface for a solving algorithm. Each algorithm should implement this interface. """
 
     @abstractmethod
-    def solve(self, input: list):
+    def solve(self, input: list) -> int:
         """ Solves the input problem with some kind of algorithm and returns the solution as string. The single
             steps of the algorithm can be performed in different functions (if needed), but the final act of solving
             should happen within this function.
