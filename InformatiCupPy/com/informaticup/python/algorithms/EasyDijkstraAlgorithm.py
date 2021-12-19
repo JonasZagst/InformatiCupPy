@@ -27,6 +27,7 @@ class EasyDijkstraAlgorithm(ISolver):
                     input: input list (result of Input_Parser.parse_input())"""
         file_solvable = True
         time = 0
+        delay_cumulated = 0
 
         # setting up the Graph
         graph = Graph()
@@ -95,12 +96,16 @@ class EasyDijkstraAlgorithm(ISolver):
                         time += 1
                         time = self.travelSelectedPath(time, list_of_path, list_of_lines, self.trains[0], p)
                         p.journey_history[time] = "Detrain"
+                        if int(p.target_time) - time > 0:
+                            delay_cumulated += int(p.target_time) - time
+
                         time += 1
                     else:
-                        # TODO: Calculate individual delay
                         print("something went wrong... your train didn't travel to the passenger")
         else:
             print("Input file is not solvable")
+
+        return delay_cumulated
 
     @staticmethod
     def calculate_shortest_path(graph, start, target):
@@ -129,8 +134,10 @@ class EasyDijkstraAlgorithm(ISolver):
 
         return visited[target], list(full_path), list(full_names)
 
-    #
-    # TODO: idea: work with objects instead of id's (what are advantages/disadvantages?)
+    # TODO: idea: work with objects instead of id's
+    #  advantages: don't have to parse through all objects afterwards to assign
+    #  disadvantages: have to parse before (stations in lines are already given as string)
+    #  --> result: would be event more inefficient
     # inspired by:
     @staticmethod
     def dijkstra(graph, initial):

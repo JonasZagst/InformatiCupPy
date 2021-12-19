@@ -5,8 +5,11 @@ class OutputParser:
     @staticmethod
     def parse_output_files(solvers: list, input):
         for solver in solvers:
-            solver.solve(input)
+            delay_accumulated = solver.solve(input)
             output_str = ""
+
+            # performance rating of the distinct algorithms used
+            print(solver.get_name() + " - accumulated delay time: " + str(delay_accumulated))
 
             for i in solver.get_trains_and_passengers()[0]:
                 if isinstance(i, Train):
