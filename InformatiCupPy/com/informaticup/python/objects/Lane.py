@@ -8,6 +8,8 @@ class Lane:
         self.length = length
         # Capacity in trains at the same time
         self.capacity = capacity
+        # Current capacity (capacity - trains on line)
+        self.current_capacity = capacity
 
     def to_string(self):
         return "%s %s %s %s %s" % (self.id,

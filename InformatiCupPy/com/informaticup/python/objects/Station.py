@@ -5,6 +5,8 @@ class Station:
         self.id = id
         # Capacity in trains at the same time
         self.capacity = capacity
+        # Current capacity (capacity - trains at station)
+        self.current_capacity = capacity
 
     def to_string(self) -> str:
         return "%s %s" % (self.id, self.capacity)
