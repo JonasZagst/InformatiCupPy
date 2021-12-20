@@ -6,7 +6,7 @@ class Train:
         # number of passenger, which can travel with this train
         self.capacity = capacity
         # remaining capacity of the train (capacity - sum(group_size of all current passengers)
-        self.current_capacity = capacity
+        self.current_capacity = int(capacity)
         # passengers of this train
         self.passengers = None
         # speed of this train
