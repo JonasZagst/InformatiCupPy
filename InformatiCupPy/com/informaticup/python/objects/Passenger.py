@@ -8,9 +8,9 @@ class Passenger:
         # target station of this passenger
         self.target_station = target_station
         # this is the number of persons eventually traveling with this passenger
-        self.group_size = group_size
+        self.group_size = int(group_size)
         # the target time of arrival
-        self.target_time = target_time
+        self.target_time = int(target_time)
         # the current position of the passenger
         self.position = initial_station
         # true if passenger currently in a train, else false

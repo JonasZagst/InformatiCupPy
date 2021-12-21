@@ -4,18 +4,19 @@ class Train:
         # every train has a train ID
         self.id = id
         # number of passenger, which can travel with this train
-        self.capacity = capacity
+        self.capacity = int(capacity)
         # remaining capacity of the train (capacity - sum(group_size of all current passengers)
         self.current_capacity = int(capacity)
         # passengers of this train
         self.passengers = None
         # speed of this train
-        self.speed = speed
+        self.speed = float(speed)
         # current position of this train
         self.position = position
         # self.position_since
         # self.position_type
         # self.plan
+        self.is_on_line = False
         # self.boarding_possible
         self.initial_position = position
         self.fixed_start = True
