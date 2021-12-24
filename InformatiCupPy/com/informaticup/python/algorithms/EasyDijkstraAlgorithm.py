@@ -4,8 +4,8 @@ from collections import deque
 from InformatiCupPy.com.informaticup.python.algorithms.Graph import Graph
 from InformatiCupPy.com.informaticup.python.algorithms.ISolver import ISolver
 
-# TODO: implement better searching algorithms
-# TODO: database for already calculated shortest paths
+
+# TODO: implement searching algorithm from helper class
 class EasyDijkstraAlgorithm(ISolver):
     """ Primitive Algorithm, which iterates through a list of all passengers and uses one train to bring them
     separately to their distinct destinations. To calculate the shortest path between two stations the
@@ -40,7 +40,6 @@ class EasyDijkstraAlgorithm(ISolver):
         # only for demo reasons
         # print(self.calculateShortestPath(graph, 'S2', 'S6'))
 
-        # TODO: must every wildcard train be placed
         # care for wildcard trains
         if not self.trains[0].fixed_start:
             # check if there is enough space in the whole graph for an additional wildcard train
@@ -137,10 +136,6 @@ class EasyDijkstraAlgorithm(ISolver):
 
         return visited[target], list(full_path), list(full_names)
 
-    # TODO: idea: work with objects instead of id's
-    #  advantages: don't have to parse through all objects afterwards to assign
-    #  disadvantages: have to parse before (stations in lines are already given as string)
-    #  --> result: would be event more inefficient
     # inspired by:
     @staticmethod
     def dijkstra(graph, initial):
@@ -216,9 +211,8 @@ class EasyDijkstraAlgorithm(ISolver):
                     time_temp = float(visited_lines.length) / float(train.speed)
                     time += int(math.ceil(time_temp))
                     if self.check_station_capacity(list_of_path[count]) < 1:
-                        # TODO: evaluate capacity --> idea: train from goal station meets train[0] in last round
-                        #  before arriving
-                        #  TODO: not working yet for multi lane use
+                        # TODO: calculate line/station capacity
+                        #  --> idea: train from goal station meets train[0] in last round before arriving (swapping)
                         self.check_trains_at_station(list_of_path[count])[0].journey_history[
                             int(time) - 1] = visited_lines.id
                         self.check_trains_at_station(list_of_path[count])[0].position = list_of_path[count]

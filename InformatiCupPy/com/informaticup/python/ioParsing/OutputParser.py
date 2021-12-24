@@ -6,10 +6,11 @@ class OutputParser:
     @staticmethod
     def parse_output_files(solvers: list, input):
         for solver in solvers:
-            delay_accumulated = solver.solve(input)
+            copied_input = copy.deepcopy(input)
+            delay_accumulated = solver.solve(copied_input)
             output_str = ""
 
-            # new_input = copy.copy(input)
+
 
             # performance rating of the distinct algorithms used
             print(solver.get_name() + " - accumulated delay time: " + str(delay_accumulated))

@@ -1,10 +1,4 @@
 [Train:T1]
 
-[Train:T2]
-
-[Train:T3]
-
 [Passenger:P1]
-
-[Passenger:P2]
 
