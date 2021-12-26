@@ -3,9 +3,9 @@ from collections import deque
 
 from InformatiCupPy.com.informaticup.python.algorithms.Graph import Graph
 from InformatiCupPy.com.informaticup.python.algorithms.ISolver import ISolver
+from InformatiCupPy.com.informaticup.python.algorithms.Helper import Helper
 
 
-# TODO: implement searching algorithm from helper class
 class EasyDijkstraAlgorithm(ISolver):
     """ Primitive Algorithm, which iterates through a list of all passengers and uses one train to bring them
     separately to their distinct destinations. To calculate the shortest path between two stations the
@@ -22,7 +22,7 @@ class EasyDijkstraAlgorithm(ISolver):
         self.trains = input_from_file[2]
         self.passengers = input_from_file[3]
 
-    def solve(self, input):
+    def solve(self, input_data):
         """ Method to solve an input problem. To understand the general thoughts this algorithm is based on read
         the class description. To comprehend the separate steps have a look at the comments.
                     input: input list (result of Input_Parser.parse_input())"""
@@ -32,10 +32,8 @@ class EasyDijkstraAlgorithm(ISolver):
 
         # setting up the Graph
         graph = Graph()
-        for s in self.stations:
-            graph.add_node(s.id)
-        for l in self.lines:
-            graph.add_edge(l.connected_stations[0], l.connected_stations[1], int(l.length), l.id)
+        helper = Helper()
+        graph = helper.set_up_graph(self.stations, self.lines)
 
         # only for demo reasons
         # print(self.calculateShortestPath(graph, 'S2', 'S6'))
@@ -108,7 +106,6 @@ class EasyDijkstraAlgorithm(ISolver):
 
         return delay_cumulated
 
-    # TODO: throws exception if start == target --> to fix
     @staticmethod
     def calculate_shortest_path(graph, start, target):
         """
@@ -119,11 +116,15 @@ class EasyDijkstraAlgorithm(ISolver):
         :param target: station where the calculation should end
         :return: distance as whole, visited stations and visited lines
         """
+        if start == target:
+            return 0, list(target), list()
+
         visited, paths, names = EasyDijkstraAlgorithm.dijkstra(graph, start)
         full_path = deque()
         full_names = deque()
 
         _target = paths[target]
+
         while _target != start:
             full_path.appendleft(_target)
             _start_target = _target
@@ -195,24 +196,22 @@ class EasyDijkstraAlgorithm(ISolver):
         """
         count = 0
 
+        helper = Helper()
+
         # putting station objects in instead of id's in resulting string of shortest path algorithm
-        for n, i in enumerate(list_of_path):
-            for s in self.stations:
-                if s.id == i:
-                    list_of_path[n] = s
+        for n, station_id in enumerate(list_of_path):
+            s = helper.get_element_from_list_by_id(station_id, self.stations)
+            list_of_path[n] = s
 
         for visited_lines in list_of_lines:
             count += 1
             for all_lines in self.lines:
-                # TODO: fix odd line number calculation
                 if all_lines.id == visited_lines:
                     visited_lines = all_lines
                     train.journey_history[int(time)] = visited_lines.id
                     time_temp = float(visited_lines.length) / float(train.speed)
                     time += int(math.ceil(time_temp))
                     if self.check_station_capacity(list_of_path[count]) < 1:
-                        # TODO: calculate line/station capacity
-                        #  --> idea: train from goal station meets train[0] in last round before arriving (swapping)
                         self.check_trains_at_station(list_of_path[count])[0].journey_history[
                             int(time) - 1] = visited_lines.id
                         self.check_trains_at_station(list_of_path[count])[0].position = list_of_path[count]

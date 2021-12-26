@@ -5,6 +5,7 @@ from InformatiCupPy.com.informaticup.python.algorithms.ISolver import ISolver
 class EasyDijkstraAlgorithm(ISolver):
 
     # TODO: improve the easy version of this algorithm with the following ideas:
+    #  - implement the ability of trains to pass a station without stopping to save some time
     #  - passenger priority based on target time, group size
     #  - take more passengers in one train
     #  - improve calculation time using a database for already calculated shortest paths
