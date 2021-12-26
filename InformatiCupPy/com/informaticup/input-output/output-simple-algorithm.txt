@@ -1,4 +1,7 @@
 [Train:T1]
 
+[Train:T2]
+
 [Passenger:P1]
+1 Board T1
 

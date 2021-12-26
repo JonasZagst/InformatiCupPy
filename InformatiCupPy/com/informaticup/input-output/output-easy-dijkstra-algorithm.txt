@@ -3,6 +3,11 @@
 4 Depart L2
 7 Depart L3
 
+<<<<<<< HEAD
+=======
+[Train:T2]
+
+>>>>>>> origin/dev
 [Passenger:P1]
 1 Board T1
 8 Detrain
