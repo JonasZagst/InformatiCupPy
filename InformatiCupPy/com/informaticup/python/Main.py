@@ -5,7 +5,7 @@ from InformatiCupPy.com.informaticup.python.ioParsing.OutputParser import Output
 
 
 def main():
-    '''
+    """
     List order + each variables:
         1 Stations
             id, capacity
@@ -15,7 +15,7 @@ def main():
             id, capacity, speed, position
         4 Passengers
             id, initial_station, target_station, group_size, target_time
-    '''
+    """
 
     # creates a list (length 4) of lists (length x), which contains several object parsed from the input file
     input = InputParser("../input-output/input.txt").parse_input()
