@@ -4,7 +4,7 @@ from InformatiCupPy.com.informaticup.python.ioParsing.InputParser import InputPa
 from InformatiCupPy.com.informaticup.python.ioParsing.OutputParser import OutputParser
 
 
-def main():
+def __main__():
     '''
     List order + each variables:
         1 Stations
@@ -21,10 +21,10 @@ def main():
     input = InputParser("../input-output/input.txt").parse_input()
     solvers = [SimpleAlgorithmSolver(), EasyDijkstraAlgorithm()]
     OutputParser.parse_output_files(solvers, input)
+    print(open("../input-output/output.txt"))
 
 
 
 
 
-
-main()
+__main__()
