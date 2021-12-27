@@ -2,8 +2,6 @@ from InformatiCupPy.com.informaticup.python.algorithms.ISolver import ISolver
 from InformatiCupPy.com.informaticup.python.algorithms.EasyDijkstraAlgorithm import EasyDijkstraAlgorithm as Dij
 from InformatiCupPy.com.informaticup.python.algorithms.Helper import Helper
 import sys
-from _thread import start_new_thread
-from threading import Thread
 import pandas as pd
 
 
@@ -27,8 +25,6 @@ class SimpleAlgorithmSolver(ISolver):
         # setting up the graph
         graph = Helper.set_up_graph(self.stations, self.lines)
 
-        # list_threads = []
-
         # starting solving algorithm
         while self.check_break_condition():
             count = 0
@@ -43,13 +39,8 @@ class SimpleAlgorithmSolver(ISolver):
                     chosen_passenger_pos = self.df[chosen_passenger.id + "-position"].iloc[self.time]
                     if chosen_passenger_pos == chosen_train_pos:
                         self.board_passenger(chosen_passenger, chosen_train)
-                        # t = Thread(target=self.depart_train, args=(chosen_train, chosen_passenger, self.time, graph))
-                        # list_threads.append(t)
-                        # t.start()
                     else:
                         pass
-                        # start_new_thread(self.bring_train_to_passenger, (chosen_train, chosen_passenger.position,
-                        #                                                  self.time, graph,))
                     count += 1
             self.time += 1
             self.add_new_row(self.time)
