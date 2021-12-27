@@ -16,6 +16,7 @@ class Graph(object):
         self.edges[to_node].append(from_node)
         self.distances[(from_node, to_node)] = distance
         self.names[(from_node, to_node)] = name
+        self.names[(to_node, from_node)] = name
 
 
 def dijkstra(graph, initial):
@@ -56,9 +57,13 @@ def dijkstra(graph, initial):
 
 
 def shortest_path(graph, origin, destination):
+    if origin == destination:
+        return 0, list(destination), list()
+
     visited, paths, names = dijkstra(graph, origin)
     full_path = deque()
     full_names = deque()
+    print(names)
 
     _destination = paths[destination]
     while _destination != origin:
@@ -72,6 +77,7 @@ def shortest_path(graph, origin, destination):
     full_names.append(names[full_path[-2], full_path[-1]])
 
     return visited[destination], list(full_path), list(full_names)
+
 
 if __name__ == '__main__':
     graph = Graph()
@@ -90,4 +96,4 @@ if __name__ == '__main__':
     graph.add_edge('A', 'H', 7, 'L9')
     graph.add_edge('G', 'H', 2, 'L10')
 
-    print(shortest_path(graph, 'D', 'H')) # output: (25, ['A', 'B', 'D'])
+    print(shortest_path(graph, 'A', 'D'))  # output: (25, ['A', 'B', 'D'])

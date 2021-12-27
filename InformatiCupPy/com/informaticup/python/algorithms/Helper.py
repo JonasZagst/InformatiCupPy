@@ -12,7 +12,7 @@ class Helper:
             :returns searched object (as Train/Passenger/Line/Passenger-Object)
         """
         list_.sort(key=lambda x: x.id)
-        index = int(str(element_id)[1:]) - 1
+        index = int(element_id[1:]) - 1
         return list_[index]
 
     @staticmethod
