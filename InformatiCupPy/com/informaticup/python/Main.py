@@ -21,7 +21,7 @@ def __main__():
     input = InputParser("../input-output/input.txt").parse_input()
     solvers = [SimpleAlgorithmSolver(), EasyDijkstraAlgorithm()]
     OutputParser.parse_output_files(solvers, input)
-    print(open("../input-output/output.txt"))
+    print(open("../input-output/output.txt").read())
 
 
 
