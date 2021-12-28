@@ -1,3 +1,5 @@
+import sys
+
 from InformatiCupPy.com.informaticup.python.algorithms.EasyDijkstraAlgorithm import EasyDijkstraAlgorithm
 from InformatiCupPy.com.informaticup.python.algorithms.SimpleAlgorithmSolver import SimpleAlgorithmSolver
 from InformatiCupPy.com.informaticup.python.ioParsing.InputParser import InputParser
@@ -17,11 +19,16 @@ def __main__():
             id, initial_station, target_station, group_size, target_time
     '''
 
-    # creates a list (length 4) of lists (length x), which contains several object parsed from the input file
-    input = InputParser("InformatiCupPy/com/informaticup/input-output/input.txt").parse_input()
+    input_str = open("InformatiCupPy/com/informaticup/input-output/input.txt", "r").read()
+
+    # input = InputParser(input_str).parse_input()
+    # solvers = [SimpleAlgorithmSolver(), EasyDijkstraAlgorithm()]
+    # OutputParser.parse_output_files(solvers, input)
+    # print(open("InformatiCupPy/com/informaticup/input-output/output.txt").read())
+
+    input = InputParser(sys.stdin.read()).parse_input()
     solvers = [SimpleAlgorithmSolver(), EasyDijkstraAlgorithm()]
-    OutputParser.parse_output_files(solvers, input)
-    print(open("InformatiCupPy/com/informaticup/input-output/output.txt").read())
+    OutputParser.parse_output_files_to_stdout(solvers, input)
 
 
 
