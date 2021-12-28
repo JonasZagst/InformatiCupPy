@@ -1,7 +1,5 @@
 [Train:T1]
-1 Depart L1
-5 Depart L2
-10 Depart L3
+2 Depart L1
 
 [Train:T2]
 

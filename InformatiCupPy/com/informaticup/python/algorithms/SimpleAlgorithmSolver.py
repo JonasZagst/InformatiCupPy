@@ -11,6 +11,12 @@ class SimpleAlgorithmSolver(ISolver):
         Works by looping through the passengers in the order of the their priority/target time.
         Uses dijkstra algorithm for shortest path problems. """
 
+    # TODO: -funktionsfähiger Swap
+    #       -Attribute wie is_on_line bei ankommen aktualisieren
+    #       -intelligenter Swap (bei Swap gleich Passagiere mitnehmen)
+    #       -Zug zu Passagier fahren lassen
+    #       -Detrain implementieren (evtl. depart_train + detrain in einer Methode bring_passenger_to_target())
+
     def __init__(self, input_from_file):
         self.stations = input_from_file[0]
         self.lines = input_from_file[1]
@@ -28,6 +34,7 @@ class SimpleAlgorithmSolver(ISolver):
         # starting solving algorithm
         while self.check_break_condition():
             count = 0
+            self.set_checked_false()
             while self.check_inner_break_condition() and count <= 5:
                 if self.get_free_trains():
                     chosen_passenger = self.choose_next_passenger()
@@ -40,7 +47,7 @@ class SimpleAlgorithmSolver(ISolver):
                     if chosen_passenger_pos == chosen_train_pos:
                         self.board_passenger(chosen_passenger, chosen_train)
                         try:
-                            self.depart_train(chosen_train, chosen_passenger.target_station, self.time, graph)
+                            self.depart_train(chosen_train, chosen_passenger.target_station, self.time + 1, graph)
                         except CannotDepartTrain:
                             pass
                     else:
@@ -134,7 +141,9 @@ class SimpleAlgorithmSolver(ISolver):
                     self.df[line.id + "-current_capacity"].iloc[i] = self.df[line.id + "-current_capacity"].iloc[i] - 1
                 self.add_new_row(end_time_line)
                 self.df[stations[c+1] + "-current_capacity"].iloc[end_time_line] = \
-                    self.df[stations[c+1] + "-current_capacity"].iloc[end_time_line] + 1
+                    self.df[stations[c+1] + "-current_capacity"].iloc[end_time_line] - 1
+                self.df[line.id + "-current_capacity"].iloc[end_time_line] = \
+                    self.df[line.id + "-current_capacity"].iloc[end_time_line] + 1
                 if self.df[stations[c+1] + "-current_capacity"].iloc[end_time_line] < 1:  # swap
                     for swap_train in self.trains:
                         if self.df[swap_train.id + "-position"].iloc[end_time_line] == stations[c+1]:
@@ -143,8 +152,6 @@ class SimpleAlgorithmSolver(ISolver):
                 raise CannotDepartTrain()
 
             start_time_line = end_time_line
-            self.df[line.id + "-current_capacity"].iloc[end_time_line] = \
-                self.df[line.id + "-current_capacity"].iloc[end_time_line] + 1
 
     def board_passenger(self, passenger, train):
         """ Boards a passenger on a specific train. Adds boarding to the passengers journey_history and
@@ -237,6 +244,10 @@ class SimpleAlgorithmSolver(ISolver):
                     and not self.df[passenger.id + "is_in_train"].iloc[self.time]:
                 next_passenger = passenger
         return next_passenger
+
+    def set_checked_false(self):
+        for column in self.df.filter(regex="^T\\d+-checked$"):
+            self.df[column].iloc[self.time] = False
 
     def get_name(self):
         return "simple-algorithm"
