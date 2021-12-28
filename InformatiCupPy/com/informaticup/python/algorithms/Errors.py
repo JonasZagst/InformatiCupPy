@@ -1,0 +1,2 @@
+class CannotDepartTrain(Exception):
+    pass
