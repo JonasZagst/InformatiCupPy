@@ -22,10 +22,11 @@ class EasyDijkstraAlgorithm(ISolver):
         self.trains = input_from_file[2]
         self.passengers = input_from_file[3]
 
-    def solve(self, input_data):
-        """ Method to solve an input problem. To understand the general thoughts this algorithm is based on read
+    def solve(self):
+        """
+        Method to solve an input problem. To understand the general thoughts this algorithm is based on read
         the class description. To comprehend the separate steps have a look at the comments.
-                    input: input list (result of Input_Parser.parse_input())"""
+        """
         file_solvable = True
         time = 0
         delay_cumulated = 0

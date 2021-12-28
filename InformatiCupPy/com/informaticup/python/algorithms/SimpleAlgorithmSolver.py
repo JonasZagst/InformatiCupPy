@@ -19,9 +19,8 @@ class SimpleAlgorithmSolver(ISolver):
         self.time = 0
         self.df = self.generate_data_frame()
 
-    def solve(self, input):
+    def solve(self):
         """ Method to solve an input problem.
-            :param input: input list (result of Input_Parser.parse_input())
         """
         # setting up the graph
         graph = Helper.set_up_graph(self.stations, self.lines)
@@ -69,9 +68,21 @@ class SimpleAlgorithmSolver(ISolver):
         """
         columns = []
         row_0 = []
+
+        trains_per_station = {}
+        for train in self.trains:
+            if train.position in trains_per_station.keys():
+                trains_per_station[train.position] += 1
+            else:
+                trains_per_station[train.position] = 1
+
         for station in self.stations:
             columns.append(station.id + "-current_capacity")
-            row_0.append(station.current_capacity)
+            try:
+                trains_at_station = trains_per_station[station.id]
+            except KeyError:
+                trains_at_station = 0
+            row_0.append(station.current_capacity - trains_at_station)
 
         for line in self.lines:
             columns.append(line.id + "-current_capacity")
@@ -105,9 +116,9 @@ class SimpleAlgorithmSolver(ISolver):
         end_time = int(length / train.speed) + start_time
         self.df[train.id + "-checked"].iloc[self.time] = True
         start_time_line = start_time
-        for line in lines:
-            line = Helper.get_element_from_list_by_id(line, self.lines)
-            end_time_line = int(line.length / train.speed) + start_time_line + 1
+        for c in range(len(lines)):
+            line = Helper.get_element_from_list_by_id(lines[c], self.lines)
+            end_time_line = int(line.length / train.speed) + start_time_line
             can_depart = True
             for i in range(start_time_line, end_time_line):
                 self.add_new_row(i)
@@ -115,17 +126,25 @@ class SimpleAlgorithmSolver(ISolver):
                     can_depart = False
                     break
             if can_depart:
-                train.journey_history[start_time_line] = self.df[train.id + "-position"].iloc[start_time_line]
+                train.journey_history[start_time_line] = line.id
                 for i in range(start_time_line, end_time_line):
+                    self.df[stations[c] + "-current_capacity"].iloc[i] = \
+                        self.df[stations[c] + "-current_capacity"].iloc[i] + 1
                     self.df[train.id + "-is_on_line"].iloc[i] = True
                     self.df[line.id + "-current_capacity"].iloc[i] = self.df[line.id + "-current_capacity"].iloc[i] - 1
+                self.add_new_row(end_time_line)
+                self.df[stations[c+1] + "-current_capacity"].iloc[end_time_line] = \
+                    self.df[stations[c+1] + "-current_capacity"].iloc[end_time_line] + 1
+                if self.df[stations[c+1] + "-current_capacity"].iloc[end_time_line] < 1:  # swap
+                    for swap_train in self.trains:
+                        if self.df[swap_train.id + "-position"].iloc[end_time_line] == stations[c+1]:
+                            self.depart_train(swap_train, stations[c], end_time_line-1, graph)
             else:
                 raise CannotDepartTrain()
 
             start_time_line = end_time_line
-            self.add_new_row(end_time_line)
             self.df[line.id + "-current_capacity"].iloc[end_time_line] = \
-                self.df[line.id + "-current_capacity"].iloc[end_time_line]+1
+                self.df[line.id + "-current_capacity"].iloc[end_time_line] + 1
 
     def board_passenger(self, passenger, train):
         """ Boards a passenger on a specific train. Adds boarding to the passengers journey_history and

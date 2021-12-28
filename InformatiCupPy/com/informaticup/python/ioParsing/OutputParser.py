@@ -1,14 +1,12 @@
 from InformatiCupPy.com.informaticup.python.objects.Passenger import Passenger
 from InformatiCupPy.com.informaticup.python.objects.Train import Train
-import copy
 
 
 class OutputParser:
     @staticmethod
     def parse_output_files(solvers: list, input):
         for solver in solvers:
-            copied_input = copy.deepcopy(input)
-            delay_accumulated = solver.solve(copied_input)
+            delay_accumulated = solver.solve()
             output_str = ""
 
             # performance rating of the distinct algorithms used
