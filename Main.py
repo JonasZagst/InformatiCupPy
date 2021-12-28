@@ -18,10 +18,10 @@ def __main__():
     '''
 
     # creates a list (length 4) of lists (length x), which contains several object parsed from the input file
-    input = InputParser("../input-output/input.txt").parse_input()
+    input = InputParser("InformatiCupPy/com/informaticup/input-output/input.txt").parse_input()
     solvers = [SimpleAlgorithmSolver(), EasyDijkstraAlgorithm()]
     OutputParser.parse_output_files(solvers, input)
-    print(open("../input-output/output.txt").read())
+    print(open("InformatiCupPy/com/informaticup/input-output/output.txt").read())
 
 
 
