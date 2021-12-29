@@ -11,7 +11,7 @@ class SimpleAlgorithmSolver(ISolver):
         Works by looping through the passengers in the order of the their priority/target time.
         Uses dijkstra algorithm for shortest path problems. """
 
-    # TODO: -funktionsfähiger Swap
+    # TODO:
     #       -Attribute wie is_on_line bei ankommen aktualisieren
     #       -intelligenter Swap (bei Swap gleich Passagiere mitnehmen)
     #       -Zug zu Passagier fahren lassen
@@ -47,11 +47,15 @@ class SimpleAlgorithmSolver(ISolver):
                     if chosen_passenger_pos == chosen_train_pos:
                         self.board_passenger(chosen_passenger, chosen_train)
                         try:
-                            self.depart_train(chosen_train, chosen_passenger.target_station, self.time + 1, graph)
+                            end_time = self.depart_train(chosen_train, chosen_passenger.target_station, self.time + 1, graph)
+                            self.detrain_passenger(chosen_passenger, chosen_train, end_time)
                         except CannotDepartTrain:
                             pass
                     else:
-                        pass
+                        try:
+                            self.depart_train(chosen_train, chosen_passenger_pos, self.time, graph)
+                        except CannotDepartTrain:
+                            pass
                     count += 1
             self.time += 1
             self.add_new_row(self.time)
@@ -117,6 +121,14 @@ class SimpleAlgorithmSolver(ISolver):
 
         return df
 
+    def detrain_passenger(self, passenger, train, time):
+        self.add_new_row(time)
+        passenger.journey_history[time] = "Detrain"
+        self.df[train.id + "-passengers"].iloc[time] = \
+            self.df[train.id + "-passengers"].iloc[time].replace(passenger.id + ";", "")
+        self.df[passenger.id + "-is_in_train"].iloc[time] = False
+        self.df[passenger.id + "-position"].iloc[time] = self.df[train.id + "-position"].iloc[time]
+
     def depart_train(self, train, target, start_time, graph):
         length, stations, lines = \
             Dij.calculate_shortest_path(graph, self.df[train.id + "-position"].iloc[self.time], target)
@@ -139,19 +151,29 @@ class SimpleAlgorithmSolver(ISolver):
                         self.df[stations[c] + "-current_capacity"].iloc[i] + 1
                     self.df[train.id + "-is_on_line"].iloc[i] = True
                     self.df[line.id + "-current_capacity"].iloc[i] = self.df[line.id + "-current_capacity"].iloc[i] - 1
+                    self.df[train.id + "-position"].iloc[i] = line.id
                 self.add_new_row(end_time_line)
                 self.df[stations[c+1] + "-current_capacity"].iloc[end_time_line] = \
                     self.df[stations[c+1] + "-current_capacity"].iloc[end_time_line] - 1
                 self.df[line.id + "-current_capacity"].iloc[end_time_line] = \
                     self.df[line.id + "-current_capacity"].iloc[end_time_line] + 1
-                if self.df[stations[c+1] + "-current_capacity"].iloc[end_time_line] < 1:  # swap
+                self.df[line.id + "-current_capacity"].iloc[end_time_line - 1] = \
+                    self.df[line.id + "-current_capacity"].iloc[end_time_line - 1] + 1
+                if self.df[stations[c+1] + "-current_capacity"].iloc[end_time_line] < 0:  # swap
                     for swap_train in self.trains:
                         if self.df[swap_train.id + "-position"].iloc[end_time_line] == stations[c+1]:
                             self.depart_train(swap_train, stations[c], end_time_line-1, graph)
             else:
                 raise CannotDepartTrain()
 
+            self.df[train.id + "-position"].iloc[end_time_line] = stations[c+1]
+
             start_time_line = end_time_line
+
+            if self.df[train.id + "-position"].iloc[end_time_line] == target:
+                self.df[train.id + "-is_on_line"].iloc[end_time_line] = False
+
+        return end_time
 
     def board_passenger(self, passenger, train):
         """ Boards a passenger on a specific train. Adds boarding to the passengers journey_history and
