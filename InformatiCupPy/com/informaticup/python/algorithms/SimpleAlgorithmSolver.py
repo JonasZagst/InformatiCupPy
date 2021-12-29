@@ -12,10 +12,10 @@ class SimpleAlgorithmSolver(ISolver):
         Uses dijkstra algorithm for shortest path problems. """
 
     # TODO:
-    #       -Attribute wie is_on_line bei ankommen aktualisieren
+    #       -Fix capacity-issues
     #       -intelligenter Swap (bei Swap gleich Passagiere mitnehmen)
-    #       -Zug zu Passagier fahren lassen
-    #       -Detrain implementieren (evtl. depart_train + detrain in einer Methode bring_passenger_to_target())
+    #       -für verschiedene Inputs testen und anpassen
+    #       -finalen Dataframe plotten und evtl. zusammenhänge/optimierungsideen finden
 
     def __init__(self, input_from_file):
         self.stations = input_from_file[0]
@@ -60,9 +60,7 @@ class SimpleAlgorithmSolver(ISolver):
             self.time += 1
             self.add_new_row(self.time)
 
-            # for demo reasons:-
-            if self.time > 20:
-                break
+        self.df.to_csv("algorithms\\df.csv")
 
     def add_new_row(self, time):
         try:
@@ -128,6 +126,8 @@ class SimpleAlgorithmSolver(ISolver):
             self.df[train.id + "-passengers"].iloc[time].replace(passenger.id + ";", "")
         self.df[passenger.id + "-is_in_train"].iloc[time] = False
         self.df[passenger.id + "-position"].iloc[time] = self.df[train.id + "-position"].iloc[time]
+        self.df[train.id + "-current_capacity"].iloc[time] = \
+            self.df[train.id + "-current_capacity"].iloc[time] + passenger.group_size
 
     def depart_train(self, train, target, start_time, graph):
         length, stations, lines = \
@@ -187,6 +187,7 @@ class SimpleAlgorithmSolver(ISolver):
         self.df[train.id + "-passengers"].iloc[self.time] = \
             self.df[train.id + "-passengers"].iloc[self.time] + passenger.id + ";"
         self.df[passenger.id + "-is_in_train"].iloc[self.time] = True
+        self.df[passenger.id + "-position"].iloc[self.time] = train.id
 
     def check_inner_break_condition(self):  # has to be improved by debugging more advanced solutions of this algorithm
         for train in self.trains:

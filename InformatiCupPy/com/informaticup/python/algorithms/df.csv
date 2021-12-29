@@ -1,0 +1,14 @@
+,S1-current_capacity,S2-current_capacity,S3-current_capacity,S4-current_capacity,L1-current_capacity,L2-current_capacity,L3-current_capacity,T1-current_capacity,T1-passengers,T1-position,T1-is_on_line,T1-checked,T2-current_capacity,T2-passengers,T2-position,T2-is_on_line,T2-checked,T3-current_capacity,T3-passengers,T3-position,T3-is_on_line,T3-checked,T4-current_capacity,T4-passengers,T4-position,T4-is_on_line,T4-checked,P1-position,P1-is_in_train
+0,0,0,0,0,1,1,1,10,,S1,False,False,10,,S2,False,False,10,,S3,False,False,10,,S4,False,False,S1,False
+1,0,0,0,0,1,1,1,0,P1;,S1,False,True,10,,S2,False,True,10,,S3,False,True,10,,S4,False,True,T1,True
+2,1,0,0,0,0,1,1,0,P1;,L1,True,False,10,,S2,False,False,10,,S3,False,False,10,,S4,False,False,T1,True
+3,1,0,0,0,0,1,1,0,P1;,L1,True,False,10,,S2,False,False,10,,S3,False,False,10,,S4,False,False,T1,True
+4,1,0,0,0,0,1,1,0,P1;,L1,True,False,10,,S2,False,False,10,,S3,False,False,10,,S4,False,False,T1,True
+5,1,1,0,0,0,1,1,0,P1;,L1,True,False,10,,L1,True,False,10,,S3,False,False,10,,S4,False,False,T1,True
+6,1,1,0,0,1,0,1,0,P1;,L2,True,False,10,,L1,True,False,10,,S3,False,False,10,,S4,False,False,T1,True
+7,0,1,0,0,1,0,1,0,P1;,L2,True,False,10,,S1,False,False,10,,S3,False,False,10,,S4,False,False,T1,True
+8,0,1,0,0,1,0,1,0,P1;,L2,True,False,10,,S1,False,False,10,,S3,False,False,10,,S4,False,False,T1,True
+9,0,1,0,0,1,0,1,0,P1;,L2,True,False,10,,S1,False,False,10,,S3,False,False,10,,S4,False,False,T1,True
+10,0,1,1,0,1,0,2,0,P1;,L2,True,False,10,,S1,False,False,10,,L2,True,False,10,,S4,False,False,T1,True
+11,0,1,0,0,1,1,2,0,P1;,L3,True,False,10,,S1,False,False,10,,L2,True,False,10,,S3,False,False,T1,True
+12,0,0,0,-1,1,1,2,10,,S4,False,True,10,,S1,False,False,10,,S2,False,False,10,,S4,False,False,S4,False
