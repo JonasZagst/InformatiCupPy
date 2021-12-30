@@ -27,8 +27,6 @@ def __main__():
     # print(open("InformatiCupPy/com/informaticup/input-output/output.txt").read())
 
     input_file = InputParser(sys.stdin.read()).parse_input()
-    print(sys.stdin.readlines())
-    print(input_file)
     solvers = [SimpleAlgorithmSolver(), EasyDijkstraAlgorithm()]
     OutputParser.parse_output_files_to_stdout(solvers, input_file)
 
