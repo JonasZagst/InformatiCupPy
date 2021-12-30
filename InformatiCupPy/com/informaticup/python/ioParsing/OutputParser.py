@@ -24,3 +24,4 @@ class OutputParser:
             file.write(output_str)
             file.close()
             sys.stdout = output_str
+

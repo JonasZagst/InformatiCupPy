@@ -7,7 +7,7 @@ from InformatiCupPy.com.informaticup.python.ioParsing.OutputParser import Output
 
 
 def __main__():
-    '''
+    """
     List order + each variables:
         1 Stations
             id, capacity
@@ -17,7 +17,7 @@ def __main__():
             id, capacity, speed, position
         4 Passengers
             id, initial_station, target_station, group_size, target_time
-    '''
+    """
 
     input_str = open("InformatiCupPy/com/informaticup/input-output/input.txt", "r").read()
 
@@ -26,9 +26,11 @@ def __main__():
     # OutputParser.parse_output_files(solvers, input)
     # print(open("InformatiCupPy/com/informaticup/input-output/output.txt").read())
 
-    input = InputParser(sys.stdin.read()).parse_input()
+    input_file = InputParser(sys.stdin.read()).parse_input()
+    print(sys.stdin.readlines())
+    print(input_file)
     solvers = [SimpleAlgorithmSolver(), EasyDijkstraAlgorithm()]
-    OutputParser.parse_output_files_to_stdout(solvers, input)
+    OutputParser.parse_output_files_to_stdout(solvers, input_file)
 
 
 

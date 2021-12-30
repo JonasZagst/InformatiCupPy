@@ -114,3 +114,6 @@ class EasyDijkstraAlgorithm(ISolver):
 
     def get_name(self):
         return "easy-dijkstra-algoritm"
+
+    def flush(self):
+        pass
