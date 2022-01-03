@@ -1,25 +1,18 @@
 [Train:T1]
 2 Depart L1
+6 Depart L2
+11 Depart L3
 
 [Train:T2]
-2 Depart L1
+5 Depart L1
 
 [Train:T3]
-3 Depart L1
+10 Depart L2
 
 [Train:T4]
-
-[Train:T5]
+11 Depart L3
 
 [Passenger:P1]
 1 Board T1
-3 Detrain
-
-[Passenger:P2]
-1 Board T2
-3 Detrain
-
-[Passenger:P3]
-2 Board T3
-4 Detrain
+12 Detrain
 
