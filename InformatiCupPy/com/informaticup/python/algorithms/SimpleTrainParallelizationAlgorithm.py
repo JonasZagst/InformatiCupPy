@@ -1,19 +1,27 @@
 from InformatiCupPy.com.informaticup.python.algorithms.ISolver import ISolver
 from InformatiCupPy.com.informaticup.python.algorithms.EasyDijkstraAlgorithm import EasyDijkstraAlgorithm as Dij
 from InformatiCupPy.com.informaticup.python.algorithms.Helper import Helper
-from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotDepartTrain
+from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotDepartTrain, NoPassengerChosen, \
+    NoTrainChosen, CannotBoardPassenger
+from InformatiCupPy.com.informaticup.python.objects.Passenger import Passenger
+from InformatiCupPy.com.informaticup.python.objects.Train import Train
 import sys
 import pandas as pd
 
 
-class SimpleAlgorithmSolver(ISolver):
-    """ Simple algorithm to solve an input problem.
-        Works by looping through the passengers in the order of the their priority/target time.
-        Uses dijkstra algorithm for shortest path problems. """
+class SimpleTrainParallelizationAlgorithm(ISolver):
+    """ Simple algorithm to solve an input problem. The basic idea of this algorithm is to have multiple trains running
+        at the same time (-> parallelization). Passengers are prioritized in terms of their target time.
+        All attributes which can change over time (such as position, current capacity, ...) are stored in a dataframe.
+        Every change in these attributes is also shown in the dataframe.
+        The algorithm consists of a loop that will only break if all passengers have reached their targets. For each
+        time step / round, as many trains as possible (up to a certain maximum) are started (= depart).
+        Uses dijkstra algorithm for shortest path problems (e.g. to choose the nearest train or the shortest path to
+        the target station).
+    """
 
     # TODO:
-    #       -Fix capacity-issues
-    #       -calculate delay
+    #       -add wildcards
     #       -kommentieren und dokumentieren
     #       -intelligenter Swap (bei Swap gleich Passagiere mitnehmen)
     #       -für verschiedene Inputs testen und anpassen
@@ -26,40 +34,52 @@ class SimpleAlgorithmSolver(ISolver):
         self.passengers = input_from_file[3]
         self.time = 0
         self.df = self.generate_data_frame()
+        self.max_parallelization_coefficient = min(len(self.stations), len(self.lines), len(self.passengers))
 
     def solve(self):
-        """ Method to solve an input problem.
+        """ Solves the input problem. Includes the graph set-up (needed for dijkstra) and the main loop
+            of the algorithm (more details in class description). Calculates, moreover, the delay time of the solution.
+            :returns: delay time.
         """
         # setting up the graph
         graph = Helper.set_up_graph(self.stations, self.lines)
 
-        # starting solving algorithm
+        # starting solving algorithm/loop
         while self.check_break_condition():
-            count = 0
+            print(self.time)
+            inner_loop_index = 0
             self.set_checked_false()
-            while self.check_inner_break_condition() and count <= 5:
+            while self.check_inner_break_condition() and inner_loop_index <= self.max_parallelization_coefficient:
                 if self.get_free_trains():
-                    chosen_passenger = self.choose_next_passenger()
+                    try:
+                        chosen_passenger = self.choose_next_passenger()
+                    except NoPassengerChosen:
+                        break
                     if self.time == 0:
                         # do stuff for wildcard trains here
                         break
-                    chosen_train = self.get_nearest_possible_train(passenger=chosen_passenger, graph=graph)
+                    try:
+                        chosen_train = self.get_nearest_possible_train(passenger=chosen_passenger, graph=graph)
+                    except NoTrainChosen:
+                        break
                     chosen_train_pos = self.df[chosen_train.id + "-position"].iloc[self.time]
                     chosen_passenger_pos = self.df[chosen_passenger.id + "-position"].iloc[self.time]
                     if chosen_passenger_pos == chosen_train_pos:
-                        self.board_passenger(chosen_passenger, chosen_train)
                         try:
                             end_time = \
                                 self.depart_train(chosen_train, chosen_passenger.target_station, self.time + 1, graph)
+                            self.board_passenger(chosen_passenger, chosen_train)
                             self.detrain_passenger(chosen_passenger, chosen_train, end_time)
                         except CannotDepartTrain:
+                            pass
+                        except CannotBoardPassenger:
                             pass
                     else:
                         try:
                             self.depart_train(chosen_train, chosen_passenger_pos, self.time, graph)
                         except CannotDepartTrain:
                             pass
-                    count += 1
+                    inner_loop_index += 1
             self.time += 1
             self.add_new_row(self.time)
 
@@ -87,12 +107,12 @@ class SimpleAlgorithmSolver(ISolver):
             :param train: train on which the passenger should be boarded.
         """
         passenger.journey_history[self.time] = train.id
-        self.df[train.id + "-current_capacity"].iloc[self.time] = \
-            self.df[train.id + "-current_capacity"].iloc[self.time] - passenger.group_size
-        self.df[train.id + "-passengers"].iloc[self.time] = \
-            self.df[train.id + "-passengers"].iloc[self.time] + passenger.id + ";"
-        self.df[passenger.id + "-is_in_train"].iloc[self.time] = True
-        self.df[passenger.id + "-position"].iloc[self.time] = train.id
+        for i in range(self.time, len(self.df)):
+            self.df[train.id + "-current_capacity"].iloc[i] = \
+                self.df[train.id + "-current_capacity"].iloc[i] - passenger.group_size
+            self.df[train.id + "-passengers"].iloc[i] = self.df[train.id + "-passengers"].iloc[i] + passenger.id + ";"
+            self.df[passenger.id + "-is_in_train"].iloc[i] = True
+            self.df[passenger.id + "-position"].iloc[i] = train.id
 
     def check_break_condition(self):
         """ Checks if the main loop of the algorithm can finish/stop. Works with the dataframe.
@@ -106,7 +126,15 @@ class SimpleAlgorithmSolver(ISolver):
                 return True
         return False
 
-    def check_inner_break_condition(self):  # has to be improved by debugging more advanced solutions of this algorithm
+    def check_inner_break_condition(self):
+        """ Checks if the condition for the inner while-loop in the solve()-method is fulfilled.
+            As long as the inner condition is fulfilled, the algorithm tries to start new trains in the same
+            round (/point of time). The algorithm stops starting new trains (according to this method) if all free
+            trains do not have enough capacity for any free passenger and/or possible trains have already been checked
+            (algorithm has tried to start them).
+            :returns: True, if condition is fulfilled.
+                      False, if condition is not fulfilled.
+        """
         for train in self.trains:
             for passenger in self.passengers:
                 if self.df[train.id + "-current_capacity"].iloc[self.time] - int(passenger.group_size) >= 0 \
@@ -122,22 +150,28 @@ class SimpleAlgorithmSolver(ISolver):
             target station yet can be chosen).
             Returns the chosen passenger.
         """
-        try:
-            next_passenger = self.passengers[0]
-        except IndexError:
-            return
+        dummy_passenger = Passenger("", "", "", 0, sys.maxsize)
+        next_passenger = dummy_passenger
+
         for passenger in self.passengers:
             if int(passenger.target_time) < int(next_passenger.target_time) \
                     and passenger.target_station != self.df[passenger.id + "-position"].iloc[self.time] \
-                    and not self.df[passenger.id + "is_in_train"].iloc[self.time]:
+                    and not self.df[passenger.id + "-is_in_train"].iloc[self.time]:
                 next_passenger = passenger
-        return next_passenger
+        if next_passenger != dummy_passenger:
+            return next_passenger
+        else:
+            raise NoPassengerChosen()
 
     def depart_train(self, train, target, start_time, graph):
-        length, stations, lines = \
-            Dij.calculate_shortest_path(graph, self.df[train.id + "-position"].iloc[self.time], target)
-        end_time = int(length / train.speed) + start_time
         self.df[train.id + "-checked"].iloc[self.time] = True
+        try:
+            length, stations, lines = \
+                Dij.calculate_shortest_path(graph, self.df[train.id + "-position"].iloc[start_time], target)
+        except IndexError:
+            length, stations, lines = \
+                Dij.calculate_shortest_path(graph, self.df[train.id + "-position"].iloc[start_time-1], target)
+        end_time = int(length / train.speed) + start_time
         start_time_line = start_time
         for c in range(len(lines)):
             line = Helper.get_element_from_list_by_id(lines[c], self.lines)
@@ -156,21 +190,18 @@ class SimpleAlgorithmSolver(ISolver):
                     self.df[train.id + "-is_on_line"].iloc[i] = True
                     self.df[line.id + "-current_capacity"].iloc[i] = self.df[line.id + "-current_capacity"].iloc[i] - 1
                     self.df[train.id + "-position"].iloc[i] = line.id
-                self.add_new_row(end_time_line)
-                self.df[stations[c+1] + "-current_capacity"].iloc[end_time_line] = \
-                    self.df[stations[c+1] + "-current_capacity"].iloc[end_time_line] - 1
-                self.df[line.id + "-current_capacity"].iloc[end_time_line] = \
-                    self.df[line.id + "-current_capacity"].iloc[end_time_line] + 1
                 self.df[line.id + "-current_capacity"].iloc[end_time_line - 1] = \
                     self.df[line.id + "-current_capacity"].iloc[end_time_line - 1] + 1
-                if self.df[stations[c+1] + "-current_capacity"].iloc[end_time_line] < 0:  # swap
+                self.add_new_row(end_time_line)
+                if self.df[stations[c + 1] + "-current_capacity"].iloc[end_time_line] < 1:  # swap
                     for swap_train in self.trains:
-                        if self.df[swap_train.id + "-position"].iloc[end_time_line] == stations[c+1]:
-                            self.depart_train(swap_train, stations[c], end_time_line-1, graph)
+                        if self.df[swap_train.id + "-position"].iloc[end_time_line] == stations[c + 1]:
+                            self.depart_train(swap_train, stations[c], end_time_line - 1, graph)
+                            break
             else:
                 raise CannotDepartTrain()
 
-            self.df[train.id + "-position"].iloc[end_time_line] = stations[c+1]
+            self.df[train.id + "-position"].iloc[end_time_line] = stations[c + 1]
 
             start_time_line = end_time_line
 
@@ -180,6 +211,9 @@ class SimpleAlgorithmSolver(ISolver):
         return end_time
 
     def detrain_passenger(self, passenger, train, time):
+        """ Detrains a passenger from a train at a certain round / point of time.
+            Adds 'Detrain' to the passengers journey history (and therefore to the output, later).
+            Sets all attributes that are affected by detrain-action to the respective values in self.df."""
         self.add_new_row(time)
         passenger.journey_history[time] = "Detrain"
         self.df[train.id + "-passengers"].iloc[time] = \
@@ -250,7 +284,8 @@ class SimpleAlgorithmSolver(ISolver):
         group_size = 0 if passenger is None else passenger.group_size
         for train in self.trains:
             if self.df[train.id + "-current_capacity"].iloc[self.time] - int(group_size) >= 0 \
-                    and self.df[train.id + "-passengers"].iloc[self.time] == "":
+                    and self.df[train.id + "-passengers"].iloc[self.time] == ""\
+                    and not self.df[train.id + "-is_on_line"].iloc[self.time]:
                 possible_trains.append(train)
         return possible_trains
 
@@ -262,10 +297,8 @@ class SimpleAlgorithmSolver(ISolver):
             :return: nearest train.
         """
         possible_trains = self.get_free_trains(passenger=passenger)
-        try:
-            best_train = (possible_trains[0], sys.maxsize)  # tuple: (train, distance of train to passenger)
-        except IndexError:
-            return
+        dummy_train = Train("", "", 0, 0)
+        best_train = (dummy_train, sys.maxsize)  # tuple: (train, distance of train to passenger)
 
         for train in possible_trains:
             train_pos = self.df[train.id + "-position"].iloc[self.time]
@@ -278,9 +311,13 @@ class SimpleAlgorithmSolver(ISolver):
             # and return nearest train:
             if distance_to_passenger < best_train[1]:
                 best_train = (train, distance_to_passenger)
-        return best_train[0]
+        if best_train[0] != dummy_train:
+            return best_train[0]
+        else:
+            raise NoTrainChosen
 
     def set_checked_false(self):
+        """ Sets the attribute 'checked' to false for all trains (in self.df) at the current point of time."""
         for column in self.df.filter(regex="^T\\d+-checked$"):
             self.df[column].iloc[self.time] = False
 
