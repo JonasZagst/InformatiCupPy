@@ -12,7 +12,6 @@ class AdvancedDijkstraAlgorithm(ISolver):
     #  - implement the ability of trains to pass a station without stopping to save some time
     #  - passenger priority based on target time, group size
     #  - take more passengers in one train
-    #  - improve calculation time using a database for already calculated shortest paths
 
     def __init__(self, input_from_file):
         self.stations = input_from_file[0]
@@ -28,15 +27,18 @@ class AdvancedDijkstraAlgorithm(ISolver):
         file_solvable = False
         time = 0
         delay_cumulated = 0
+
+        # prioritize passengers with low target_time by sorting the list
+        self.passengers.sort(key=lambda x: x.target_time)
+
+        # setting up the dictionary which will contain already calculated paths
         path_dict = {}
 
         for s in self.stations:
             path_dict[s.id] = None
 
-        # setting up the Graph
-        graph = Graph()
-        helper = Helper()
-        graph = helper.set_up_graph(self.stations, self.lines)
+        # setting up the graph
+        graph = Helper.set_up_graph(self.stations, self.lines)
 
         train_placed = False
 
@@ -107,8 +109,6 @@ class AdvancedDijkstraAlgorithm(ISolver):
                         print("something went wrong... your train didn't travel to the passenger")
         else:
             print("Input file is not solvable with this algorithm")
-
-        print(path_dict)
 
         return delay_cumulated
 

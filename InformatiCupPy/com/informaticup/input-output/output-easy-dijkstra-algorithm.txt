@@ -1,31 +1,53 @@
 [Train:T1]
 2 Depart L1
-6 Depart L2
-11 Depart L3
-13 Depart L3
-15 Depart L3
-17 Depart L3
-18 Depart L2
-24 Depart L1
-30 Depart L1
-34 Depart L2
+6 Depart L10
+8 Depart L11
+14 Depart L11
+19 Depart L10
+21 Depart L2
+26 Depart L6
+28 Depart L7
+34 Depart L7
+40 Depart L6
+41 Depart L2
+47 Depart L2
+52 Depart L6
+54 Depart L7
+60 Depart L7
+66 Depart L6
+67 Depart L2
 
 [Train:T2]
-5 Depart L1
+
+[Train:T3]
+
+[Train:T4]
+
+[Train:T5]
+
+[Train:T6]
+
+[Train:T7]
+
+[Train:T8]
 
 [Passenger:P1]
 1 Board T1
-12 Detrain
+13 Detrain
 
 [Passenger:P2]
-14 Board T1
-16 Detrain
+27 Board T1
+33 Detrain
 
 [Passenger:P3]
-23 Board T1
-28 Detrain
+39 Board T1
+46 Detrain
 
 [Passenger:P4]
-29 Board T1
-39 Detrain
+53 Board T1
+59 Detrain
+
+[Passenger:P5]
+65 Board T1
+72 Detrain
 
