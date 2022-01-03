@@ -1,3 +1,4 @@
+import copy
 import math
 from collections import deque
 
@@ -9,9 +10,8 @@ from InformatiCupPy.com.informaticup.python.algorithms.ISolver import ISolver
 class AdvancedDijkstraAlgorithm(ISolver):
 
     # TODO: improve the easy version of this algorithm with the following ideas:
-    #  - implement the ability of trains to pass a station without stopping to save some time
-    #  - passenger priority based on target time, group size
-    #  - take more passengers in one train
+    #  - (implement the ability of trains to pass a station without stopping to save some time)
+    #  - don't deliver passengers to early -> detrain them intelligent in the middle of the journey
 
     def __init__(self, input_from_file):
         self.stations = input_from_file[0]
@@ -28,11 +28,13 @@ class AdvancedDijkstraAlgorithm(ISolver):
         time = 0
         delay_cumulated = 0
 
-        # prioritize passengers with low target_time by sorting the list
+        # prioritize passengers/trains
         self.passengers.sort(key=lambda x: x.target_time)
+        self.trains.sort(key=lambda x: x.capacity, reverse=True)
 
         # setting up the dictionary which will contain already calculated paths
         path_dict = {}
+        shortest_paths = []
 
         for s in self.stations:
             path_dict[s.id] = None
@@ -91,6 +93,7 @@ class AdvancedDijkstraAlgorithm(ISolver):
                                                                                            mytrain.position,
                                                                                            p.initial_station, path_dict)
                         time = self.travelSelectedPath(time, list_of_path, list_of_lines, mytrain, None)
+                        shortest_paths.append(list_of_lines)
 
                     # getting the passenger to his target station
                     if mytrain.position == p.initial_station:
@@ -100,6 +103,7 @@ class AdvancedDijkstraAlgorithm(ISolver):
                         p.journey_history[time] = mytrain.id
                         time += 1
                         time = self.travelSelectedPath(time, list_of_path, list_of_lines, mytrain, p)
+                        shortest_paths.append(list_of_lines)
                         p.journey_history[time] = "Detrain"
                         if time - int(p.target_time) > 0:
                             delay_cumulated += time - int(p.target_time)
@@ -211,12 +215,14 @@ class AdvancedDijkstraAlgorithm(ISolver):
         """
         count = 0
 
-        helper = Helper()
+        # TODO: use the generated information to take passengers along the way
+        passengers_at_path = self.find_passengers_along_the_way(list_of_path)
 
         # putting station objects in instead of id's in resulting string of shortest path algorithm
         for n, station_id in enumerate(list_of_path):
-            s = helper.get_element_from_list_by_id(station_id, self.stations)
+            s = Helper.get_element_from_list_by_id(station_id, self.stations)
             list_of_path[n] = s
+
 
         for visited_lines in list_of_lines:
             count += 1
@@ -256,6 +262,27 @@ class AdvancedDijkstraAlgorithm(ISolver):
         :return: number of free capacity slots at the inspected station
         """
         return int(station.capacity) - len(self.check_trains_at_station(station))
+
+    def find_common_shortest_paths(self, shortest_paths):
+        # TODO: write algorithm to find small subsets of common shortest paths in the list of lists
+        i = 0
+
+    def find_passengers_along_the_way(self, list_of_path):
+        passengers_at_path = {}
+        passengers = copy.deepcopy(self.passengers)
+        for p in passengers:
+            if p.target_station == p.position:
+                passengers.remove(p)
+
+        passengers.sort(key=lambda x: x.initial_station)
+        for p in passengers:
+            if p.initial_station in list_of_path and p.target_station in list_of_path and list_of_path.index(p.initial_station) < list_of_path.index(p.target_station):
+                if not (p.initial_station in passengers_at_path):
+                    passengers_at_path[p.initial_station] = [p.id]
+                else:
+                    passengers_at_path[p.initial_station].append(p.id)
+
+        return passengers_at_path
 
     def get_name(self):
         """
