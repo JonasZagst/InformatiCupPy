@@ -63,7 +63,7 @@ class SimpleAlgorithmSolver(ISolver):
             self.time += 1
             self.add_new_row(self.time)
 
-        self.df.to_csv("algorithms\\df.csv")
+        self.df.to_csv("algorithms/df.csv")
 
     def add_new_row(self, time):
         try:
