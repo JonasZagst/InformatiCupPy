@@ -12,3 +12,7 @@ class NoPassengerChosen(Exception):
 
 class NoTrainChosen(Exception):
     pass
+
+
+class CannotSolveInput(Exception):
+    pass

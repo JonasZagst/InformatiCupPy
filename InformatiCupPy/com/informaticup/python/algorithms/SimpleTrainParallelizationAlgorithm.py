@@ -2,11 +2,12 @@ from InformatiCupPy.com.informaticup.python.algorithms.ISolver import ISolver
 from InformatiCupPy.com.informaticup.python.algorithms.EasyDijkstraAlgorithm import EasyDijkstraAlgorithm as Dij
 from InformatiCupPy.com.informaticup.python.algorithms.Helper import Helper
 from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotDepartTrain, NoPassengerChosen, \
-    NoTrainChosen, CannotBoardPassenger
+    NoTrainChosen, CannotBoardPassenger, CannotSolveInput
 from InformatiCupPy.com.informaticup.python.objects.Passenger import Passenger
 from InformatiCupPy.com.informaticup.python.objects.Train import Train
 import sys
 import pandas as pd
+import math
 
 
 class SimpleTrainParallelizationAlgorithm(ISolver):
@@ -56,7 +57,7 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
                     except NoPassengerChosen:
                         break
                     if self.time == 0:
-                        # do stuff for wildcard trains here
+                        self.set_wildcard_trains()
                         break
                     try:
                         chosen_train = self.get_nearest_possible_train(passenger=chosen_passenger, graph=graph)
@@ -171,11 +172,11 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
         except IndexError:
             length, stations, lines = \
                 Dij.calculate_shortest_path(graph, self.df[train.id + "-position"].iloc[start_time-1], target)
-        end_time = int(length / train.speed) + start_time
+        end_time = int(math.ceil(length / train.speed)) + start_time
         start_time_line = start_time
         for c in range(len(lines)):
             line = Helper.get_element_from_list_by_id(lines[c], self.lines)
-            end_time_line = int(line.length / train.speed) + start_time_line
+            end_time_line = int(math.ceil(line.length / train.speed)) + start_time_line
             can_depart = True
             for i in range(start_time_line, end_time_line):
                 self.add_new_row(i)
@@ -320,6 +321,39 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
         """ Sets the attribute 'checked' to false for all trains (in self.df) at the current point of time."""
         for column in self.df.filter(regex="^T\\d+-checked$"):
             self.df[column].iloc[self.time] = False
+
+    def set_wildcard_trains(self):
+        wildcard_trains = []
+        for train in self.trains:
+            if train.position == "*":
+                wildcard_trains.append(train)
+
+        if not wildcard_trains:
+            return
+
+        for passenger in self.passengers:
+            pos = self.df[passenger.id + "-position"].iloc[self.time]
+            station = Helper.get_element_from_list_by_id(pos, self.stations)
+            if station.capacity == self.df[pos + "-current_capacity"].iloc[self.time]:
+                self.df[wildcard_trains[0].id + "-position"] = pos
+                self.df[pos + "-current_capacity"].iloc[self.time] = \
+                    self.df[pos + "-current_capacity"].iloc[self.time] - 1
+                wildcard_trains[0].initial_position = pos
+                wildcard_trains.pop(0)
+                if not wildcard_trains:
+                    return
+
+        for station in self.stations:
+            if station.capacity > self.df[station.id + "-current_capacity"].iloc[self.time]:
+                self.df[wildcard_trains[0].id + "-position"] = station.id
+                self.df[station.id + "-current_capacity"].iloc[self.time] = \
+                    self.df[station.id + "-current_capacity"].iloc[self.time] - 1
+                wildcard_trains[0].initial_position = station.id
+                wildcard_trains.pop(0)
+                if not wildcard_trains:
+                    return
+
+        raise CannotSolveInput("Cannot solve input: too many wildcard trains for station capacities")
 
     def get_name(self):
         return "simple-algorithm"
