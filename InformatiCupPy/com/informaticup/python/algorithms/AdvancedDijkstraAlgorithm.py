@@ -28,6 +28,10 @@ class AdvancedDijkstraAlgorithm(ISolver):
         file_solvable = False
         time = 0
         delay_cumulated = 0
+        path_dict = {}
+
+        for s in self.stations:
+            path_dict[s.id] = None
 
         # setting up the Graph
         graph = Graph()
@@ -81,16 +85,16 @@ class AdvancedDijkstraAlgorithm(ISolver):
                 else:
                     # moving train to passenger
                     if self.trains[0].position != p.initial_station:
-                        length, list_of_path, list_of_lines = self.calculate_shortest_path(graph,
+                        length, list_of_path, list_of_lines, path_dict = self.calculate_shortest_path(graph,
                                                                                            self.trains[0].position,
-                                                                                           p.initial_station)
+                                                                                           p.initial_station, path_dict)
                         time = self.travelSelectedPath(time, list_of_path, list_of_lines, self.trains[0], None)
 
                     # getting the passenger to his target station
                     if self.trains[0].position == p.initial_station:
-                        length, list_of_path, list_of_lines = self.calculate_shortest_path(graph,
+                        length, list_of_path, list_of_lines, path_dict = self.calculate_shortest_path(graph,
                                                                                            self.trains[0].position,
-                                                                                           p.target_station)
+                                                                                           p.target_station, path_dict)
                         p.journey_history[time] = self.trains[0].id
                         time += 1
                         time = self.travelSelectedPath(time, list_of_path, list_of_lines, self.trains[0], p)
@@ -104,10 +108,12 @@ class AdvancedDijkstraAlgorithm(ISolver):
         else:
             print("Input file is not solvable with this algorithm")
 
+        print(path_dict)
+
         return delay_cumulated
 
     @staticmethod
-    def calculate_shortest_path(graph, start, target):
+    def calculate_shortest_path(graph, start, target, dict):
         """
         uses the dijkstra algorithm to calculate the shortest path from an initial station to all others
         and creates based on the return data an easy to read and handle output for one station
@@ -119,7 +125,16 @@ class AdvancedDijkstraAlgorithm(ISolver):
         if start == target:
             return 0, list(target), list()
 
-        visited, paths, names = AdvancedDijkstraAlgorithm.dijkstra(graph, start)
+        path_dict = dict
+
+        if path_dict[start] is not None:
+            visited = path_dict[start][0]
+            paths = path_dict[start][1]
+            names = path_dict[start][2]
+        else:
+            visited, paths, names = AdvancedDijkstraAlgorithm.dijkstra(graph, start)
+            path_dict[start] = [visited, paths, names]
+
         full_path = deque()
         full_names = deque()
 
@@ -135,7 +150,7 @@ class AdvancedDijkstraAlgorithm(ISolver):
         full_path.append(target)
         full_names.append(names[full_path[-2], full_path[-1]])
 
-        return visited[target], list(full_path), list(full_names)
+        return visited[target], list(full_path), list(full_names), path_dict
 
     # inspired by:
     @staticmethod

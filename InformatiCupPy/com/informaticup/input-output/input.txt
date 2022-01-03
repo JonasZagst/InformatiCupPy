@@ -16,10 +16,11 @@ L3 S3 S4 1 1
 [Trains]
 T1 S1 1 10
 T2 S2 2 10
-T3 S3 2 10
-T4 S4 2 10
 
 
 # Passagiere: str(ID) str(Startbahnhof) str(Zielbahnhof) int(Gruppengröße) int(Ankunftszeit)
 [Passengers]
 P1 S1 S4 10 5
+P2 S3 S4 10 2
+P3 S2 S1 10 2
+P4 S1 S3 10 2
