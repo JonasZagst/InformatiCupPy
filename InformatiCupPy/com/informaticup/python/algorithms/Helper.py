@@ -4,7 +4,7 @@ from InformatiCupPy.com.informaticup.python.algorithms.Graph import Graph
 class Helper:
     @staticmethod
     def get_element_from_list_by_id(element_id, list_):
-        """ Easy way to get an object (Train, Passenger, Line or Station) from their respective id.
+        """ Easy way to get an object (Train, Passenger, Line or Station) from its respective id.
             Sorts list by id, calculates index = id - 1 and gets element from list at index = index.
             More efficient than using a for-each-loop each time a object for a given id is needed.
             :param element_id: id of the object you want to get (e.g. 'S1' or 'P12')
