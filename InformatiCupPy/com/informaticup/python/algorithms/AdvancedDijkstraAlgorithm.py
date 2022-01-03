@@ -80,26 +80,26 @@ class AdvancedDijkstraAlgorithm(ISolver):
         if file_solvable:
             for p in self.passengers:
                 # evaluate passenger group size
-                if self.trains[0].capacity < p.group_size:
+                if mytrain.capacity < p.group_size:
                     print("Passenger", p.id, "cannot be transported by the used train. "
                                              "It will be skipped, because this algorithm provides no "
                                              "optional solution.")
                 else:
                     # moving train to passenger
-                    if self.trains[0].position != p.initial_station:
+                    if mytrain.position != p.initial_station:
                         length, list_of_path, list_of_lines, path_dict = self.calculate_shortest_path(graph,
-                                                                                           self.trains[0].position,
+                                                                                           mytrain.position,
                                                                                            p.initial_station, path_dict)
-                        time = self.travelSelectedPath(time, list_of_path, list_of_lines, self.trains[0], None)
+                        time = self.travelSelectedPath(time, list_of_path, list_of_lines, mytrain, None)
 
                     # getting the passenger to his target station
-                    if self.trains[0].position == p.initial_station:
+                    if mytrain.position == p.initial_station:
                         length, list_of_path, list_of_lines, path_dict = self.calculate_shortest_path(graph,
-                                                                                           self.trains[0].position,
+                                                                                           mytrain.position,
                                                                                            p.target_station, path_dict)
-                        p.journey_history[time] = self.trains[0].id
+                        p.journey_history[time] = mytrain.id
                         time += 1
-                        time = self.travelSelectedPath(time, list_of_path, list_of_lines, self.trains[0], p)
+                        time = self.travelSelectedPath(time, list_of_path, list_of_lines, mytrain, p)
                         p.journey_history[time] = "Detrain"
                         if time - int(p.target_time) > 0:
                             delay_cumulated += time - int(p.target_time)
