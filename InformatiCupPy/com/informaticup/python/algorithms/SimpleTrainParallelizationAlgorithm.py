@@ -49,7 +49,6 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
         while self.check_break_condition():
             print(self.time)
             inner_loop_index = 0
-            self.set_checked_false()
             while self.check_inner_break_condition() and inner_loop_index <= self.max_parallelization_coefficient:
                 if self.get_free_trains():
                     try:
@@ -67,9 +66,9 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
                     chosen_passenger_pos = self.df[chosen_passenger.id + "-position"].iloc[self.time]
                     if chosen_passenger_pos == chosen_train_pos:
                         try:
+                            self.board_passenger(chosen_passenger, chosen_train)
                             end_time = \
                                 self.depart_train(chosen_train, chosen_passenger.target_station, self.time + 1, graph)
-                            self.board_passenger(chosen_passenger, chosen_train)
                             self.detrain_passenger(chosen_passenger, chosen_train, end_time)
                         except CannotDepartTrain:
                             pass
@@ -100,6 +99,10 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
             self.df.iloc[time]
         except IndexError:
             self.df = self.df.append(self.df.iloc[time - 1], ignore_index=True)
+            for column in self.df.filter(regex="^T\\d+-status$"):
+                self.df[column].iloc[time] = ""
+            for column in self.df.filter(regex="^T\\d+-checked$"):
+                self.df[column].iloc[time] = False
 
     def board_passenger(self, passenger, train):
         """ Boards a passenger on a specific train. Adds boarding to the passengers journey_history and
@@ -108,6 +111,9 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
             :param train: train on which the passenger should be boarded.
         """
         passenger.journey_history[self.time] = train.id
+        if self.df[train.id + "-status"].iloc[self.time] != "":
+            raise CannotBoardPassenger()
+        self.df[train.id + "-status"].iloc[self.time] = "boarded"
         for i in range(self.time, len(self.df)):
             self.df[train.id + "-current_capacity"].iloc[i] = \
                 self.df[train.id + "-current_capacity"].iloc[i] - passenger.group_size
@@ -166,12 +172,15 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
 
     def depart_train(self, train, target, start_time, graph):
         self.df[train.id + "-checked"].iloc[self.time] = True
+        self.add_new_row(start_time)
+        if self.df[train.id + "-status"].iloc[start_time] != "":
+            raise CannotDepartTrain
         try:
             length, stations, lines = \
                 Dij.calculate_shortest_path(graph, self.df[train.id + "-position"].iloc[start_time], target)
         except IndexError:
             length, stations, lines = \
-                Dij.calculate_shortest_path(graph, self.df[train.id + "-position"].iloc[start_time-1], target)
+                Dij.calculate_shortest_path(graph, self.df[train.id + "-position"].iloc[start_time - 1], target)
         end_time = int(math.ceil(length / train.speed)) + start_time
         start_time_line = start_time
         for c in range(len(lines)):
@@ -185,6 +194,7 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
                     break
             if can_depart:
                 train.journey_history[start_time_line] = line.id
+                self.df[train.id + "-status"].iloc[start_time_line] = "departed"
                 for i in range(start_time_line, end_time_line):
                     self.df[stations[c] + "-current_capacity"].iloc[i] = \
                         self.df[stations[c] + "-current_capacity"].iloc[i] + 1
@@ -216,7 +226,11 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
             Adds 'Detrain' to the passengers journey history (and therefore to the output, later).
             Sets all attributes that are affected by detrain-action to the respective values in self.df."""
         self.add_new_row(time)
+        if self.df[train.id + "-status"].iloc[time] != "":
+            time += 1
+            self.add_new_row(time)
         passenger.journey_history[time] = "Detrain"
+        self.df[train.id + "-status"].iloc[time] = "detrained"
         self.df[train.id + "-passengers"].iloc[time] = \
             self.df[train.id + "-passengers"].iloc[time].replace(passenger.id + ";", "")
         self.df[passenger.id + "-is_in_train"].iloc[time] = False
@@ -259,11 +273,13 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
             columns.append(train.id + "-position")
             columns.append(train.id + "-is_on_line")
             columns.append(train.id + "-checked")  # boolean: true if algorithm already tried to depart that train
+            columns.append(train.id + "-status")  # str: boarded/departed/detrained, to avoid 2 actions at the same time
             row_0.append(train.current_capacity)
             row_0.append("")  # no passengers in trains = empty string
             row_0.append(train.position)
             row_0.append(train.is_on_line)
             row_0.append(False)
+            row_0.append("")
 
         for passenger in self.passengers:
             columns.append(passenger.id + "-position")
@@ -285,7 +301,7 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
         group_size = 0 if passenger is None else passenger.group_size
         for train in self.trains:
             if self.df[train.id + "-current_capacity"].iloc[self.time] - int(group_size) >= 0 \
-                    and self.df[train.id + "-passengers"].iloc[self.time] == ""\
+                    and self.df[train.id + "-passengers"].iloc[self.time] == "" \
                     and not self.df[train.id + "-is_on_line"].iloc[self.time]:
                 possible_trains.append(train)
         return possible_trains
@@ -316,11 +332,6 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
             return best_train[0]
         else:
             raise NoTrainChosen
-
-    def set_checked_false(self):
-        """ Sets the attribute 'checked' to false for all trains (in self.df) at the current point of time."""
-        for column in self.df.filter(regex="^T\\d+-checked$"):
-            self.df[column].iloc[self.time] = False
 
     def set_wildcard_trains(self):
         wildcard_trains = []
