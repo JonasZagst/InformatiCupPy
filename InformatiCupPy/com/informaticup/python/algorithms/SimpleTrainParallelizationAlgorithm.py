@@ -63,7 +63,16 @@ class SimpleAlgorithmSolver(ISolver):
             self.time += 1
             self.add_new_row(self.time)
 
-        self.df.to_csv("algorithms/df.csv")
+        # self.df.to_csv("algorithms\\df.csv")
+        delay = 0
+        for passenger in self.passengers:
+            for i in range(len(self.df)):
+                pos = self.df[passenger.id + "-position"].iloc[i]
+                if passenger.target_station == pos:
+                    passenger_delay = i - passenger.target_time
+                    if passenger_delay > 0:
+                        delay += passenger_delay
+        return delay
 
     def add_new_row(self, time):
         try:
