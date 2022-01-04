@@ -11,7 +11,7 @@ class Helper:
             :param list_: list of all stations/lines/trains/passengers, depending on what kind of object you search for
             :returns searched object (as Train/Passenger/Line/Passenger-Object)
         """
-        list_.sort(key=lambda x: x.id)
+        list_.sort(key=lambda x: int(x.id[1:]))
         index = int(element_id[1:]) - 1
         return list_[index]
 
