@@ -1,12 +1,18 @@
+import sys
+
 from InformatiCupPy.com.informaticup.python.objects.Passenger import Passenger
 from InformatiCupPy.com.informaticup.python.objects.Train import Train
+from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotSolveInput
 
 
 class OutputParser:
     @staticmethod
     def parse_output_files(solvers: list, input):
         for solver in solvers:
-            delay_accumulated = solver.solve()
+            try:
+                delay_accumulated = solver.solve()
+            except CannotSolveInput:
+                delay_accumulated = sys.maxsize
             output_str = ""
 
             # performance rating of the distinct algorithms used
