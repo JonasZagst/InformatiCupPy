@@ -90,7 +90,8 @@ class AdvancedDijkstraAlgorithm(ISolver):
                                                                                                       mytrain.position,
                                                                                                       p.initial_station,
                                                                                                       path_dict)
-                        time = self.travelSelectedPath(time, list_of_path, list_of_lines, mytrain, None)
+                        time, delay = self.travelSelectedPath(time, list_of_path, list_of_lines, mytrain, None)
+                        delay_cumulated += delay
                         shortest_paths.append(list_of_lines)
 
                     # getting the passenger to his target station
@@ -101,11 +102,10 @@ class AdvancedDijkstraAlgorithm(ISolver):
                                                                                                       path_dict)
                         # p.journey_history[time] = mytrain.id
                         time += 1
-                        time = self.travelSelectedPath(time, list_of_path, list_of_lines, mytrain, p)
+                        time, delay = self.travelSelectedPath(time, list_of_path, list_of_lines, mytrain, p)
                         shortest_paths.append(list_of_lines)
                         # p.journey_history[time] = "Detrain"
-                        if time - int(p.target_time) > 0:
-                            delay_cumulated += time - int(p.target_time)
+                        delay_cumulated += delay
 
                         time += 1
                     else:
@@ -213,6 +213,7 @@ class AdvancedDijkstraAlgorithm(ISolver):
         :return: end time after travelling process
         """
         count = 0
+        delay_cumulated = 0
         passengers = []
 
         passengers_at_path = self.find_passengers_along_the_way(list_of_path)
@@ -242,6 +243,8 @@ class AdvancedDijkstraAlgorithm(ISolver):
 
                 if p.position == p.target_station and not p.reached_target:
                     train.capacity = train.capacity + p.group_size
+                    if time - int(p.target_time) > 0:
+                        delay_cumulated += time - int(p.target_time)
                     p.reached_target = True
                     detrained = True
                     p.journey_history[time] = "Detrain"
@@ -265,6 +268,8 @@ class AdvancedDijkstraAlgorithm(ISolver):
                 p.position = list_of_path[count].id
             if p.position == p.target_station and not p.reached_target:
                 train.capacity = train.capacity + p.group_size
+                if time - int(p.target_time) > 0:
+                    delay_cumulated += time - int(p.target_time)
                 p.reached_target = True
                 detrained = True
                 p.journey_history[time] = "Detrain"
@@ -272,7 +277,7 @@ class AdvancedDijkstraAlgorithm(ISolver):
         if detrained:
             time += 1
 
-        return int(time)
+        return int(time), int(delay_cumulated)
 
     def check_trains_at_station(self, station):
         """

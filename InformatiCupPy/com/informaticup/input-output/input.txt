@@ -36,8 +36,8 @@ T8 S8 1 20
 
 # Passagiere: str(ID) str(Startbahnhof) str(Zielbahnhof) int(Gruppengröße) int(Ankunftszeit)
 [Passengers]
-P1 S1 S8 20 4
-P2 S2 S8 20 5
-P3 S2 S3 30 2
-P4 S4 S1 20 20
-P5 S1 S8 30 40
+P1 S1 S8 4 4
+P2 S2 S8 4 5
+P3 S2 S3 4 2
+P4 S4 S1 4 20
+P5 S1 S8 4 40
