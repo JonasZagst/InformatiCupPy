@@ -22,7 +22,9 @@ def main():
 
     # creates a list (length 4) of lists (length x), which contains several object parsed from the input file
     input = InputParser("../input-output/input.txt").parse_input()
-    solvers = [EasyDijkstraAlgorithm(copy.deepcopy(input)), AdvancedDijkstraAlgorithm(copy.deepcopy(input)),
+    solvers = [EasyDijkstraAlgorithm(copy.deepcopy(input)),
+               AdvancedDijkstraAlgorithm(copy.deepcopy(input)),
+               SimpleTrainParallelizationAlgorithm(copy.deepcopy(input), parallelization_factor=0.2, runtime_limit=5),
                SimpleTrainParallelizationAlgorithm(copy.deepcopy(input))]
     OutputParser.parse_output_files(solvers, input)
 

@@ -8,6 +8,7 @@ from InformatiCupPy.com.informaticup.python.objects.Train import Train
 import sys
 import pandas as pd
 import math
+from datetime import datetime, timedelta
 
 
 class SimpleTrainParallelizationAlgorithm(ISolver):
@@ -28,28 +29,34 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
     #       -für verschiedene Inputs testen und anpassen
     #       -finalen Dataframe plotten und evtl. zusammenhänge/optimierungsideen finden
 
-    def __init__(self, input_from_file):
+    def __init__(self, input_from_file, parallelization_factor=1.0, runtime_limit=15):
         self.stations = input_from_file[0]
         self.lines = input_from_file[1]
         self.trains = input_from_file[2]
         self.passengers = input_from_file[3]
         self.time = 0
         self.df = self.generate_data_frame()
+        self.runtime_limit = runtime_limit
         self.max_parallelization_coefficient = min(len(self.stations), len(self.lines), len(self.passengers))
+        self.parallelization_factor = parallelization_factor
 
     def solve(self):
         """ Solves the input problem. Includes the graph set-up (needed for dijkstra) and the main loop
             of the algorithm (more details in class description). Calculates, moreover, the delay time of the solution.
             :returns: delay time.
         """
+        algorithm_starting_time = datetime.now()
+
         # setting up the graph
         graph = Helper.set_up_graph(self.stations, self.lines)
 
         # starting solving algorithm/loop
         while self.check_break_condition():
+            self.check_algorithm_runtime(algorithm_starting_time)
             print(self.time)
             inner_loop_index = 0
-            while self.check_inner_break_condition() and inner_loop_index <= self.max_parallelization_coefficient:
+            while self.check_inner_break_condition() \
+                    and inner_loop_index <= max(1.0, self.max_parallelization_coefficient * self.parallelization_factor):
                 if self.get_free_trains():
                     try:
                         chosen_passenger = self.choose_next_passenger()
@@ -169,6 +176,10 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
             return next_passenger
         else:
             raise NoPassengerChosen()
+
+    def check_algorithm_runtime(self, algorithm_starting_time):
+        if datetime.now()-algorithm_starting_time > timedelta(minutes=self.runtime_limit):
+            raise CannotSolveInput
 
     def depart_train(self, train, target, start_time, graph):
         self.df[train.id + "-checked"].iloc[self.time] = True
@@ -364,10 +375,10 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
                 if not wildcard_trains:
                     return
 
-        raise CannotSolveInput("Cannot solve input: too many wildcard trains for station capacities")
+        raise CannotSolveInput()  # Cannot solve input: too many wildcard trains for station capacities
 
     def get_name(self):
-        return "simple-algorithm"
+        return f"simple-train-parallelization-algorithm-{str(self.parallelization_factor)}-{str(self.runtime_limit)}"
 
     def get_trains_and_passengers(self) -> list:
         return [self.trains, self.passengers]
