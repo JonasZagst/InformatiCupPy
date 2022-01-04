@@ -15,6 +15,7 @@ class Passenger:
         self.position = initial_station
         # true if passenger currently in a train, else false
         self.is_in_train = False
+        self.reached_target = False
         self.journey_history = {}
 
     """Returns objects properties as String fitting the input format."""
