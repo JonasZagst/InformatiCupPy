@@ -13,7 +13,6 @@ class AdvancedDijkstraAlgorithm(ISolver):
     #  - (implement the ability of trains to pass a station without stopping to save some time)
     #  - don't deliver passengers to early -> detrain them intelligent in the middle of the journey
     #  - capacity of lines/stations should also be changed (like train capacity) -> goal: use more than one train
-    #  - implement runtime limit
 
     def __init__(self, input_from_file):
         self.stations = input_from_file[0]
@@ -103,11 +102,9 @@ class AdvancedDijkstraAlgorithm(ISolver):
                                                                                                       mytrain.position,
                                                                                                       p.target_station,
                                                                                                       path_dict)
-                        # p.journey_history[time] = mytrain.id
                         time += 1
                         time, delay = self.travelSelectedPath(time, list_of_path, list_of_lines, mytrain, p)
                         shortest_paths.append(list_of_lines)
-                        # p.journey_history[time] = "Detrain"
                         delay_cumulated += delay
 
                         time += 1
@@ -237,7 +234,7 @@ class AdvancedDijkstraAlgorithm(ISolver):
 
             detrained = False
             for p in passengers:
-                if not p.is_in_train and train.capacity > p.group_size:
+                if not p.is_in_train and train.capacity >= p.group_size:
                     p.journey_history[time] = train.id
                     train.capacity = train.capacity - p.group_size
                     p.is_in_train = True

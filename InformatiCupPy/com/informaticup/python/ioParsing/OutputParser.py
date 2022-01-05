@@ -31,7 +31,7 @@ class OutputParser:
             output_str = ""
 
             try:
-                with time_limit(5, 'sleep'):
+                with time_limit(600, 'sleep'):
                     delay_accumulated = solver.solve()
 
                     # performance rating of the distinct algorithms used
