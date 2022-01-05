@@ -4,6 +4,7 @@ from collections import deque
 
 from InformatiCupPy.com.informaticup.python.algorithms.Helper import Helper
 from InformatiCupPy.com.informaticup.python.algorithms.ISolver import ISolver
+from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotSolveInput, CannotBoardPassenger
 
 
 class AdvancedDijkstraAlgorithm(ISolver):
@@ -11,6 +12,8 @@ class AdvancedDijkstraAlgorithm(ISolver):
     # TODO: improve the easy version of this algorithm with the following ideas:
     #  - (implement the ability of trains to pass a station without stopping to save some time)
     #  - don't deliver passengers to early -> detrain them intelligent in the middle of the journey
+    #  - capacity of lines/stations should also be changed (like train capacity) -> goal: use more than one train
+    #  - implement runtime limit
 
     def __init__(self, input_from_file):
         self.stations = input_from_file[0]
@@ -82,7 +85,7 @@ class AdvancedDijkstraAlgorithm(ISolver):
             for p in self.passengers:
                 # evaluate passenger group size
                 if mytrain.capacity < p.group_size:
-                    print("Passenger", p.id, "cannot be transferred due to a to big group_size")
+                    raise CannotSolveInput()
                 elif p.position != p.target_station:
                     # moving train to passenger
                     if mytrain.position != p.initial_station:
@@ -109,9 +112,9 @@ class AdvancedDijkstraAlgorithm(ISolver):
 
                         time += 1
                     else:
-                        print("something went wrong... your train didn't travel to the passenger")
+                        raise CannotBoardPassenger()
         else:
-            print("Input file is not solvable with this algorithm")
+            raise CannotSolveInput()
 
         return delay_cumulated
 

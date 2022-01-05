@@ -19,22 +19,6 @@
 [Train:T2]
 5 Depart L1
 
-[Train:T3]
-42 Depart L2
-
-[Train:T4]
-49 Depart L4
-
-[Train:T5]
-
-[Train:T6]
-
-[Train:T7]
-7 Depart L10
-
-[Train:T8]
-12 Depart L11
-
 [Passenger:P1]
 1 Board T1
 13 Detrain

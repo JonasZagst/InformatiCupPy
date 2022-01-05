@@ -1,6 +1,7 @@
 import math
 from collections import deque
 
+from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotSolveInput, CannotBoardPassenger
 from InformatiCupPy.com.informaticup.python.algorithms.Graph import Graph
 from InformatiCupPy.com.informaticup.python.algorithms.ISolver import ISolver
 from InformatiCupPy.com.informaticup.python.algorithms.Helper import Helper
@@ -76,9 +77,7 @@ class EasyDijkstraAlgorithm(ISolver):
             for p in self.passengers:
                 # evaluate passenger group size
                 if self.trains[0].capacity < p.group_size:
-                    print("Passenger", p.id, "cannot be transported by the used train. "
-                                             "It will be skipped, because this algorithm provides no "
-                                             "optional solution.")
+                    raise CannotSolveInput()
                 else:
                     # moving train to passenger
                     if self.trains[0].position != p.initial_station:
@@ -101,9 +100,9 @@ class EasyDijkstraAlgorithm(ISolver):
 
                         time += 1
                     else:
-                        print("something went wrong... your train didn't travel to the passenger")
+                        raise CannotBoardPassenger()
         else:
-            print("Input file is not solvable")
+            raise CannotSolveInput()
 
         return delay_cumulated
 

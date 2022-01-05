@@ -1,37 +1,75 @@
+import _thread
+import signal
 import sys
+import threading
+from contextlib import contextmanager
 
 from InformatiCupPy.com.informaticup.python.objects.Passenger import Passenger
 from InformatiCupPy.com.informaticup.python.objects.Train import Train
-from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotSolveInput
+from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotSolveInput, TimeoutException
 
 
 class OutputParser:
     @staticmethod
     def parse_output_files(solvers: list, input):
-        for solver in solvers:
+
+        @contextmanager
+        def time_limit(seconds, msg=''):
+            timer = threading.Timer(seconds, lambda: _thread.interrupt_main())
+            timer.start()
             try:
-                delay_accumulated = solver.solve()
-            except CannotSolveInput:
-                delay_accumulated = sys.maxsize
+                yield
+            except KeyboardInterrupt:
+                raise TimeoutException("Timed out for operation {}".format(msg))
+            finally:
+                # if the action ends in specified time, timer is canceled
+                timer.cancel()
+
+        best_delay_time = sys.maxsize
+
+        for solver in solvers:
             output_str = ""
 
-            # performance rating of the distinct algorithms used
-            print(solver.get_name() + " - accumulated delay time: " + str(delay_accumulated))
+            try:
+                with time_limit(5, 'sleep'):
+                    delay_accumulated = solver.solve()
 
-            for i in solver.get_trains_and_passengers()[0]:
-                if isinstance(i, Train):
-                    output_str += i.to_output()
+                    # performance rating of the distinct algorithms used
+                    print(solver.get_name() + " - accumulated delay time: " + str(delay_accumulated))
 
-            for i in solver.get_trains_and_passengers()[1]:
-                if isinstance(i, Passenger):
-                    output_str += i.to_output()
+                    for i in solver.get_trains_and_passengers()[0]:
+                        if isinstance(i, Train):
+                            output_str += i.to_output()
+
+                    for i in solver.get_trains_and_passengers()[1]:
+                        if isinstance(i, Passenger):
+                            output_str += i.to_output()
+
+            except CannotSolveInput:
+                delay_accumulated = sys.maxsize
+            except TimeoutException:
+                print(solver.get_name() + " --- execution timed out ----")
+                output_str = "--- execution timed out ---- \n \n"
+
+            if best_delay_time > delay_accumulated:
+                best_delay_time = delay_accumulated
+                output_file = open("../input-output/output.txt", "w+")
+                output_file.write(output_str)
+                output_file.close()
 
             file = open("../input-output/output-" + solver.get_name() + ".txt", "w+")
             file.write(output_str)
             file.close()
+
+        if best_delay_time == sys.maxsize:
+            output_file = open("../input-output/output.txt", "w+")
+            output_file.write("input file is not solvable")
+            output_file.close()
 
     @staticmethod
     def prepare_output_file():
         # just an idea... maybe add general output file syntax here
         output_str = ""
         return output_str
+
+

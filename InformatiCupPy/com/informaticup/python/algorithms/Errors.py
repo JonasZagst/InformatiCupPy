@@ -16,3 +16,8 @@ class NoTrainChosen(Exception):
 
 class CannotSolveInput(Exception):
     pass
+
+
+class TimeoutException(Exception):
+    def __init__(self, msg=''):
+        self.msg = msg
