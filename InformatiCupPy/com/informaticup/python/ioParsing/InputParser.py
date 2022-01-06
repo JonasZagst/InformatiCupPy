@@ -6,8 +6,8 @@ from InformatiCupPy.com.informaticup.python.objects.Train import Train
 
 class InputParser:
 
-    def __init__(self, input_str):
-        self.input = input_str.split("\n")
+    def __init__(self, input_path):
+        self.input = open(input_path, "r").read().split("\n")
 
     """Parses stations form input and creates station objects with the input parameters and returns them as list."""
 

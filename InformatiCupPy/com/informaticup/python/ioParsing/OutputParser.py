@@ -52,23 +52,23 @@ class OutputParser:
 
             if best_delay_time > delay_accumulated:
                 best_delay_time = delay_accumulated
-                output_file = open("../input-output/output.txt", "w+")
+                output_file = open("InformatiCupPy/com/informaticup/input-output/output.txt", "w+")
                 output_file.write(output_str)
                 output_file.close()
 
-            file = open("../input-output/output-" + solver.get_name() + ".txt", "w+")
+            file = open("InformatiCupPy/com/informaticup/input-output/output-" + solver.get_name() + ".txt", "w+")
             file.write(output_str)
             file.close()
 
         if best_delay_time == sys.maxsize:
-            output_file = open("../input-output/output.txt", "w+")
+            output_file = open("InformatiCupPy/com/informaticup/input-output/output.txt", "w+")
             output_file.write("input file is not solvable")
             output_file.close()
 
-    @staticmethod
-    def prepare_output_file():
-        # just an idea... maybe add general output file syntax here
-        output_str = ""
         return output_str
+
+    @staticmethod
+    def parse_output_files_to_stdout(solvers: list, input):
+        sys.stdout = OutputParser.parse_output_files(solvers, input)
 
 
