@@ -24,15 +24,15 @@ def main():
     # input_str = open("InformatiCupPy/com/informaticup/input-output/input.txt", "r").read()
 
     # creates a list (length 4) of lists (length x), which contains several object parsed from the input file
-    # input = InputParser("input.txt").parse_input()
-    input = InputParser(sys.stdin.read()).parse_input()
+    input = InputParser("InformatiCupPy/com/informaticup/input-output/input.txt").parse_input()
+    # input = InputParser(sys.stdin.read()).parse_input()
     solvers = [EasyDijkstraAlgorithm(copy.deepcopy(input)),
                AdvancedDijkstraAlgorithm(copy.deepcopy(input)),
                SimpleTrainParallelizationAlgorithm(copy.deepcopy(input), set_wildcards=0),
                SimpleTrainParallelizationAlgorithm(copy.deepcopy(input), parallelization_factor=0.2),
                SimpleTrainParallelizationAlgorithm(copy.deepcopy(input))]
-    # OutputParser.parse_output_files(solvers, input)
-    OutputParser.parse_output_files_to_stdout(solvers, input)
+    OutputParser.parse_output_files(solvers, input)
+    # OutputParser.parse_output_files_to_stdout(solvers, input)
 
 
 main()
