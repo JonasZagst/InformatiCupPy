@@ -34,7 +34,7 @@ class OutputParser:
                     delay_accumulated = solver.solve()
 
                     # performance rating of the distinct algorithms used
-                    print(solver.get_name() + " - accumulated delay time: " + str(delay_accumulated))
+                    #print(solver.get_name() + " - accumulated delay time: " + str(delay_accumulated))
 
                     for i in solver.get_trains_and_passengers()[0]:
                         if isinstance(i, Train):
@@ -47,7 +47,7 @@ class OutputParser:
             except CannotSolveInput:
                 delay_accumulated = sys.maxsize
             except TimeoutException:
-                print(solver.get_name() + " --- execution timed out ----")
+                #print(solver.get_name() + " --- execution timed out ----")
                 output_str = "--- execution timed out ---- \n \n"
 
             if best_delay_time > delay_accumulated:
@@ -69,6 +69,7 @@ class OutputParser:
 
     @staticmethod
     def parse_output_files_to_stdout(solvers: list, input):
-        sys.stdout = OutputParser.parse_output_files(solvers, input)
-
+        OutputParser.parse_output_files(solvers, input)
+        print(open("InformatiCupPy/com/informaticup/input-output/output.txt", "r").read())
+        #sys.stdout = open("InformatiCupPy/com/informaticup/input-output/output.txt", "r").read()
 

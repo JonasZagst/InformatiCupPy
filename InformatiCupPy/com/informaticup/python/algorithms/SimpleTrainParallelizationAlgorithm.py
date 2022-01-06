@@ -49,7 +49,7 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
         try:
             # starting solving algorithm/loop
             while self.check_break_condition():
-                print(self.time)
+                #print(self.time)
                 inner_loop_index = 0  # set counter for inner loop = 0
                 while self.check_inner_break_condition() \
                         and inner_loop_index <= max(1.0,  # run inner loop at least one time
