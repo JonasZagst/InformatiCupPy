@@ -13,6 +13,8 @@ class AdvancedDijkstraAlgorithm(ISolver):
     #  - (implement the ability of trains to pass a station without stopping to save some time)
     #  - don't deliver passengers to early -> detrain them intelligent in the middle of the journey
     #  - capacity of lines/stations should also be changed (like train capacity) -> goal: use more than one train
+    #  - take passengers with you when swapping - take passengers just with you for just a part of the journey
+    #  - wildcard parameter
 
     def __init__(self, input_from_file):
         self.stations = input_from_file[0]
