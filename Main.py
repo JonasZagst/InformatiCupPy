@@ -34,5 +34,6 @@ def main():
     # OutputParser.parse_output_files(solvers, input)
     OutputParser.parse_output_files_to_stdout(solvers, input)
 
+    #Exec Docker: docker run -i trainpy < {Your Path to input.txt} > {path to txt file for output}
 
 main()
