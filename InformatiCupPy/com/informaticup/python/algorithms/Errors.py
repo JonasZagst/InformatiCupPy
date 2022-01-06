@@ -1,5 +1,6 @@
 class CannotDepartTrain(Exception):
-    pass
+    def __init__(self, time):
+        self.time = time
 
 
 class CannotBoardPassenger(Exception):
@@ -15,6 +16,10 @@ class NoTrainChosen(Exception):
 
 
 class CannotSolveInput(Exception):
+    pass
+
+
+class ProblemWithPassenger(Exception):
     pass
 
 
