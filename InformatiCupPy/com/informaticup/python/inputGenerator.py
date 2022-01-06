@@ -1,7 +1,9 @@
 import random
+
+import Main
 import ioParsing
 from InformatiCupPy.com.informaticup.python.algorithms.EasyDijkstraAlgorithm import EasyDijkstraAlgorithm
-from InformatiCupPy.com.informaticup.python.algorithms.SimpleAlgorithmSolver import SimpleAlgorithmSolver
+from InformatiCupPy.com.informaticup.python.algorithms.SimpleTrainParallelizationAlgorithm import SimpleTrainParallelizationAlgorithm
 from InformatiCupPy.com.informaticup.python.ioParsing.InputParser import InputParser
 from InformatiCupPy.com.informaticup.python.ioParsing.OutputParser import OutputParser
 
@@ -71,8 +73,9 @@ class inputGenerator:
 
         for i in range(1, self.numberOfFiles + 1):
             input = InputParser("../python/"+self.fileName + "_"+str(i)+".txt").parse_input()
-            solvers = [SimpleAlgorithmSolver("../python/"+self.fileName + "_"+str(i)+".txt"), EasyDijkstraAlgorithm("../python/"+self.fileName + "_"+str(i)+".txt")]
-            OutputParser.parse_output_files(solvers, input)
+            Main.main()
+            # solvers = [SimpleTrainParallelizationAlgorithm("../python/"+self.fileName + "_"+str(i)+".txt"), EasyDijkstraAlgorithm("../python/"+self.fileName + "_"+str(i)+".txt")]
+            # OutputParser.parse_output_files(solvers, input)
 
     def generateStations(self):
         self.inputFile.write("# Bahnhoefe: str(ID) int(Kapazitaet) \n")
