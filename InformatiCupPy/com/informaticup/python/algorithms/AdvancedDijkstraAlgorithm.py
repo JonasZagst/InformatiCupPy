@@ -33,15 +33,9 @@ class AdvancedDijkstraAlgorithm(ISolver):
         self.passengers.sort(key=lambda x: x.target_time)
         self.trains.sort(key=lambda x: x.capacity, reverse=True)
 
-        # setting up the dictionary which will contain already calculated paths
-        path_dict = {}
-        shortest_paths = []
-
-        for s in self.stations:
-            path_dict[s.id] = None
-
-        # setting up the graph
+        # setting up the graph and a path dictionary
         graph = Helper.set_up_graph(self.stations, self.lines)
+        path_dict = Helper.set_up_path_dict(self.stations)
 
         train_placed = False
 
@@ -94,7 +88,6 @@ class AdvancedDijkstraAlgorithm(ISolver):
                                                                                                       path_dict)
                         time, delay = self.travelSelectedPath(time, list_of_path, list_of_lines, mytrain, None)
                         delay_cumulated += delay
-                        shortest_paths.append(list_of_lines)
 
                     # getting the passenger to his target station
                     if mytrain.position == p.initial_station:
@@ -104,7 +97,6 @@ class AdvancedDijkstraAlgorithm(ISolver):
                                                                                                       path_dict)
                         time += 1
                         time, delay = self.travelSelectedPath(time, list_of_path, list_of_lines, mytrain, p)
-                        shortest_paths.append(list_of_lines)
                         delay_cumulated += delay
 
                         time += 1

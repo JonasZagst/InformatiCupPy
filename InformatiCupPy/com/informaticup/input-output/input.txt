@@ -29,13 +29,10 @@ L12 S8 S9 5 1
 [Trains]
 T1 S1 2 20
 T2 S2 1 20
-T3 S8 1 20
 
 
 # Passagiere: str(ID) str(Startbahnhof) str(Zielbahnhof) int(Gruppengröße) int(Ankunftszeit)
 [Passengers]
-P1 S1 S9 6 4
-P2 S2 S7 15 5
-P3 S2 S3 4 2
-P4 S4 S1 4 20
-P5 S1 S8 4 40
+P1 S1 S2 20 10
+P2 S1 S2 20 20
+P3 S1 S2 20 30

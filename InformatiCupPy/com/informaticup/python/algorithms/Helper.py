@@ -28,3 +28,12 @@ class Helper:
         for line in lines:
             graph.add_edge(line.connected_stations[0], line.connected_stations[1], int(line.length), line.id)
         return graph
+
+    @staticmethod
+    def set_up_path_dict(stations):
+        path_dict = {}
+
+        for s in stations:
+            path_dict[s.id] = None
+
+        return path_dict
