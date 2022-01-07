@@ -46,77 +46,74 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
             of the algorithm (more details in class description).
             :returns: total delay time.
         """
-        try:
-            # starting solving algorithm/loop
-            while self.check_break_condition():
-                print(self.time)
-                inner_loop_index = 0  # set counter for inner loop = 0
-                while self.check_inner_break_condition() \
-                        and inner_loop_index <= max(1.0,  # run inner loop at least one time
-                                                    self.max_parallelization_coefficient * self.parallelization_factor):
-                    if self.get_free_trains():  # if free trains left
-                        try:
-                            chosen_passenger = self.choose_next_passenger()  # choose next passenger by target time
-                        except NoPassengerChosen:
-                            break
-                        if self.time == 0:
-                            self.set_wildcard_trains()  # if time = 0, wildcard trains will be set
-                            break
-                        try:
-                            chosen_train = self.get_nearest_possible_train(passenger=chosen_passenger)  # choose nearest tr.
-                        except NoTrainChosen:
-                            break
-                        except ProblemWithPassenger:
-                            self.df[chosen_passenger.id + "-checked"].iloc[self.time] = True
-                            continue
+        # starting solving algorithm/loop
+        while self.check_break_condition():
+            print(self.time)
+            inner_loop_index = 0  # set counter for inner loop = 0
+            while self.check_inner_break_condition() and inner_loop_index <= \
+                    max(1.0, self.max_parallelization_coefficient * self.parallelization_factor):
 
-                        # get current position of chosen train and passenger
-                        chosen_train_pos = self.df[chosen_train.id + "-position"].iloc[self.time]
-                        chosen_passenger_pos = self.df[chosen_passenger.id + "-position"].iloc[self.time]
+                if self.time == 0:
+                    self.set_wildcard_trains()  # if time = 0, wildcard trains will be set
+                    break
 
-                        # boarding, departing and detraining:
-                        if chosen_passenger_pos == chosen_train_pos:  # if train and passenger on same station
-                            try:
-                                self.board_passenger(chosen_passenger, chosen_train)  # board passenger on train
-                                # depart train after boarding
-                                end_time = \
-                                    self.depart_train(chosen_train, chosen_passenger.target_station, self.time + 1)
-                                # detrain passenger after arriving at target station
-                                self.detrain_passenger(chosen_passenger, chosen_train, end_time)
-                            except CannotDepartTrain as c:
-                                self.detrain_passenger(chosen_passenger, chosen_train, c.time + 1)
-                                pass
-                            except CannotBoardPassenger:
-                                pass
-                        else:  # if passenger and train are not at the same station
-                            try:
-                                # bring train to passenger
-                                self.depart_train(chosen_train, chosen_passenger_pos, self.time)
-                            except CannotDepartTrain:
-                                pass
-
-                        inner_loop_index += 1
-
-                    else:
-                        break  # break inner loop if no free train available -> go on to next time step
-
-                self.time += 1  # go to next time step
-                self.add_new_row(self.time)  # add row (if needed) for new time step
-                self.df.to_csv("algorithms\\df.csv")
-
-            delay = 0
-            for passenger in self.passengers:
-                for i in range(len(self.df)):
-                    pos = self.df[passenger.id + "-position"].iloc[i]
-                    if passenger.target_station == pos:
-                        passenger_delay = i - passenger.target_time
-                        if passenger_delay > 0:
-                            delay += passenger_delay
+                if self.get_free_trains():  # if free trains left
+                    try:
+                        chosen_passenger = self.choose_next_passenger()  # choose next passenger by target time
+                    except NoPassengerChosen:
                         break
-            return delay
+                    try:
+                        chosen_train = self.get_nearest_possible_train(passenger=chosen_passenger)  # choose nearest tr.
+                    except NoTrainChosen:
+                        break
+                    except ProblemWithPassenger:
+                        self.df[chosen_passenger.id + "-checked"].iloc[self.time] = True
+                        continue
 
-        except Exception:
-            raise CannotSolveInput()
+                    # get current position of chosen train and passenger
+                    chosen_train_pos = self.df[chosen_train.id + "-position"].iloc[self.time]
+                    chosen_passenger_pos = self.df[chosen_passenger.id + "-position"].iloc[self.time]
+
+                    # boarding, departing and detraining:
+                    if chosen_passenger_pos == chosen_train_pos:  # if train and passenger on same station
+                        try:
+                            self.board_passenger(chosen_passenger, chosen_train)  # board passenger on train
+                            # depart train after boarding
+                            end_time = \
+                                self.depart_train(chosen_train, chosen_passenger.target_station, self.time + 1)
+                            # detrain passenger after arriving at target station
+                            self.detrain_passenger(chosen_passenger, chosen_train, end_time)
+                        except CannotDepartTrain as c:
+                            self.detrain_passenger(chosen_passenger, chosen_train, c.time + 1)
+                            pass
+                        except CannotBoardPassenger:
+                            pass
+                    else:  # if passenger and train are not at the same station
+                        try:
+                            # bring train to passenger
+                            self.depart_train(chosen_train, chosen_passenger_pos, self.time)
+                        except CannotDepartTrain:
+                            pass
+
+                    inner_loop_index += 1
+
+                else:
+                    break  # break inner loop if no free train available -> go on to next time step
+
+            self.time += 1  # go to next time step
+            self.add_new_row(self.time)  # add row (if needed) for new time step
+            self.df.to_csv("InformatiCupPy/com/informaticup/python/algorithms/df.csv")
+
+        delay = 0
+        for passenger in self.passengers:
+            for i in range(len(self.df)):
+                pos = self.df[passenger.id + "-position"].iloc[i]
+                if passenger.target_station == pos:
+                    passenger_delay = i - passenger.target_time
+                    if passenger_delay > 0:
+                        delay += passenger_delay
+                    break
+        return delay
 
     def add_new_row(self, time):
         """ Adds a new row for at index=time to the dataframe (self.df). If the row with this index does already exist,
