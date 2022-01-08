@@ -97,11 +97,10 @@ class AdvancedDijkstraAlgorithm(ISolver):
                                                                                                       mytrain.position,
                                                                                                       p.target_station,
                                                                                                       path_dict)
-                        time += 1
+
                         time, delay = self.travelSelectedPath(time, list_of_path, list_of_lines, mytrain, p)
                         delay_cumulated += delay
 
-                        time += 1
                     else:
                         raise CannotBoardPassenger()
         else:
@@ -227,11 +226,13 @@ class AdvancedDijkstraAlgorithm(ISolver):
                     passengers.append(p)
 
             detrained = False
+            boarded = False
             for p in passengers:
                 if not p.is_in_train and train.capacity >= p.group_size:
                     p.journey_history[time] = train.id
                     train.capacity = train.capacity - p.group_size
                     p.is_in_train = True
+                    boarded = True
                 elif p.position != p.target_station and not p.reached_target and p.is_in_train:
                     p.position = list_of_path[count].id
 
@@ -243,16 +244,21 @@ class AdvancedDijkstraAlgorithm(ISolver):
                     detrained = True
                     p.journey_history[time] = "Detrain"
 
-            if detrained:
+            if detrained or boarded:
                 time += 1
 
             count += 1
             train.journey_history[int(time)] = visited_lines.id
             time_temp = float(visited_lines.length) / float(train.speed)
-            time += int(math.ceil(time_temp))
+            time_old = time
+            if int(math.ceil(time_temp)) - 1 == 0:
+                time += int(math.ceil(time_temp))
+            else:
+                time += int(math.ceil(time_temp)) -1
+            # Swapping to handle capacity issues
             if self.check_station_capacity(list_of_path[count]) < 1:
                 self.check_trains_at_station(list_of_path[count])[0].journey_history[
-                    int(time) - 1] = visited_lines.id
+                    int(time_old + int(math.ceil(time_temp)) - 1)] = visited_lines.id
                 self.check_trains_at_station(list_of_path[count])[0].position = list_of_path[count]
             train.position = list_of_path[count].id
 
