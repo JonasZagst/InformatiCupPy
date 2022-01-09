@@ -28,9 +28,10 @@ def main():
     # input = InputParser(sys.stdin.read()).parse_input()
     solvers = [EasyDijkstraAlgorithm(copy.deepcopy(input)),
                AdvancedDijkstraAlgorithm(copy.deepcopy(input)),
-               SimpleTrainParallelizationAlgorithm(copy.deepcopy(input), set_wildcards=0),
+               SimpleTrainParallelizationAlgorithm(copy.deepcopy(input), set_wildcards=0.0),
                SimpleTrainParallelizationAlgorithm(copy.deepcopy(input), parallelization_factor=0.2),
-               SimpleTrainParallelizationAlgorithm(copy.deepcopy(input))]
+               SimpleTrainParallelizationAlgorithm(copy.deepcopy(input))
+               ]
     OutputParser.parse_output_files(solvers, input)
     # OutputParser.parse_output_files_to_stdout(solvers, input)
 

@@ -124,7 +124,7 @@ class AdvancedDijkstraAlgorithm(ISolver):
         :return: distance as whole, visited stations and visited lines
         """
         if start == target:
-            return 0, list(target), list()
+            return 0, list(target), list(), None
 
         path_dict = dict
 

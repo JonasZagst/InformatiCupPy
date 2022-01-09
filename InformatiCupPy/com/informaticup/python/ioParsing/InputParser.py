@@ -1,4 +1,4 @@
-from InformatiCupPy.com.informaticup.python.objects.Lane import Lane
+from InformatiCupPy.com.informaticup.python.objects.Line import Line
 from InformatiCupPy.com.informaticup.python.objects.Passenger import Passenger
 from InformatiCupPy.com.informaticup.python.objects.Station import Station
 from InformatiCupPy.com.informaticup.python.objects.Train import Train
@@ -38,7 +38,7 @@ class InputParser:
             if lane:
                 lane_str = line.split(" ")
                 connected_stations = [lane_str[1], lane_str[2]]
-                lanes.append(Lane(lane_str[0], connected_stations, lane_str[3], lane_str[4]))
+                lanes.append(Line(lane_str[0], connected_stations, lane_str[3], lane_str[4]))
             if line == "[Lines]":
                 lane = True
 

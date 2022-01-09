@@ -60,7 +60,15 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
                 if self.get_free_trains():  # if free trains left
                     try:
                         chosen_passenger = self.choose_next_passenger()  # choose next passenger by target time
-                        chosen_train = self.get_nearest_possible_train(passenger=chosen_passenger)  # choose nearest tr.
+                        if self.df[chosen_passenger.id + "-is_in_train"].iloc[self.time]:
+                            chosen_train = Helper.get_element_from_list_by_id(
+                                self.df[chosen_passenger.id + "-position"].iloc[self.time], self.trains)
+                            if self.df[chosen_train.id + "-is_on_line"].iloc[self.time]:
+                                self.df[chosen_passenger.id + "-checked"].iloc[self.time] = True
+                                continue
+                        else:
+                            # choose nearest train
+                            chosen_train = self.get_nearest_possible_train(passenger=chosen_passenger)
                     except NoPassengerChosen:
                         break
                     except NoTrainChosen:
@@ -80,9 +88,16 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
                             # detrain passenger after arriving at target station
                             self.detrain_passenger(chosen_passenger, chosen_train, end_time)
                         except CannotDepartTrain as e:  # if train cannot depart: detrain passenger again
-                            self.detrain_passenger(chosen_passenger, chosen_train, e.time + 1)
+                            # self.detrain_passenger(chosen_passenger, chosen_train, e.time + 1)
                             pass
                         except CannotBoardPassenger:
+                            pass
+                    elif self.df[chosen_passenger.id + "-is_in_train"].iloc[self.time]:
+                        try:
+                            end_time = self.depart_train(chosen_train, chosen_passenger.target_station, self.time)
+                            self.detrain_passenger(chosen_passenger, chosen_train, end_time)
+
+                        except CannotDepartTrain:
                             pass
                     else:  # if passenger and train are not at the same station
                         try:
@@ -196,8 +211,7 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
         # next passenger
         for passenger in self.passengers:
             if int(passenger.target_time) < int(next_passenger.target_time) \
-                    and passenger.target_station != self.df[passenger.id + "-position"].iloc[self.time] \
-                    and not self.df[passenger.id + "-is_in_train"].iloc[self.time] \
+                    and passenger.target_station not in self.df[passenger.id + "-position"] \
                     and not self.df[passenger.id + "-checked"].iloc[self.time]:
                 next_passenger = passenger
         if next_passenger != dummy_passenger:
@@ -222,7 +236,7 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
         self.add_new_row(start_time)
 
         # if a passenger is currently being boarded/detrained, the train cannot depart
-        if self.df[train.id + "-status"].iloc[start_time] != "":
+        if self.df[train.id + "-status"].iloc[start_time] != "" or self.df[train.id + "-position"].iloc[self.time] == target:
             raise CannotDepartTrain(start_time)
 
         # calculate total length of the shortest path to the target and determine stations and lines on the path
@@ -247,7 +261,8 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
                 if self.df[line.id + "-current_capacity"].iloc[i] < 1:
                     can_depart = False
                     break
-            """
+
+            """"""
             self.add_new_row(end_time_line)
             if self.df[stations[c + 1] + "-current_capacity"].iloc[end_time_line] < 1:
                 can_depart = False
@@ -265,11 +280,11 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
                         self.add_new_row(swap_end)
                         if self.df[stations[c] + "-current_capacity"].iloc[swap_end] < 1:
                             can_depart = False
-            """
+            """"""
 
             # if line is free, depart train, else raise CannotDepartTrain-Exception
             if not can_depart:
-                if "L" in self.df[train.id + "-position"].iloc[start_time_line]:#
+                if "L" in self.df[train.id + "-position"].iloc[start_time_line]:  #
                     self.df[train.id + "-position"].iloc[start_time_line] = stations[c]
                     self.df[train.id + "-is_on_line"].iloc[start_time_line] = False
                     self.df[stations[c] + "-current_capacity"].iloc[start_time_line] = \
@@ -362,11 +377,11 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
                 trains_at_station = trains_per_station[station.id]
             except KeyError:
                 trains_at_station = 0
-            row_0.append(station.current_capacity - trains_at_station)
+            row_0.append(station.capacity - trains_at_station)
 
         for line in self.lines:
             columns.append(line.id + "-current_capacity")
-            row_0.append(line.current_capacity)
+            row_0.append(line.capacity)
 
         for train in self.trains:
             columns.append(train.id + "-current_capacity")
@@ -375,10 +390,10 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
             columns.append(train.id + "-is_on_line")
             columns.append(train.id + "-checked")  # boolean: true if algorithm already tried to depart that train
             columns.append(train.id + "-status")  # str: boarded/departed/detrained, to avoid 2 actions at the same time
-            row_0.append(train.current_capacity)
+            row_0.append(train.capacity)
             row_0.append("")  # no passengers in trains = empty string
             row_0.append(train.position)
-            row_0.append(train.is_on_line)
+            row_0.append(False)
             row_0.append(False)
             row_0.append("")
 
@@ -406,7 +421,7 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
             if self.df[train.id + "-current_capacity"].iloc[self.time] - int(group_size) >= 0 \
                     and self.df[train.id + "-passengers"].iloc[self.time] == "" \
                     and not self.df[train.id + "-is_on_line"].iloc[self.time] \
-                    and not self.df[train.id + "-checked"].iloc[self.time]\
+                    and not self.df[train.id + "-checked"].iloc[self.time] \
                     and self.df[train.id + "-position"].iloc[self.time] != "*":
                 possible_trains.append(train)
         return possible_trains
