@@ -211,8 +211,8 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
         # next passenger
         for passenger in self.passengers:
             if int(passenger.target_time) < int(next_passenger.target_time) \
-                    and passenger.target_station not in self.df[passenger.id + "-position"] \
-                    and not self.df[passenger.id + "-checked"].iloc[self.time]:
+                    and not self.df[passenger.id + "-checked"].iloc[self.time]\
+                    and not passenger.reached_target:
                 next_passenger = passenger
         if next_passenger != dummy_passenger:
             return next_passenger
@@ -262,7 +262,7 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
                     can_depart = False
                     break
 
-            """"""
+
             self.add_new_row(end_time_line)
             if self.df[stations[c + 1] + "-current_capacity"].iloc[end_time_line] < 1:
                 can_depart = False
@@ -280,7 +280,7 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
                         self.add_new_row(swap_end)
                         if self.df[stations[c] + "-current_capacity"].iloc[swap_end] < 1:
                             can_depart = False
-            """"""
+
 
             # if line is free, depart train, else raise CannotDepartTrain-Exception
             if not can_depart:
@@ -305,8 +305,8 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
                 self.df[stations[c] + "-current_capacity"].iloc[i] = \
                     self.df[stations[c] + "-current_capacity"].iloc[i] + 1
 
-            self.df[line.id + "-current_capacity"].iloc[end_time_line - 1] = \
-                self.df[line.id + "-current_capacity"].iloc[end_time_line - 1] + 1
+            # self.df[line.id + "-current_capacity"].iloc[end_time_line - 1] = \
+                # self.df[line.id + "-current_capacity"].iloc[end_time_line - 1] + 1
 
             self.add_new_row(end_time_line)
 
@@ -353,6 +353,8 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
             self.df[passenger.id + "-position"].iloc[i] = self.df[train.id + "-position"].iloc[i]
             self.df[train.id + "-current_capacity"].iloc[i] = \
                 self.df[train.id + "-current_capacity"].iloc[i] + passenger.group_size
+        if self.df[passenger.id + "-position"].iloc[time] == passenger.target_station:
+            passenger.reached_target = True
 
     def generate_data_frame(self):
         """
