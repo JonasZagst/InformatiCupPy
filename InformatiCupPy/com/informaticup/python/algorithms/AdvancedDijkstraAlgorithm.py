@@ -216,13 +216,13 @@ class AdvancedDijkstraAlgorithm(ISolver):
 
         passengers_at_path = self.find_passengers_along_the_way(list_of_path)
 
-        for key, value in passengers_at_path.items():
-            print(key, end=' ')
-            for v in value:
-                print(v.id, end=' ')
-            print(' ')
-
-        print("path finished")
+        # for key, value in passengers_at_path.items():
+        #     print(key, end=' ')
+        #     for v in value:
+        #         print(v.id, end=' ')
+        #     print(' ')
+        #
+        # print("path finished")
 
         # replacing id's with objects
         for n, station_id in enumerate(list_of_path):
