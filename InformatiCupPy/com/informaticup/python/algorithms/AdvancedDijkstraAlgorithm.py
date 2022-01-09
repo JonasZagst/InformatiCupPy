@@ -153,7 +153,6 @@ class AdvancedDijkstraAlgorithm(ISolver):
 
         return visited[target], list(full_path), list(full_names), path_dict
 
-    # inspired by:
     @staticmethod
     def dijkstra(graph, initial):
         """
@@ -256,6 +255,7 @@ class AdvancedDijkstraAlgorithm(ISolver):
 
             detrained = False
             boarded = False
+            jumped = False
 
             count += 1
             train.journey_history[int(time)] = visited_lines.id
@@ -265,6 +265,7 @@ class AdvancedDijkstraAlgorithm(ISolver):
                 time += int(math.ceil(time_temp))
             else:
                 time += int(math.ceil(time_temp)) - 1
+                jumped = True
             # Swapping to handle capacity issues
             if self.check_station_capacity(list_of_path[count]) < 1:
                 self.check_trains_at_station(list_of_path[count])[0].journey_history[
@@ -279,7 +280,10 @@ class AdvancedDijkstraAlgorithm(ISolver):
 
             for p in passengers:
                 if not p.is_in_train and train.capacity >= p.group_size:
-                    p.journey_history[time + 1] = train.id
+                    if jumped:
+                        p.journey_history[time + 1] = train.id
+                    else:
+                        p.journey_history[time] = train.id
                     train.capacity = train.capacity - p.group_size
                     p.is_in_train = True
                     boarded = True
@@ -292,9 +296,14 @@ class AdvancedDijkstraAlgorithm(ISolver):
                         delay_cumulated += time - int(p.target_time)
                     p.reached_target = True
                     detrained = True
-                    p.journey_history[time] = "Detrain"
+                    if jumped:
+                        p.journey_history[time+1] = "Detrain"
+                    else:
+                        p.journey_history[time] = "Detrain"
 
-            if detrained or boarded:
+            if (detrained or boarded) and jumped:
+                time += 2
+            elif detrained or boarded or (count == len(list_of_lines) and jumped):
                 time += 1
 
         return int(time), int(delay_cumulated)
