@@ -26,7 +26,7 @@ class Helper:
         for station in stations:
             graph.add_node(station.id)
         for line in lines:
-            graph.add_edge(line.connected_stations[0], line.connected_stations[1], int(line.length), line.id)
+            graph.add_edge(line.connected_stations[0], line.connected_stations[1], float(line.length), line.id)
         return graph
 
     @staticmethod
