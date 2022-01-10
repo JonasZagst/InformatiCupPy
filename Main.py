@@ -32,7 +32,7 @@ def main():
                #SimpleTrainParallelizationAlgorithm(copy.deepcopy(input), parallelization_factor=0.2),
                SimpleTrainParallelizationAlgorithm(copy.deepcopy(input))
                ]
-    OutputParser.parse_output_files(solvers, input)
+    OutputParser.parse_output_files(solvers)
     # OutputParser.parse_output_files_to_stdout(solvers, input)
 
 
