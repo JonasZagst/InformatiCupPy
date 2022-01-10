@@ -1,3 +1,5 @@
+import sys
+
 from InformatiCupPy.com.informaticup.python.objects.Line import Line
 from InformatiCupPy.com.informaticup.python.objects.Passenger import Passenger
 from InformatiCupPy.com.informaticup.python.objects.Station import Station
@@ -223,6 +225,15 @@ class InputParser:
     """Parses stations, lanes, trains and passengers from input and returns a list of those objects as list."""
 
     def parse_input(self):
-        objects = [self.parse_stations(), self.parse_lanes(), self.parse_trains(), self.parse_passengers()]
+        try:
+            objects = [self.parse_stations(), self.parse_lanes(), self.parse_trains(), self.parse_passengers()]
+            return objects
+        except CannotParseInputException as ex:
+            print("")
+            print("")
+            print("-----------------------------------------------------------------")
+            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            print(ex.msg)
+            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            print("-----------------------------------------------------------------")
 
-        return objects
