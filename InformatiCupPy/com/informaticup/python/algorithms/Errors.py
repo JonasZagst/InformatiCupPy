@@ -26,3 +26,7 @@ class ProblemWithPassenger(Exception):
 class TimeoutException(Exception):
     def __init__(self, msg=''):
         self.msg = msg
+
+class CannotParseInputException(Exception):
+    def __init__(self, msg):
+        self.msg = msg
