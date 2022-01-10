@@ -1,7 +1,7 @@
 import sys
 
 from InformatiCupPy.com.informaticup.python.algorithms.AdvancedDijkstraAlgorithm import AdvancedDijkstraAlgorithm
-from InformatiCupPy.com.informaticup.python.algorithms.EasyDijkstraAlgorithm import EasyDijkstraAlgorithm
+from InformatiCupPy.com.informaticup.python.algorithms.SimpleDijkstraAlgorithm import SimpleDijkstraAlgorithm
 from InformatiCupPy.com.informaticup.python.algorithms.SimpleTrainParallelizationAlgorithm \
     import SimpleTrainParallelizationAlgorithm
 from InformatiCupPy.com.informaticup.python.ioParsing.InputParser import InputParser
@@ -26,7 +26,7 @@ def main():
     # creates a list (length 4) of lists (length x), which contains several object parsed from the input file
     input = InputParser("InformatiCupPy/com/informaticup/input-output/input.txt").parse_input()
     # input = InputParser(sys.stdin.read()).parse_input()
-    solvers = [EasyDijkstraAlgorithm(copy.deepcopy(input)),
+    solvers = [SimpleDijkstraAlgorithm(copy.deepcopy(input)),
                AdvancedDijkstraAlgorithm(copy.deepcopy(input)),
                #SimpleTrainParallelizationAlgorithm(copy.deepcopy(input), set_wildcards=0.0),
                #SimpleTrainParallelizationAlgorithm(copy.deepcopy(input), parallelization_factor=0.2),
