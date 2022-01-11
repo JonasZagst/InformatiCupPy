@@ -27,9 +27,12 @@ def main():
     input = InputParser("InformatiCupPy/com/informaticup/input-output/input.txt").parse_input()
     # input = InputParser(sys.stdin.read()).parse_input()
     solvers = [SimpleDijkstraAlgorithm(copy.deepcopy(input)),
-               AdvancedDijkstraAlgorithm(copy.deepcopy(input)),
-               #SimpleTrainParallelizationAlgorithm(copy.deepcopy(input), set_wildcards=0.0),
-               #SimpleTrainParallelizationAlgorithm(copy.deepcopy(input), parallelization_factor=0.2),
+               AdvancedDijkstraAlgorithm(copy.deepcopy(input), capacity_speed_ratio=0),
+               AdvancedDijkstraAlgorithm(copy.deepcopy(input), capacity_speed_ratio=0.3),
+               AdvancedDijkstraAlgorithm(copy.deepcopy(input), capacity_speed_ratio=0.7),
+               AdvancedDijkstraAlgorithm(copy.deepcopy(input), capacity_speed_ratio=1),
+               SimpleTrainParallelizationAlgorithm(copy.deepcopy(input), set_wildcards=0.0),
+               SimpleTrainParallelizationAlgorithm(copy.deepcopy(input), parallelization_factor=0.2),
                SimpleTrainParallelizationAlgorithm(copy.deepcopy(input))
                ]
     OutputParser.parse_output_files(solvers)
