@@ -24,8 +24,8 @@ def main():
     # input_str = open("InformatiCupPy/com/informaticup/input-output/input.txt", "r").read()
 
     # creates a list (length 4) of lists (length x), which contains several object parsed from the input file
-    input = InputParser("InformatiCupPy/com/informaticup/input-output/input.txt").parse_input()
-    # input = InputParser(sys.stdin.read()).parse_input()
+    # input = InputParser("InformatiCupPy/com/informaticup/input-output/input.txt").parse_input()
+    input = InputParser(sys.stdin.read()).parse_input()
     solvers = [SimpleDijkstraAlgorithm(copy.deepcopy(input)),
                AdvancedDijkstraAlgorithm(copy.deepcopy(input), capacity_speed_ratio=0),
                AdvancedDijkstraAlgorithm(copy.deepcopy(input), capacity_speed_ratio=0.3),
@@ -35,8 +35,8 @@ def main():
                SimpleTrainParallelizationAlgorithm(copy.deepcopy(input), parallelization_factor=0.2),
                SimpleTrainParallelizationAlgorithm(copy.deepcopy(input))
                ]
-    OutputParser.parse_output_files(solvers)
-    # OutputParser.parse_output_files_to_stdout(solvers, input)
+    # OutputParser.parse_output_files(solvers)
+    OutputParser.parse_output_files_to_stdout(solvers)
 
     #Exec Docker: docker run -i trainpy < {Your Path to input.txt} > {path to txt file for output}
 

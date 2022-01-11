@@ -72,8 +72,8 @@ class OutputParser:
         return output_str
 
     @staticmethod
-    def parse_output_files_to_stdout(solvers: list, input):
-        OutputParser.parse_output_files(solvers, input)
+    def parse_output_files_to_stdout(solvers: list):
+        OutputParser.parse_output_files(solvers)
         print(open("InformatiCupPy/com/informaticup/input-output/output.txt", "r").read())
         #sys.stdout = open("InformatiCupPy/com/informaticup/input-output/output.txt", "r").read()
 
