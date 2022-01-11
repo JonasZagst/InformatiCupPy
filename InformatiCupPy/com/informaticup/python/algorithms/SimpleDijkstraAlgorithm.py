@@ -32,6 +32,8 @@ class SimpleDijkstraAlgorithm(ISolver):
         time = 0
         delay_cumulated = 0
 
+        self.trains.sort(key=lambda x: x.capacity, reverse=True)
+
         # setting up the Graph
         graph = Graph()
         helper = Helper()
@@ -247,7 +249,7 @@ class SimpleDijkstraAlgorithm(ISolver):
         name of the algorithm (used to name the output file)
         :return: name of the algorithm
         """
-        return "easy-dijkstra-algorithm"
+        return "simple-dijkstra-algorithm"
 
     def get_trains_and_passengers(self) -> list:
         """
