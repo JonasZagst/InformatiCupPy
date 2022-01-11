@@ -1,5 +1,6 @@
 import copy
 import math
+import sys
 from collections import deque
 
 from InformatiCupPy.com.informaticup.python.algorithms.Helper import Helper
@@ -13,12 +14,14 @@ class AdvancedDijkstraAlgorithm(ISolver):
     #  - (implement the ability of trains to pass a station without stopping to save some time)
     #  - don't deliver passengers to early -> detrain them intelligent in the middle of the journey
     #  - capacity of lines/stations should also be changed (like train capacity) -> goal: use more than one train
+    #  - take passengers with you when swapping - take passengers just with you for just a part of the journey
 
-    def __init__(self, input_from_file):
+    def __init__(self, input_from_file, capacity_speed_ratio):
         self.stations = input_from_file[0]
         self.lines = input_from_file[1]
         self.trains = input_from_file[2]
         self.passengers = input_from_file[3]
+        self.capacity_speed_ratio = capacity_speed_ratio
 
     def solve(self):
         """
@@ -29,9 +32,12 @@ class AdvancedDijkstraAlgorithm(ISolver):
         time = 0
         delay_cumulated = 0
 
+        # get biggest passenger group
+        self.passengers.sort(key=lambda x: x.group_size)
+        biggest_passenger_group = self.passengers[0].group_size
+
         # prioritize passengers/trains
         self.passengers.sort(key=lambda x: x.target_time)
-        self.trains.sort(key=lambda x: x.capacity, reverse=True)
 
         # setting up the graph and a path dictionary
         graph = Helper.set_up_graph(self.stations, self.lines)
@@ -39,34 +45,32 @@ class AdvancedDijkstraAlgorithm(ISolver):
 
         train_placed = False
 
-        mytrain = None
+        my_train = self.get_my_train(self.trains, biggest_passenger_group, self.capacity_speed_ratio)
 
         # care if the used train is a wildcard train
-        for train in self.trains:
-            if train.fixed_start and not train_placed:
-                mytrain = train
-                train_placed = True
+        if my_train.fixed_start and not train_placed:
+            train_placed = True
 
-            if not train.fixed_start and not train_placed:
+        if not my_train.fixed_start and not train_placed:
 
-                # first check for initial station of the first passenger to save some time
+            # first check for initial station of the first passenger to save some time
+            for s in self.stations:
+                if s.id == self.passengers[0].initial_station and self.check_station_capacity(s) >= 1:
+                    initial_position = self.passengers[0].initial_station
+                    my_train.initial_position = initial_position
+                    my_train.position = initial_position
+                    train_placed = True
+                    break
+
+            # evaluate capacity of all other stations
+            if not train_placed:
                 for s in self.stations:
-                    if s.id == self.passengers[0].initial_station and self.check_station_capacity(s) >= 1:
-                        initial_position = self.passengers[0].initial_station
-                        train.initial_position = initial_position
-                        train.position = initial_position
+                    if self.check_station_capacity(s) >= 1:
+                        initial_position = s.id
+                        my_train.initial_position = initial_position
+                        my_train.position = initial_position
                         train_placed = True
                         break
-
-                # evaluate capacity of all other stations
-                if not train_placed:
-                    for s in self.stations:
-                        if self.check_station_capacity(s) >= 1:
-                            initial_position = s.id
-                            train.initial_position = initial_position
-                            train.position = initial_position
-                            train_placed = True
-                            break
 
         if train_placed:
             file_solvable = True
@@ -77,29 +81,28 @@ class AdvancedDijkstraAlgorithm(ISolver):
         if file_solvable:
             for p in self.passengers:
                 # evaluate passenger group size
-                if mytrain.capacity < p.group_size:
+                if my_train.capacity < p.group_size:
                     raise CannotSolveInput()
                 elif p.position != p.target_station:
                     # moving train to passenger
-                    if mytrain.position != p.initial_station:
+                    if my_train.position != p.initial_station:
                         length, list_of_path, list_of_lines, path_dict = self.calculate_shortest_path(graph,
-                                                                                                      mytrain.position,
+                                                                                                      my_train.position,
                                                                                                       p.initial_station,
                                                                                                       path_dict)
-                        time, delay = self.travelSelectedPath(time, list_of_path, list_of_lines, mytrain, None)
+                        time, delay = self.travelSelectedPath(time, list_of_path, list_of_lines, my_train, None)
                         delay_cumulated += delay
 
                     # getting the passenger to his target station
-                    if mytrain.position == p.initial_station:
+                    if my_train.position == p.initial_station:
                         length, list_of_path, list_of_lines, path_dict = self.calculate_shortest_path(graph,
-                                                                                                      mytrain.position,
+                                                                                                      my_train.position,
                                                                                                       p.target_station,
                                                                                                       path_dict)
-                        time += 1
-                        time, delay = self.travelSelectedPath(time, list_of_path, list_of_lines, mytrain, p)
+
+                        time, delay = self.travelSelectedPath(time, list_of_path, list_of_lines, my_train, p)
                         delay_cumulated += delay
 
-                        time += 1
                     else:
                         raise CannotBoardPassenger()
         else:
@@ -118,7 +121,7 @@ class AdvancedDijkstraAlgorithm(ISolver):
         :return: distance as whole, visited stations and visited lines
         """
         if start == target:
-            return 0, list(target), list()
+            return 0, list(target), list(), None
 
         path_dict = dict
 
@@ -147,7 +150,6 @@ class AdvancedDijkstraAlgorithm(ISolver):
 
         return visited[target], list(full_path), list(full_names), path_dict
 
-    # inspired by:
     @staticmethod
     def dijkstra(graph, initial):
         """
@@ -210,6 +212,14 @@ class AdvancedDijkstraAlgorithm(ISolver):
 
         passengers_at_path = self.find_passengers_along_the_way(list_of_path)
 
+        # for key, value in passengers_at_path.items():
+        #     print(key, end=' ')
+        #     for v in value:
+        #         print(v.id, end=' ')
+        #     print(' ')
+        #
+        # print("path finished")
+
         # replacing id's with objects
         for n, station_id in enumerate(list_of_path):
             s = Helper.get_element_from_list_by_id(station_id, self.stations)
@@ -220,16 +230,60 @@ class AdvancedDijkstraAlgorithm(ISolver):
             list_of_lines[n] = l
 
         for visited_lines in list_of_lines:
+
+            if count == 0:
+                boarded = False
+                if list_of_path[count].id in passengers_at_path:
+                    for p in passengers_at_path[list_of_path[count].id]:
+                        passengers.append(p)
+                    passengers.sort(key=lambda x: x.target_time)
+                for p in passengers:
+                    if not p.is_in_train and train.capacity >= p.group_size:
+                        p.journey_history[time] = train.id
+                        train.capacity = train.capacity - p.group_size
+                        p.is_in_train = True
+                        boarded = True
+                if boarded:
+                    time += 1
+
+            for p in reversed(passengers):
+                if not p.is_in_train:
+                    passengers.remove(p)
+
+            detrained = False
+            boarded = False
+            jumped = False
+
+            count += 1
+            train.journey_history[int(time)] = visited_lines.id
+            time_temp = float(visited_lines.length) / float(train.speed)
+            time_old = time
+            if int(math.ceil(time_temp)) - 1 == 0:
+                time += int(math.ceil(time_temp))
+            else:
+                time += int(math.ceil(time_temp)) - 1
+                jumped = True
+            # Swapping to handle capacity issues
+            if self.check_station_capacity(list_of_path[count]) < 1:
+                self.check_trains_at_station(list_of_path[count])[0].journey_history[
+                    int(time_old + int(math.ceil(time_temp)) - 1)] = visited_lines.id
+                self.check_trains_at_station(list_of_path[count])[0].position = list_of_path[count]
+            train.position = list_of_path[count].id
+
             if list_of_path[count].id in passengers_at_path:
                 for p in passengers_at_path[list_of_path[count].id]:
                     passengers.append(p)
+                passengers.sort(key=lambda x: x.target_time)
 
-            detrained = False
             for p in passengers:
                 if not p.is_in_train and train.capacity >= p.group_size:
-                    p.journey_history[time] = train.id
+                    if jumped:
+                        p.journey_history[time + 1] = train.id
+                    else:
+                        p.journey_history[time] = train.id
                     train.capacity = train.capacity - p.group_size
                     p.is_in_train = True
+                    boarded = True
                 elif p.position != p.target_station and not p.reached_target and p.is_in_train:
                     p.position = list_of_path[count].id
 
@@ -239,35 +293,15 @@ class AdvancedDijkstraAlgorithm(ISolver):
                         delay_cumulated += time - int(p.target_time)
                     p.reached_target = True
                     detrained = True
-                    p.journey_history[time] = "Detrain"
+                    if jumped:
+                        p.journey_history[time+1] = "Detrain"
+                    else:
+                        p.journey_history[time] = "Detrain"
 
-            if detrained:
+            if (detrained or boarded) and jumped:
+                time += 2
+            elif detrained or boarded or (count == len(list_of_lines) and jumped):
                 time += 1
-
-            count += 1
-            train.journey_history[int(time)] = visited_lines.id
-            time_temp = float(visited_lines.length) / float(train.speed)
-            time += int(math.ceil(time_temp))
-            if self.check_station_capacity(list_of_path[count]) < 1:
-                self.check_trains_at_station(list_of_path[count])[0].journey_history[
-                    int(time) - 1] = visited_lines.id
-                self.check_trains_at_station(list_of_path[count])[0].position = list_of_path[count]
-            train.position = list_of_path[count].id
-
-        detrained = False
-        for p in passengers:
-            if p.position != p.target_station and not p.reached_target and p.is_in_train:
-                p.position = list_of_path[count].id
-            if p.position == p.target_station and not p.reached_target:
-                train.capacity = train.capacity + p.group_size
-                if time - int(p.target_time) > 0:
-                    delay_cumulated += time - int(p.target_time)
-                p.reached_target = True
-                detrained = True
-                p.journey_history[time] = "Detrain"
-
-        if detrained:
-            time += 1
 
         return int(time), int(delay_cumulated)
 
@@ -301,7 +335,7 @@ class AdvancedDijkstraAlgorithm(ISolver):
 
         for p in passengers:
             if p.initial_station in list_of_path and p.target_station in list_of_path \
-                    and list_of_path.index(p.initial_station) < list_of_path.index(p.target_station)\
+                    and list_of_path.index(p.initial_station) < list_of_path.index(p.target_station) \
                     and not p.reached_target:
                 if not (p.initial_station in passengers_at_path):
                     passengers_at_path[p.initial_station] = [p]
@@ -310,12 +344,28 @@ class AdvancedDijkstraAlgorithm(ISolver):
 
         return passengers_at_path
 
+    def get_my_train(self, train, biggest_passenger_group, capacity_speed_ratio):
+        for train in reversed(self.trains):
+            if train.capacity < biggest_passenger_group:
+                self.trains.remove(train)
+
+        self.trains.sort(key=lambda x: (x.capacity, x.speed))
+        old_speed = self.trains[len(self.trains)-1].speed - 1
+        for train in reversed(self.trains):
+            if train.speed <= old_speed:
+                self.trains.remove(train)
+            else:
+                old_speed = train.speed
+
+        mytrain = self.trains[int(capacity_speed_ratio*(len(self.trains)-1))]
+        return mytrain
+
     def get_name(self):
         """
         name of the algorithm (used to name the output file)
         :return: name of the algorithm
         """
-        return "advanced-dijkstra-algorithm"
+        return f"advanced-dijkstra-algorithm-{str(self.capacity_speed_ratio)}"
 
     def get_trains_and_passengers(self) -> list:
         return [self.trains, self.passengers]

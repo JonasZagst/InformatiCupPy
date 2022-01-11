@@ -38,7 +38,7 @@ class InputParser:
             if lane:
                 lane_str = line.split(" ")
                 connected_stations = [lane_str[1], lane_str[2]]
-                lanes.append(Lane(lane_str[0], connected_stations, lane_str[3], lane_str[4]))
+                lanes.append(Line(lane_str[0], connected_stations, lane_str[3], lane_str[4]))
             if line == "[Lines]":
                 lane = True
 

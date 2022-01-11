@@ -1,4 +1,4 @@
-class Lane:
+class Line:
 
     def __init__(self, id, connected_stations, length, capacity):
         self.id = id
@@ -18,14 +18,3 @@ class Lane:
                                    self.length,
                                    self.capacity)
 
-    def id(self):
-        return self.id()
-
-    def connected_stations(self):
-        return self.connected_stations()
-
-    def length(self):
-        return self.length()
-
-    def capacity(self):
-        return self.capacity()

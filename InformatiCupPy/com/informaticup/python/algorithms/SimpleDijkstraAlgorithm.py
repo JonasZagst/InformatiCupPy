@@ -7,7 +7,7 @@ from InformatiCupPy.com.informaticup.python.algorithms.ISolver import ISolver
 from InformatiCupPy.com.informaticup.python.algorithms.Helper import Helper
 
 
-class EasyDijkstraAlgorithm(ISolver):
+class SimpleDijkstraAlgorithm(ISolver):
     """ Primitive Algorithm, which iterates through a list of all passengers and uses one train to bring them
     separately to their distinct destinations. To calculate the shortest path between two stations the
     dijkstra algorithm is used.
@@ -31,6 +31,8 @@ class EasyDijkstraAlgorithm(ISolver):
         file_solvable = True
         time = 0
         delay_cumulated = 0
+
+        self.trains.sort(key=lambda x: x.capacity, reverse=True)
 
         # setting up the Graph
         graph = Graph()
@@ -119,7 +121,7 @@ class EasyDijkstraAlgorithm(ISolver):
         if start == target:
             return 0, list(target), list()
 
-        visited, paths, names = EasyDijkstraAlgorithm.dijkstra(graph, start)
+        visited, paths, names = SimpleDijkstraAlgorithm.dijkstra(graph, start)
         full_path = deque()
         full_names = deque()
 
@@ -247,7 +249,7 @@ class EasyDijkstraAlgorithm(ISolver):
         name of the algorithm (used to name the output file)
         :return: name of the algorithm
         """
-        return "easy-dijkstra-algorithm"
+        return "simple-dijkstra-algorithm"
 
     def get_trains_and_passengers(self) -> list:
         """
