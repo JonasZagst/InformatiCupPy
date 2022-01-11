@@ -1,4 +1,4 @@
-from InformatiCupPy.com.informaticup.python.objects.Lane import Lane
+from InformatiCupPy.com.informaticup.python.objects.Line import Line
 from InformatiCupPy.com.informaticup.python.objects.Passenger import Passenger
 from InformatiCupPy.com.informaticup.python.objects.Station import Station
 from InformatiCupPy.com.informaticup.python.objects.Train import Train
