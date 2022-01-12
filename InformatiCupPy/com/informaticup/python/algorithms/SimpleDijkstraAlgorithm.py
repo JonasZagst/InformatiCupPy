@@ -2,7 +2,6 @@ import math
 from collections import deque
 
 from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotSolveInput, CannotBoardPassenger
-from InformatiCupPy.com.informaticup.python.algorithms.Graph import Graph
 from InformatiCupPy.com.informaticup.python.algorithms.ISolver import ISolver
 from InformatiCupPy.com.informaticup.python.algorithms.Helper import Helper
 
@@ -11,10 +10,9 @@ class SimpleDijkstraAlgorithm(ISolver):
     """ Primitive Algorithm, which iterates through a list of all passengers and uses one train to bring them
     separately to their distinct destinations. To calculate the shortest path between two stations the
     dijkstra algorithm is used.
-    The algorithm also features a handling of wildcard trains, passenger capacity evaluation
-    not implemented yet: station/line capacity evaluation, calculation of accumulated delay of all passengers
-    Weakness: doesn't prioritize passengers + if a passenger group is to big for train[0] the algorithm can't
-    solve the problem
+    The algorithm also features a handling of wildcard trains, passenger/station/line capacity evaluation
+    and calculation of cumulated delay of all passengers
+    Weakness: doesn't prioritize passengers and carries only one passenger at the same time
     """
 
     def __init__(self, input_from_file):
@@ -27,6 +25,7 @@ class SimpleDijkstraAlgorithm(ISolver):
         """
         Method to solve an input problem. To understand the general thoughts this algorithm is based on read
         the class description. To comprehend the separate steps have a look at the comments.
+        :return: cumulated delay time of all passengers
         """
         file_solvable = True
         time = 0
@@ -48,8 +47,10 @@ class SimpleDijkstraAlgorithm(ISolver):
         # setting up the Graph
         graph = Helper.set_up_graph(self.stations, self.lines)
 
+        my_train = self.trains[0]
+
         # care for wildcard trains
-        if not self.trains[0].fixed_start:
+        if not my_train.fixed_start:
             # check if there is enough space in the whole graph for an additional wildcard train
             stations_with_capacity = 0
             for s in self.stations:
@@ -58,14 +59,14 @@ class SimpleDijkstraAlgorithm(ISolver):
 
             if stations_with_capacity < 1:
                 file_solvable = False
+
             train_placed = False
 
             # first check for initial station of the first passenger
             for s in self.stations:
                 if s.id == self.passengers[0].initial_station and self.check_station_capacity(s) >= 1:
-                    initial_position = self.passengers[0].initial_station
-                    self.trains[0].initial_position = initial_position
-                    self.trains[0].position = initial_position
+                    my_train.initial_position = self.passengers[0].initial_station
+                    my_train.position = self.passengers[0].initial_station
                     train_placed = True
                     break
 
@@ -73,9 +74,8 @@ class SimpleDijkstraAlgorithm(ISolver):
             if not train_placed:
                 for s in self.stations:
                     if self.check_station_capacity(s) >= 1:
-                        initial_position = s.id
-                        self.trains[0].initial_position = initial_position
-                        self.trains[0].position = initial_position
+                        my_train.initial_position = s.id
+                        my_train.position = s.id
                         break
 
         time = 1
@@ -83,25 +83,25 @@ class SimpleDijkstraAlgorithm(ISolver):
         # uses only one train to transport all passengers
         if file_solvable:
             for p in self.passengers:
-                # evaluate passenger group size
-                if self.trains[0].capacity < p.group_size:
+                # evaluate if passenger group fits into used train
+                if my_train.capacity < p.group_size:
                     raise CannotSolveInput()
                 else:
                     # moving train to passenger
-                    if self.trains[0].position != p.initial_station:
+                    if my_train.position != p.initial_station:
                         length, list_of_path, list_of_lines = self.calculate_shortest_path(graph,
-                                                                                           self.trains[0].position,
+                                                                                           my_train.position,
                                                                                            p.initial_station)
-                        time = self.travelSelectedPath(time, list_of_path, list_of_lines, self.trains[0], None)
+                        time = self.travelSelectedPath(time, list_of_path, list_of_lines, my_train, None)
 
                     # getting the passenger to his target station
-                    if self.trains[0].position == p.initial_station:
+                    if my_train.position == p.initial_station:
                         length, list_of_path, list_of_lines = self.calculate_shortest_path(graph,
-                                                                                           self.trains[0].position,
+                                                                                           my_train.position,
                                                                                            p.target_station)
-                        p.journey_history[time] = self.trains[0].id
+                        p.journey_history[time] = my_train.id
                         time += 1
-                        time = self.travelSelectedPath(time, list_of_path, list_of_lines, self.trains[0], p)
+                        time = self.travelSelectedPath(time, list_of_path, list_of_lines, my_train, p)
                         p.journey_history[time] = "Detrain"
                         if time - int(p.target_time) > 0:
                             delay_cumulated += time - int(p.target_time)
@@ -259,7 +259,6 @@ class SimpleDijkstraAlgorithm(ISolver):
 
     def get_trains_and_passengers(self) -> list:
         """
-        gets all trains and passengers from the parsed input
         :return: list of all trains and passengers
         """
         return [self.trains, self.passengers]
