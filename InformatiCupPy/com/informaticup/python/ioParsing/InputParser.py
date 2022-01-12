@@ -36,25 +36,25 @@ class InputParser:
 
     """Parses lanes form input and creates lane objects with the input parameters and returns them as list."""
 
-    def parse_lanes(self):
-        lanes = []
-        lane = False
+    def parse_lines(self):
+        lines = []
+        line_bool = False
 
         for i, line in enumerate(self.input):
-            if lane:
+            if line_bool:
                 splittedLine = line.split(" ")
 
                 if self.check_line_string(splittedLine):
                     connected_stations = [splittedLine[1], splittedLine[2]]
-                    lanes.append(Line(splittedLine[0], connected_stations, splittedLine[3], splittedLine[4]))
+                    lines.append(Line(splittedLine[0], connected_stations, splittedLine[3], splittedLine[4]))
                 elif self.check_passenger_string(splittedLine) or self.check_station_string(splittedLine) or self.check_train_string(splittedLine) or line.startswith("#") or line == "[Stations]" or line == "[Trains]" or line == "[Lines]" or line == "[Passengers]" or line == "":
                     continue
                 else:
                     raise CannotParseInputException("Cannot read Input, unknown line in file")
             if line == "[Lines]":
-                lane = True
+                line_bool = True
 
-        return lanes
+        return lines
 
     """Parses trains form input and creates train objects with the input parameters and returns them as list."""
 
@@ -145,7 +145,7 @@ class InputParser:
                     else:
                         endStation = int(str(stringList[2]+" ")[1:str(stringList[2]).__len__()])
 
-                    length = int(stringList[3])
+                    length = float(stringList[3])
                     cap = int(stringList[4])
 
                     return True
@@ -167,7 +167,7 @@ class InputParser:
                     else:
                         idNumber = int(str(stringList[0]+" ")[1:str(stringList[0]).__len__()])
 
-                    speed = int(stringList[2])
+                    speed = float(stringList[2])
                     cap = int(stringList[3])
 
                     if stringList[1] == "*":
@@ -225,15 +225,9 @@ class InputParser:
     """Parses stations, lanes, trains and passengers from input and returns a list of those objects as list."""
 
     def parse_input(self):
-        try:
-            objects = [self.parse_stations(), self.parse_lanes(), self.parse_trains(), self.parse_passengers()]
+        #TODO Exception handling in output_parser
+            objects = [self.parse_stations(), self.parse_lines(), self.parse_trains(), self.parse_passengers()]
             return objects
-        except CannotParseInputException as ex:
-            print("")
-            print("")
-            print("-----------------------------------------------------------------")
-            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            print(ex.msg)
-            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            print("-----------------------------------------------------------------")
+
+
 

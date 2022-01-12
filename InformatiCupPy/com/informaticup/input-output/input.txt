@@ -13,7 +13,7 @@ S9 1
 # Strecken: str(ID) str(Anfang) str(Ende) dec(Länge) int(Kapazität)
 [Lines]
 L1 S1 S2 8 1
-L2 S2 S3 10 1
+L2 S2 S1 10 1
 L3 S1 S3 10 1
 L4 S3 S4 12 1
 L5 S1 S6 14 1
