@@ -30,7 +30,10 @@ class AdvancedDijkstraAlgorithm(ISolver):
         self.lines = input_from_file[1]
         self.trains = input_from_file[2]
         self.passengers = input_from_file[3]
-        self.capacity_speed_ratio = capacity_speed_ratio
+        if 0 <= capacity_speed_ratio <= 1:
+            self.capacity_speed_ratio = capacity_speed_ratio
+        else:
+            self.capacity_speed_ratio = 0.5
 
     def solve(self):
         """
