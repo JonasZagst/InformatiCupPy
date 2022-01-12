@@ -20,6 +20,9 @@ class InputParser:
         station = False
 
         for i, line in enumerate(self.input):
+
+            if station and line.__contains__("[Stations]"):
+                raise CannotParseInputException("Cannot read Input, unknown line in file")
             if station:
                 splittedLine = line.split(" ")
 
@@ -41,6 +44,8 @@ class InputParser:
         line_bool = False
 
         for i, line in enumerate(self.input):
+            if line_bool and line.__contains__("[Lines]"):
+                raise CannotParseInputException("Cannot read Input, unknown line in file")
             if line_bool:
                 splittedLine = line.split(" ")
 
@@ -63,6 +68,8 @@ class InputParser:
         train = False
 
         for i, line in enumerate(self.input):
+            if train and line.__contains__("[Trains]"):
+                raise CannotParseInputException("Cannot read Input, unknown line in file")
             if train:
                 splittedLine = line.split(" ")
 
@@ -84,6 +91,8 @@ class InputParser:
         passenger = False
 
         for i, line in enumerate(self.input):
+            if passenger and line.__contains__("[Passengers]"):
+                raise CannotParseInputException("Cannot read Input, unknown line in file")
             if passenger:
                 splittedLine = line.split(" ")
 
