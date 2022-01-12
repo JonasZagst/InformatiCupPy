@@ -18,10 +18,6 @@ class AdvancedDijkstraAlgorithm(ISolver):
         Weakness: uses just one train to carry a passenger
         """
 
-    # TODO: improve the easy version of this algorithm with the following ideas:
-    #  - take passengers with you when swapping
-    #  - take passengers just with you for just a part of the journey
-
     def __init__(self, input_from_file, capacity_speed_ratio=0.5):
         """
         sets up the lists retrieved from the input
