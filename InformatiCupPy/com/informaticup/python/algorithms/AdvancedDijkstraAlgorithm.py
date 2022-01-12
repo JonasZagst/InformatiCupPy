@@ -32,6 +32,8 @@ class AdvancedDijkstraAlgorithm(ISolver):
         time = 0
         delay_cumulated = 0
 
+        # TODO: do all train evaluation on a deepcopy of self.trains to avoid problems with check_station_capacity method
+
         # get biggest passenger group
         self.passengers.sort(key=lambda x: x.group_size)
         biggest_passenger_group = self.passengers[0].group_size
@@ -43,37 +45,9 @@ class AdvancedDijkstraAlgorithm(ISolver):
         graph = Helper.set_up_graph(self.stations, self.lines)
         path_dict = Helper.set_up_path_dict(self.stations)
 
-        train_placed = False
 
-        my_train = self.get_my_train(self.trains, biggest_passenger_group, self.capacity_speed_ratio)
 
-        # care if the used train is a wildcard train
-        if my_train.fixed_start and not train_placed:
-            train_placed = True
-
-        if not my_train.fixed_start and not train_placed:
-
-            # first check for initial station of the first passenger to save some time
-            for s in self.stations:
-                if s.id == self.passengers[0].initial_station and self.check_station_capacity(s) >= 1:
-                    initial_position = self.passengers[0].initial_station
-                    my_train.initial_position = initial_position
-                    my_train.position = initial_position
-                    train_placed = True
-                    break
-
-            # evaluate capacity of all other stations
-            if not train_placed:
-                for s in self.stations:
-                    if self.check_station_capacity(s) >= 1:
-                        initial_position = s.id
-                        my_train.initial_position = initial_position
-                        my_train.position = initial_position
-                        train_placed = True
-                        break
-
-        if train_placed:
-            file_solvable = True
+        my_train, file_solvable = self.get_my_train(copy.deepcopy(self.trains), biggest_passenger_group, self.capacity_speed_ratio)
 
         time = 1
 
@@ -344,21 +318,59 @@ class AdvancedDijkstraAlgorithm(ISolver):
 
         return passengers_at_path
 
-    def get_my_train(self, train, biggest_passenger_group, capacity_speed_ratio):
-        for train in reversed(self.trains):
-            if train.capacity < biggest_passenger_group:
-                self.trains.remove(train)
+    def get_my_train(self, trains, biggest_passenger_group, capacity_speed_ratio):
+        # check if wildcards can be placed
+        station_capacity_cumulated = 0
+        for s in self.stations:
+            station_capacity_cumulated += self.check_station_capacity(s)
 
-        self.trains.sort(key=lambda x: (x.capacity, x.speed))
-        old_speed = self.trains[len(self.trains)-1].speed - 1
-        for train in reversed(self.trains):
+        # remove wildcard trains if they cannot be placed
+        if station_capacity_cumulated == 0:
+            for t in reversed(trains):
+                if not t.fixed_start:
+                    trains.remove(t)
+
+        for train in reversed(trains):
+            if train.capacity < biggest_passenger_group:
+                trains.remove(train)
+
+        trains.sort(key=lambda x: (x.capacity, x.speed))
+        old_speed = trains[len(trains)-1].speed - 1
+        for train in reversed(trains):
             if train.speed <= old_speed:
-                self.trains.remove(train)
+                trains.remove(train)
             else:
                 old_speed = train.speed
 
-        mytrain = self.trains[int(capacity_speed_ratio*(len(self.trains)-1))]
-        return mytrain
+        my_train = trains[int(capacity_speed_ratio*(len(trains)-1))]
+
+        my_train = Helper.get_element_from_list_by_id(my_train.id, self.trains)
+
+        train_placed = True
+
+        if not my_train.fixed_start:
+            train_placed = False
+            # first check for initial station of the first passenger to save some time
+            for s in self.stations:
+                if s.id == self.passengers[0].initial_station and self.check_station_capacity(s) >= 1:
+                    my_train.initial_position = self.passengers[0].initial_station
+                    my_train.position = self.passengers[0].initial_station
+                    train_placed = True
+                    break
+
+            # evaluate capacity of all other stations
+            if not train_placed:
+                for s in self.stations:
+                    if self.check_station_capacity(s) >= 1:
+                        my_train.initial_position = s.id
+                        my_train.position = s.id
+                        train_placed = True
+                        break
+
+        if train_placed:
+            file_solvable = True
+
+        return my_train, file_solvable
 
     def get_name(self):
         """

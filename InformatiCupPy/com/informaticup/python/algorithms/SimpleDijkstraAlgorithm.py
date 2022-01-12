@@ -34,13 +34,19 @@ class SimpleDijkstraAlgorithm(ISolver):
 
         self.trains.sort(key=lambda x: x.capacity, reverse=True)
 
-        # setting up the Graph
-        graph = Graph()
-        helper = Helper()
-        graph = helper.set_up_graph(self.stations, self.lines)
+        # check if wildcards can be placed
+        station_capacity_cumulated = 0
+        for s in self.stations:
+            station_capacity_cumulated += self.check_station_capacity(s)
 
-        # only for demo reasons
-        # print(self.calculateShortestPath(graph, 'S2', 'S6'))
+        # remove wildcard trains if they cannot be placed
+        if station_capacity_cumulated == 0 and (not self.trains[0].fixed_start):
+            for t in reversed(self.trains):
+                if not t.fixed_start:
+                    self.trains.remove(t)
+
+        # setting up the Graph
+        graph = Helper.set_up_graph(self.stations, self.lines)
 
         # care for wildcard trains
         if not self.trains[0].fixed_start:
