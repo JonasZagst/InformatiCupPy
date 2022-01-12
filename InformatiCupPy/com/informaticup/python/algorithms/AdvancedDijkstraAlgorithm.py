@@ -76,7 +76,7 @@ class AdvancedDijkstraAlgorithm(ISolver):
                                                                                                       my_train.position,
                                                                                                       p.initial_station,
                                                                                                       path_dict)
-                        time, delay = self.travelSelectedPath(time, list_of_path, list_of_lines, my_train)
+                        time, delay = self.travel_selected_path(time, list_of_path, list_of_lines, my_train)
                         delay_cumulated += delay
 
                     # getting the passenger to his target station
@@ -86,7 +86,7 @@ class AdvancedDijkstraAlgorithm(ISolver):
                                                                                                       p.target_station,
                                                                                                       path_dict)
 
-                        time, delay = self.travelSelectedPath(time, list_of_path, list_of_lines, my_train)
+                        time, delay = self.travel_selected_path(time, list_of_path, list_of_lines, my_train)
                         delay_cumulated += delay
 
                     else:
@@ -184,7 +184,7 @@ class AdvancedDijkstraAlgorithm(ISolver):
 
         return visited, path, names
 
-    def travelSelectedPath(self, time, list_of_path, list_of_lines, train):
+    def travel_selected_path(self, time, list_of_path, list_of_lines, train):
         """
         Based on a given path this method realizes the travelling of passenger and train.
         :param time: start time of travelling process

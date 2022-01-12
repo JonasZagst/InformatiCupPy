@@ -92,7 +92,7 @@ class SimpleDijkstraAlgorithm(ISolver):
                         length, list_of_path, list_of_lines = self.calculate_shortest_path(graph,
                                                                                            my_train.position,
                                                                                            p.initial_station)
-                        time = self.travelSelectedPath(time, list_of_path, list_of_lines, my_train, None)
+                        time = self.travel_selected_path(time, list_of_path, list_of_lines, my_train, None)
 
                     # getting the passenger to his target station
                     if my_train.position == p.initial_station:
@@ -101,7 +101,7 @@ class SimpleDijkstraAlgorithm(ISolver):
                                                                                            p.target_station)
                         p.journey_history[time] = my_train.id
                         time += 1
-                        time = self.travelSelectedPath(time, list_of_path, list_of_lines, my_train, p)
+                        time = self.travel_selected_path(time, list_of_path, list_of_lines, my_train, p)
                         p.journey_history[time] = "Detrain"
                         if time - int(p.target_time) > 0:
                             delay_cumulated += time - int(p.target_time)
@@ -192,7 +192,7 @@ class SimpleDijkstraAlgorithm(ISolver):
 
         return visited, path, names
 
-    def travelSelectedPath(self, time, list_of_path, list_of_lines, train, passenger):
+    def travel_selected_path(self, time, list_of_path, list_of_lines, train, passenger):
         """
         Based on a given path this method realizes the travelling of passenger and train.
         :param time: start time of travelling process
