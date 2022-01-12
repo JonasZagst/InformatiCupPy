@@ -22,7 +22,7 @@ class AdvancedDijkstraAlgorithm(ISolver):
     #  - take passengers with you when swapping
     #  - take passengers just with you for just a part of the journey
 
-    def __init__(self, input_from_file, capacity_speed_ratio):
+    def __init__(self, input_from_file, capacity_speed_ratio=0.5):
         """
         sets up the lists retrieved from the input
         :param input_from_file: list of all objects created by the input parser based on the input.txt
