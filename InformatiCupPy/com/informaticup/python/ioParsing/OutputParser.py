@@ -11,7 +11,7 @@ from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotSolve
 
 class OutputParser:
     @staticmethod
-    def parse_output_files(solvers: list):
+    def parse_output_files(solvers: list, input):
 
         # TODO: catch CannotParseInputException
         # logging.error("Cannot read input file")
@@ -42,11 +42,11 @@ class OutputParser:
 
                     for i in solver.get_trains_and_passengers()[0]:
                         if isinstance(i, Train):
-                            output_str += i.to_output()
+                            output_str += i.to_output(input)
 
                     for i in solver.get_trains_and_passengers()[1]:
                         if isinstance(i, Passenger):
-                            output_str += i.to_output()
+                            output_str += i.to_output(input)
 
             except CannotSolveInput:
                 delay_accumulated = sys.maxsize

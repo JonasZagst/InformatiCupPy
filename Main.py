@@ -1,6 +1,7 @@
 import sys
 
 from InformatiCupPy.com.informaticup.python.algorithms.AdvancedDijkstraAlgorithm import AdvancedDijkstraAlgorithm
+from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotParseInputException
 from InformatiCupPy.com.informaticup.python.algorithms.SimpleDijkstraAlgorithm import SimpleDijkstraAlgorithm
 from InformatiCupPy.com.informaticup.python.algorithms.SimpleTrainParallelizationAlgorithm \
     import SimpleTrainParallelizationAlgorithm
@@ -24,9 +25,10 @@ def main():
     # input_str = open("InformatiCupPy/com/informaticup/input-output/input.txt", "r").read()
 
     # creates a list (length 4) of lists (length x), which contains several object parsed from the input file
-    input = InputParser("InformatiCupPy/com/informaticup/input-output/input.txt").parse_input()
-    # input = InputParser(sys.stdin.read()).parse_input()
-    solvers = [SimpleDijkstraAlgorithm(copy.deepcopy(input)),
+    try:
+        input = InputParser("InformatiCupPy/com/informaticup/input-output/input.txt").parse_input()
+        # input = InputParser(sys.stdin.read()).parse_input()
+        solvers = [SimpleDijkstraAlgorithm(copy.deepcopy(input)),
                AdvancedDijkstraAlgorithm(copy.deepcopy(input), capacity_speed_ratio=0),
                AdvancedDijkstraAlgorithm(copy.deepcopy(input), capacity_speed_ratio=0.3),
                AdvancedDijkstraAlgorithm(copy.deepcopy(input), capacity_speed_ratio=0.7),
@@ -35,8 +37,9 @@ def main():
                SimpleTrainParallelizationAlgorithm(copy.deepcopy(input), parallelization_factor=0.2),
                SimpleTrainParallelizationAlgorithm(copy.deepcopy(input))
                ]
-    OutputParser.parse_output_files(solvers)
-    # OutputParser.parse_output_files_to_stdout(solvers, input)
-
+        OutputParser.parse_output_files(solvers, input)
+        # OutputParser.parse_output_files_to_stdout(solvers, input)
+    except CannotParseInputException as ex:
+        ex.print_message()
 
 main()

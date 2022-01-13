@@ -1,3 +1,6 @@
+from InformatiCupPy.com.informaticup.python.algorithms.Helper import Helper
+
+
 class Passenger:
 
     def __init__(self, original_id, original_initial_station, original_target_station, group_size, target_time):
@@ -32,12 +35,16 @@ class Passenger:
 
     """Returns objects properties as String fitting the output format."""
 
-    def to_output(self):
-        output = "[Passenger:%s]" % self.id
-
+    def to_output(self, input):
+        output = "[Passenger:%s]" % self.original_id
+        print(self.journey_history)
         # check if dictionary is empty
         if not self.journey_history:
             return output + "\n\n"
+
+        for key, value in self.journey_history.items():
+            if value.startswith("T"):
+                self.journey_history[key] = Helper.get_element_from_list_by_id(value, input[2]).original_id
 
         for key, value in self.journey_history.items():
             if value == "Detrain":
@@ -52,6 +59,7 @@ class Passenger:
 
     def set_initial_station(self, internal_initial_station):
         self.initial_station = internal_initial_station
+        self.position = self.initial_station
 
     def set_target_station(self, internal_target_station):
         self.target_station = internal_target_station

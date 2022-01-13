@@ -28,12 +28,6 @@ class TimeoutException(Exception):
         self.msg = msg
 
 class CannotParseInputException(Exception):
-    def __init__(self, msg):
-        self.msg = msg
-        print("")
-        print("")
-        print("-----------------------------------------------------------------")
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        print(self.msg)
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        print("-----------------------------------------------------------------")
+
+    def print_message(self):
+        print("Cannot read input file")

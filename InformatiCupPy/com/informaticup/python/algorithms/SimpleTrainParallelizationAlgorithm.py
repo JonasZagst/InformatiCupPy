@@ -484,6 +484,9 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
                     wildcard_trains.pop(0)
                     break
 
+        if not wildcard_trains or len(wildcard_trains) <= set_wildcards_until:
+            return
+
         for passenger in self.passengers:
             pos = self.df[passenger.id + "-position"].iloc[self.time]
             station = Helper.get_element_from_list_by_id(pos, self.stations)

@@ -1,2 +1,16 @@
---- execution timed out ---- 
- 
+[Train:T2]
+0 Start S3
+2 Depart L1
+7 Depart L1
+12 Depart L2
+
+[Train:T1]
+
+[Passenger:P1]
+1 Board T2
+6 Detrain
+
+[Passenger:P2]
+11 Board T2
+17 Detrain
+
