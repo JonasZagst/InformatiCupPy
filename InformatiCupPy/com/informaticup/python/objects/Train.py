@@ -1,8 +1,9 @@
 class Train:
 
-    def __init__(self, id, position, speed, capacity):
+    def __init__(self, original_id, original_position, speed, capacity):
         # every train has a train ID
-        self.id = id
+        self.id = ""
+        self.original_id = original_id
         # number of passenger, which can travel with this train
         self.capacity = int(capacity)
         # passengers of this train
@@ -10,15 +11,16 @@ class Train:
         # speed of this train
         self.speed = float(speed)
         # current position of this train
-        self.position = position
+        self.position = ""
+        self.original_position = original_position
         # self.position_since
         # self.position_type
         # self.plan
         # self.boarding_possible
-        self.initial_position = position
+        self.initial_position = self.position
         self.fixed_start = True
         self.journey_history = {}
-        if position == "*":
+        if self.position == "*":
             self.fixed_start = False
 
     """Returns objects properties as String fitting the input format."""
@@ -45,3 +47,12 @@ class Train:
             output += "\n%s Depart %s" % (str(key), value)
 
         return output + "\n\n"
+
+    def set_internal_id(self, id):
+        self.id = id
+
+    def set_internal_position(self, internal_position):
+        self.position = internal_position
+
+    def get_original_position(self):
+        return self.original_position

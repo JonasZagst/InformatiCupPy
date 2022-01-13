@@ -1,38 +1,24 @@
-# Bahnhöfe: str(ID) int(Kapazität)
 [Stations]
-S1 1
-S2 1
-S3 1
-S4 1
-S5 1
-S6 1
-S7 1
-S8 1
-S9 1
+L1 2
+#this is a comment
+Train 2
 
-# Strecken: str(ID) str(Anfang) str(Ende) dec(Länge) int(Kapazität)
 [Lines]
-L1 S1 S2 8 1
-L2 S2 S1 10 1
-L3 S1 S3 10 1
-L4 S3 S4 12 1
-L5 S1 S6 14 1
-L6 S3 S6 2 1
-L7 S6 S5 9 1
-L8 S5 S4 6 1
-L9 S2 S4 15 1
-L10 S2 S7 3 1
-L11 S7 S8 10 1
-L12 S8 S9 5 1
+L1 P2 L1 3.14 1
 
-# Züge: str(ID) str(Startbahnhof)/* dec(Geschwindigkeit) int(Kapazität)
+#this is also a comment
+l1 P2 Train 4 1
+
 [Trains]
-T1 S1 2 20
-T2 S2 1 20
-
-
-# Passagiere: str(ID) str(Startbahnhof) str(Zielbahnhof) int(Gruppengröße) int(Ankunftszeit)
+Trains P2 5.5 30
 [Passengers]
-P1 S1 S2 20 10
-P2 S1 S2 20 20
-P3 S1 S2 20 30
+P1 P2 L1 3 3
+[Trains]
+Train * 0.9999999 50
+#we are in commentopolis! 🌃
+[Stations]
+P2 2
+
+[Passengers]
+
+p1 P2 Train 10 3
