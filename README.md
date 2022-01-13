@@ -23,7 +23,7 @@ Anschließend wird die Anwendung über `git clone {Pfad zu Repository auf Gitpro
 ## 2. Ausführung
 Dieses Kapitel beschreibt die Ausführung der Software mithilfe von docker auf verschiedensten Betriebssystemen.
 
-### 1.1 Bau eines lauffähigen Docker Image
+### 2.1 Bau eines lauffähigen Docker Image
 Wenn die Anwendung korrekt installiert wurde, findet sich in ihr das [Dockerfile](Dockerfile).
 Anhand von diesem kann man mit **docker**, auf allen unterstützten Betriebssystemen,
 einfach ein lauffähiges **Docker Image** der Anwendung erstellen. Hierfür sollte im Terminal der Befehl
@@ -31,7 +31,7 @@ einfach ein lauffähiges **Docker Image** der Anwendung erstellen. Hierfür soll
 ausgeführt werden (in einigen Systemen kann es nötig sein dies Administrator Berechtigungen auszuführen
 (in Linux `sudo` vor den Befehl)). 
 
-### 1.2 Ausführung des Docker Image
+### 2.2 Ausführung des Docker Image
 Wenn das Docker Image ohne Fehler erstellt wurde, kann es mit dem Befehl (Referenz Linux mit zsh und bash shell)
 `docker run -i [Name des Image] < {Pfad zum Inputfile}  > {Pfad zum gewünschten Outputfile}` ausgeführt werden.
 Hier wird das Inputfile durch `< {Pfad zum Inputfile}` in stdin des Container gelesen, wodurch dieser damit arbeiten kann. Der stdout Output
