@@ -1,9 +1,9 @@
 # InformatiCupPy
-*Dieses Dokument gilt als Handbuch dieser Anwendung und ist auch nochmal in pdf Form beiliegend.*
+*Dieses Dokument gilt als Handbuch dieser Anwendung und ist deshalb zusätzlich in pdf Form beiliegend.*
 
 ---
 ## 1. Installation
-Dieses Kapitel beschreibt die Installation der Anwendung auf verschiedensten Betriebssystemen.
+Dieses Kapitel beschreibt die Installation der Anwendung auf einem beliebigen Betriebssystemen.
 
 ### 1.1 Vorraussetzungen
 Die minimalen Vorraussetzungen für die Ausführung der Software sind ein von Docker offiziell unterstütztes
@@ -12,13 +12,13 @@ sowie **x86_64** als Plattform. Hier muss die **Docker Engine** lauffähig insta
 zu ermöglichen
 (Installationsanleitung: [Linux](https://docs.docker.com/engine/install/), [Windows](https://docs.docker.com/desktop/windows/install/),
 [macOS](https://docs.docker.com/desktop/mac/install/)).
-Zusätzlich ist empfohlen git installiert zu haben ([Git Installationsanleitung](https://github.com/git-guides/install-git)).
+Zusätzlich wird empfohlen git installiert zu haben ([Git Installationsanleitung](https://github.com/git-guides/install-git)).
 
 ### 1.2 Installation der Anwendung über git
 Wir empfehlen die Installation der Anwendung über **git**. Hierfür sollte man im Terminal, in einer beliebigen shell
 (empfohlene Referenzshells: bash oder zsh), in den gewünschten Verzeichnis/Ordner für die installation navigieren, was
 in den meisten shells durch `cd {Pfad zu gewünschtem Installationsordner}` erreicht werden kann.
-Anschließend wird die Anwendung über `git clone {Pfad zu Repository auf Gitprovider}` installiert.
+Anschließend wird die Anwendung via `git clone {Pfad zu Repository auf Gitprovider}` installiert.
 
 ## 2. Ausführung
 Dieses Kapitel beschreibt die Ausführung der Software mithilfe von docker auf verschiedensten Betriebssystemen.
@@ -36,7 +36,7 @@ Wenn das Docker Image ohne Fehler erstellt wurde, kann es mit dem Befehl (Refere
 `docker run -i [Name des Image] < {Pfad zum Inputfile}  > {Pfad zum gewünschten Outputfile}` ausgeführt werden.
 Hier wird das Inputfile durch `< {Pfad zum Inputfile}` in stdin des Container gelesen, wodurch dieser damit arbeiten kann. Der stdout Output
 des Containers wird durch `> {Pfad zum gewünschten Outputfile}` in ein gewähltes Outputfile geparst, dort findet sich
-dann der berechnete Fahrplan (jeh nach Betriebssystem sollte hierfür die Dateiendung *.txt* gewählt werden).
+dann der berechnete Fahrplan (je nach Betriebssystem sollte hierfür die Dateiendung *.txt* gewählt werden).
 
 ---
 ## 3. Anmerkungen zu diesem Handbuch
@@ -44,7 +44,6 @@ Dieses Handbuch soll die Installation und Nutzung der Software möglichst jedem 
 dessen Wahl des Betriebssystems ermöglichen. Jedoch können wir nicht für die Allgemeingültigkeit dieser
 Anweisungen garantieren. Wir konnten die Software vor allem auf Linux und Windows Testen, da wir kein MacOS
 verwenden. Zudem sind die hier gezeigten Befehle alle auf die Linux Shells, welche wir getestet haben
-(bash und zsh) bezogen, es könnte auf anderen Shells und Betriebssystemen eine andere Syntax gefordert sein.
-Man findet jedoch auf allein bekannteren Systemen Anleitungen zur verwendung von git und docker. Falls es zu
-Problemen kommmt empfehlen wir diese Ressorcen: [Linux](https://docs.docker.com/config/daemon/),
+(bash und zsh) bezogen, es könnte auf anderen Shells und Betriebssystemen eine andere Syntax erforderlich sein.
+Falls es zu Problemen kommmt empfehlen wir diese Ressorcen: [Linux](https://docs.docker.com/config/daemon/),
 [Windows](https://docs.docker.com/desktop/windows/troubleshoot/) und [macOS](https://docs.docker.com/desktop/mac/troubleshoot/).
