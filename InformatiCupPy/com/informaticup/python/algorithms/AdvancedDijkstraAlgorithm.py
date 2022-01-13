@@ -9,74 +9,56 @@ from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotSolve
 
 
 class AdvancedDijkstraAlgorithm(ISolver):
+    """ Algorithm, which iterates through a list of all passengers and uses one train to bring them
+        to their distinct destinations. If there are passengers on the way, which want to travel to a target also
+        on the path they can be took along. This selection of the train based on a parameter.
+        To calculate the shortest path between two stations the dijkstra algorithm is used.
+        The algorithm also features a handling of wildcard trains, passenger/station/line capacity evaluation
+        and calculation of accumulated delay of all passengers
+        Weakness: uses just one train to carry a passenger
+        """
 
-    # TODO: improve the easy version of this algorithm with the following ideas:
-    #  - (implement the ability of trains to pass a station without stopping to save some time)
-    #  - don't deliver passengers to early -> detrain them intelligent in the middle of the journey
-    #  - capacity of lines/stations should also be changed (like train capacity) -> goal: use more than one train
-    #  - take passengers with you when swapping - take passengers just with you for just a part of the journey
-    #  - wildcard parameter
-
-    def __init__(self, input_from_file):
+    def __init__(self, input_from_file, capacity_speed_ratio=0.5):
+        """
+        sets up the lists retrieved from the input
+        :param input_from_file: list of all objects created by the input parser based on the input.txt
+        :param capacity_speed_ratio: parameter to select train (has to be between 0 and 1)
+            0: takes the fastest but smallest train possible
+            1: takes the biggest but slowest train
+        """
         self.stations = input_from_file[0]
         self.lines = input_from_file[1]
         self.trains = input_from_file[2]
         self.passengers = input_from_file[3]
+        if 0 <= capacity_speed_ratio <= 1:
+            self.capacity_speed_ratio = capacity_speed_ratio
+        else:
+            self.capacity_speed_ratio = 0.5
 
     def solve(self):
         """
         Method to solve an input problem. To understand the general thoughts this algorithm is based on read
         the class description. To comprehend the separate steps have a look at the comments.
+        :return: cumulated delay time of all passengers
         """
         file_solvable = False
         time = 0
         delay_cumulated = 0
 
+        # get biggest passenger group
+        self.passengers.sort(key=lambda x: x.group_size)
+        biggest_passenger_group = self.passengers[0].group_size
+
         # prioritize passengers/trains
         self.passengers.sort(key=lambda x: x.target_time)
-        # TODO: parameter to use faster vs. bigger trains
-        self.trains.sort(key=lambda x: (x.capacity, x.speed), reverse=True)
 
         # setting up the graph and a path dictionary
         graph = Helper.set_up_graph(self.stations, self.lines)
         path_dict = Helper.set_up_path_dict(self.stations)
 
-        train_placed = False
-
-        mytrain = None
-
-        # care if the used train is a wildcard train
-        for train in self.trains:
-            train_id = train.id
-            if train.fixed_start and not train_placed:
-                mytrain = train
-                train_placed = True
-
-            if not train.fixed_start and not train_placed:
-
-                # first check for initial station of the first passenger to save some time
-                for s in self.stations:
-                    if s.id == self.passengers[0].initial_station and self.check_station_capacity(s) >= 1:
-                        initial_position = self.passengers[0].initial_station
-                        train.initial_position = initial_position
-                        train.position = initial_position
-                        mytrain = train
-                        train_placed = True
-                        break
-
-                # evaluate capacity of all other stations
-                if not train_placed:
-                    for s in self.stations:
-                        if self.check_station_capacity(s) >= 1:
-                            initial_position = s.id
-                            train.initial_position = initial_position
-                            train.position = initial_position
-                            mytrain = train
-                            train_placed = True
-                            break
-
-        if train_placed:
-            file_solvable = True
+        # select train based on parameter
+        my_train, file_solvable = self.get_my_train(copy.deepcopy(self.trains), biggest_passenger_group,
+                                                    self.capacity_speed_ratio)
 
         time = 1
 
@@ -84,26 +66,26 @@ class AdvancedDijkstraAlgorithm(ISolver):
         if file_solvable:
             for p in self.passengers:
                 # evaluate passenger group size
-                if mytrain.capacity < p.group_size:
+                if my_train.capacity < p.group_size:
                     raise CannotSolveInput()
                 elif p.position != p.target_station:
                     # moving train to passenger
-                    if mytrain.position != p.initial_station:
+                    if my_train.position != p.initial_station:
                         length, list_of_path, list_of_lines, path_dict = self.calculate_shortest_path(graph,
-                                                                                                      mytrain.position,
+                                                                                                      my_train.position,
                                                                                                       p.initial_station,
                                                                                                       path_dict)
-                        time, delay = self.travelSelectedPath(time, list_of_path, list_of_lines, mytrain, None)
+                        time, delay = self.travel_selected_path(time, list_of_path, list_of_lines, my_train)
                         delay_cumulated += delay
 
                     # getting the passenger to his target station
-                    if mytrain.position == p.initial_station:
+                    if my_train.position == p.initial_station:
                         length, list_of_path, list_of_lines, path_dict = self.calculate_shortest_path(graph,
-                                                                                                      mytrain.position,
+                                                                                                      my_train.position,
                                                                                                       p.target_station,
                                                                                                       path_dict)
 
-                        time, delay = self.travelSelectedPath(time, list_of_path, list_of_lines, mytrain, p)
+                        time, delay = self.travel_selected_path(time, list_of_path, list_of_lines, my_train)
                         delay_cumulated += delay
 
                     else:
@@ -121,6 +103,7 @@ class AdvancedDijkstraAlgorithm(ISolver):
         :param graph: object, which represents all lines, stations and their corresponding edges
         :param start: station where the calculation should start
         :param target: station where the calculation should end
+        :param dict: contains already calculated paths to reduce time consumption
         :return: distance as whole, visited stations and visited lines
         """
         if start == target:
@@ -128,6 +111,7 @@ class AdvancedDijkstraAlgorithm(ISolver):
 
         path_dict = dict
 
+        # select already calculated paths
         if path_dict[start] is not None:
             visited = path_dict[start][0]
             paths = path_dict[start][1]
@@ -199,14 +183,13 @@ class AdvancedDijkstraAlgorithm(ISolver):
 
         return visited, path, names
 
-    def travelSelectedPath(self, time, list_of_path, list_of_lines, train, passenger):
+    def travel_selected_path(self, time, list_of_path, list_of_lines, train):
         """
         Based on a given path this method realizes the travelling of passenger and train.
         :param time: start time of travelling process
         :param list_of_path: list of paths to visit (calculated before using the dijkstra algorithm)
         :param list_of_lines: list of lines to visit (calculated before using the dijkstra algorithm)
         :param train: train which would be used to travel
-        :param passenger: passenger (also can be None) which is transported in the train
         :return: end time after travelling process
         """
         count = 0
@@ -214,14 +197,6 @@ class AdvancedDijkstraAlgorithm(ISolver):
         passengers = []
 
         passengers_at_path = self.find_passengers_along_the_way(list_of_path)
-
-        # for key, value in passengers_at_path.items():
-        #     print(key, end=' ')
-        #     for v in value:
-        #         print(v.id, end=' ')
-        #     print(' ')
-        #
-        # print("path finished")
 
         # replacing id's with objects
         for n, station_id in enumerate(list_of_path):
@@ -266,6 +241,7 @@ class AdvancedDijkstraAlgorithm(ISolver):
             else:
                 time += int(math.ceil(time_temp)) - 1
                 jumped = True
+
             # Swapping to handle capacity issues
             if self.check_station_capacity(list_of_path[count]) < 1:
                 self.check_trains_at_station(list_of_path[count])[0].journey_history[
@@ -328,10 +304,6 @@ class AdvancedDijkstraAlgorithm(ISolver):
         """
         return int(station.capacity) - len(self.check_trains_at_station(station))
 
-    def find_common_shortest_paths(self, shortest_paths):
-        # TODO: write algorithm to find small subsets of common shortest paths in the list of lists
-        i = 0
-
     def find_passengers_along_the_way(self, list_of_path):
         passengers_at_path = {}
         passengers = self.passengers
@@ -347,12 +319,78 @@ class AdvancedDijkstraAlgorithm(ISolver):
 
         return passengers_at_path
 
+    def get_my_train(self, trains, biggest_passenger_group, capacity_speed_ratio):
+        """
+        gets a train, which can carry all passengers based on a parameter
+        :param trains: list of all trains
+        :param biggest_passenger_group: integer indicating the group size of the biggest passenger group
+        :param capacity_speed_ratio: parameter to select train (has to be between 0 and 1)
+            0: takes the fastest but smallest train possible
+            1: takes the biggest but slowest train
+        :return: selected train, boolean that indicates if the file is solvable for this algorithm
+        """
+        # check if wildcards can be placed
+        station_capacity_cumulated = 0
+        for s in self.stations:
+            station_capacity_cumulated += self.check_station_capacity(s)
+
+        # remove wildcard trains if they cannot be placed
+        if station_capacity_cumulated == 0:
+            for t in reversed(trains):
+                if not t.fixed_start:
+                    trains.remove(t)
+
+        for train in reversed(trains):
+            if train.capacity < biggest_passenger_group:
+                trains.remove(train)
+
+        trains.sort(key=lambda x: (x.capacity, x.speed))
+        old_speed = trains[len(trains)-1].speed - 1
+        for train in reversed(trains):
+            if train.speed <= old_speed:
+                trains.remove(train)
+            else:
+                old_speed = train.speed
+
+        my_train = trains[int(capacity_speed_ratio*(len(trains)-1))]
+
+        my_train = Helper.get_element_from_list_by_id(my_train.id, self.trains)
+
+        train_placed = True
+
+        if not my_train.fixed_start:
+            train_placed = False
+            # first check for initial station of the first passenger to save some time
+            for s in self.stations:
+                if s.id == self.passengers[0].initial_station and self.check_station_capacity(s) >= 1:
+                    my_train.initial_position = self.passengers[0].initial_station
+                    my_train.position = self.passengers[0].initial_station
+                    train_placed = True
+                    break
+
+            # evaluate capacity of all other stations
+            if not train_placed:
+                for s in self.stations:
+                    if self.check_station_capacity(s) >= 1:
+                        my_train.initial_position = s.id
+                        my_train.position = s.id
+                        train_placed = True
+                        break
+
+        if train_placed:
+            file_solvable = True
+
+        return my_train, file_solvable
+
     def get_name(self):
         """
         name of the algorithm (used to name the output file)
         :return: name of the algorithm
         """
-        return "advanced-dijkstra-algorithm"
+        return f"advanced-dijkstra-algorithm-{str(self.capacity_speed_ratio)}"
 
     def get_trains_and_passengers(self) -> list:
+        """
+        :return: list of all trains and passengers
+        """
         return [self.trains, self.passengers]

@@ -1,6 +1,7 @@
 import _thread
 import sys
 import threading
+import logging
 from contextlib import contextmanager
 
 from InformatiCupPy.com.informaticup.python.objects.Passenger import Passenger
@@ -10,7 +11,10 @@ from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotSolve
 
 class OutputParser:
     @staticmethod
-    def parse_output_files(solvers: list, input):
+    def parse_output_files(solvers: list):
+
+        # TODO: catch CannotParseInputException
+        # logging.error("Cannot read input file")
 
         @contextmanager
         def time_limit(seconds, msg=''):
@@ -69,6 +73,6 @@ class OutputParser:
 
     @staticmethod
     def parse_output_files_to_stdout(solvers: list, input):
-        sys.stdout = OutputParser.parse_output_files(solvers, input)
+        sys.stdout = OutputParser.parse_output_files(solvers)
 
 
