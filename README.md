@@ -3,10 +3,10 @@
 
 ---
 ## 1. Installation
-Dieses Kapitel beschreibt die Installation der Anwendung auf einem beliebigen Betriebssystemen.
+Dieses Kapitel beschreibt die Installation der Anwendung auf einem beliebigen Betriebssystem.
 
-### 1.1 Vorraussetzungen
-Die minimalen Vorraussetzungen für die Ausführung der Software sind ein von Docker offiziell unterstütztes
+### 1.1 Voraussetzungen
+Die minimalen Voraussetzungen für die Ausführung der Software sind ein von Docker offiziell unterstütztes
 Betriebssystem sowie eine offiziell unterstützte Plattform. Wir empfehlen unterstützte **Linux Distributionen**,
 sowie **x86_64** als Plattform. Hier muss die **Docker Engine** lauffähig installiert sein, um die Ausführung der Anwendung
 zu ermöglichen
@@ -34,7 +34,7 @@ ausgeführt werden (in einigen Systemen kann es nötig sein dies Administrator B
 ### 2.2 Ausführung des Docker Image
 Wenn das Docker Image ohne Fehler erstellt wurde, kann es mit dem Befehl (Referenz Linux mit zsh und bash shell)
 `docker run -i [Name des Image] < {Pfad zum Inputfile}  > {Pfad zum gewünschten Outputfile}` ausgeführt werden.
-Hier wird das Inputfile durch `< {Pfad zum Inputfile}` in stdin des Container gelesen, wodurch dieser damit arbeiten kann. Der stdout Output
+Hier wird das Inputfile durch `< {Pfad zum Inputfile}` in stdin des Containers gelesen, wodurch dieser damit arbeiten kann. Der stdout Output
 des Containers wird durch `> {Pfad zum gewünschten Outputfile}` in ein gewähltes Outputfile geparst, dort findet sich
 dann der berechnete Fahrplan (je nach Betriebssystem sollte hierfür die Dateiendung *.txt* gewählt werden).
 
@@ -45,5 +45,5 @@ dessen Wahl des Betriebssystems ermöglichen. Jedoch können wir nicht für die 
 Anweisungen garantieren. Wir konnten die Software vor allem auf Linux und Windows Testen, da wir kein MacOS
 verwenden. Zudem sind die hier gezeigten Befehle alle auf die Linux Shells, welche wir getestet haben
 (bash und zsh) bezogen, es könnte auf anderen Shells und Betriebssystemen eine andere Syntax erforderlich sein.
-Falls es zu Problemen kommt empfehlen wir diese Ressorcen: [Linux](https://docs.docker.com/config/daemon/),
+Falls es zu Problemen kommt empfehlen wir diese Ressourcen: [Linux](https://docs.docker.com/config/daemon/),
 [Windows](https://docs.docker.com/desktop/windows/troubleshoot/) und [macOS](https://docs.docker.com/desktop/mac/troubleshoot/).
