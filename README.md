@@ -45,5 +45,5 @@ dessen Wahl des Betriebssystems ermöglichen. Jedoch können wir nicht für die 
 Anweisungen garantieren. Wir konnten die Software vor allem auf Linux und Windows Testen, da wir kein MacOS
 verwenden. Zudem sind die hier gezeigten Befehle alle auf die Linux Shells, welche wir getestet haben
 (bash und zsh) bezogen, es könnte auf anderen Shells und Betriebssystemen eine andere Syntax erforderlich sein.
-Falls es zu Problemen kommmt empfehlen wir diese Ressorcen: [Linux](https://docs.docker.com/config/daemon/),
+Falls es zu Problemen kommt empfehlen wir diese Ressorcen: [Linux](https://docs.docker.com/config/daemon/),
 [Windows](https://docs.docker.com/desktop/windows/troubleshoot/) und [macOS](https://docs.docker.com/desktop/mac/troubleshoot/).
