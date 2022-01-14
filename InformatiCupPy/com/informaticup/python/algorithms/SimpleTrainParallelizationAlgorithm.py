@@ -48,6 +48,8 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
         # starting solving algorithm/loop
         while self.check_break_condition():
             print(self.time)
+            if self.time == 26:
+                print()
             inner_loop_index = 0  # set counter for inner loop = 0
             while self.check_inner_break_condition() and inner_loop_index <= \
                     max(1.0, self.max_parallelization_coefficient * self.parallelization_factor):
@@ -260,8 +262,8 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
 
             can_swap = True
             self.add_new_row(end_time_line)
-            # if self.df[stations[c + 1] + "-current_capacity"].iloc[end_time_line] < 1:
-            if any(station_cap < 1 for station_cap in self.df[stations[c + 1] + "-current_capacity"].iloc[end_time_line:len(self.df)]):
+            if any(station_cap < 1 for station_cap
+                   in self.df[stations[c + 1] + "-current_capacity"].iloc[end_time_line:len(self.df)]):
                 can_swap = False
                 # try if swap is possible
                 for swap_train in self.trains:
@@ -419,11 +421,15 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
         possible_trains = []
         group_size = 0 if passenger is None else passenger.group_size
         for train in self.trains:
-            if self.df[train.id + "-current_capacity"].iloc[self.time] - int(group_size) >= 0 \
-                    and self.df[train.id + "-passengers"].iloc[self.time] == "" \
-                    and not self.df[train.id + "-is_on_line"].iloc[self.time] \
-                    and not self.df[train.id + "-checked"].iloc[self.time] \
-                    and self.df[train.id + "-position"].iloc[self.time] != "*":
+            is_free_train = True
+            for i in range(self.time, len(self.df)):
+                if self.df[train.id + "-current_capacity"].iloc[self.time] - int(group_size) < 0 \
+                        or self.df[train.id + "-passengers"].iloc[self.time] != "" \
+                        or self.df[train.id + "-is_on_line"].iloc[self.time] \
+                        or self.df[train.id + "-checked"].iloc[self.time] \
+                        or self.df[train.id + "-position"].iloc[self.time] == "*":
+                    is_free_train = False
+            if is_free_train:
                 possible_trains.append(train)
         return possible_trains
 
