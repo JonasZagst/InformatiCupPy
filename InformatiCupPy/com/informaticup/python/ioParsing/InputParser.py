@@ -10,30 +10,37 @@ class InputParser:
     def __init__(self, input_path):
         self.input = open(input_path).read().split("\n")
 
-    """Parses stations form input and creates station objects with the input parameters and returns them as list."""
-
     def parse_stations(self):
         stations_original = []
         stations = []
         counter = 0
         station = False
 
+        # iterating over each line of our input file
         for i, line in enumerate(self.input):
+            # setting the parsing boolean to "False", if the station segment ends
             if line.__contains__("[Lines]") or line.__contains__("[Trains]") or line.__contains__("[Passengers]"):
                 station = False
+            # try to parse a line if it is in a station section
             if station:
-                splittedLine = line.split(" ")
+                # splitting the line in order to get a string array, which is needed for the check method
+                splitted_line = line.split(" ")
 
-                if self.check_station_string(splittedLine):
-                    stations_original.append(Station(splittedLine[0], splittedLine[1]))
-                elif line.startswith("#") or line == "" or line == "[Trains]" or line == "[Lines]" or line == "[Stations]" or line == "[Passengers]":
+                # if this line is a valid station string, create a station object with the given values
+                if self.check_station_string(splitted_line):
+                    stations_original.append(Station(splitted_line[0], splitted_line[1]))
+                # checking if it is another valid string
+                elif line.startswith("#") or line == "" or line == "[Trains]" or line == "[Lines]" or\
+                     line == "[Stations]" or line == "[Passengers]":
                     continue
+                # if it is not another valid string, raise this exception, because there is a format problem in the file
                 else:
                     raise CannotParseInputException()
+            # setting the parsing boolean to "True" if a station segment begins
             if line == "[Stations]":
                 station = True
 
-        # setting the actualy used IDs
+        # setting the actually used IDs
         for s in stations_original:
             counter += 1
             s.set_internal_id("S" + str(counter))
@@ -41,39 +48,48 @@ class InputParser:
 
         return stations
 
-    """Parses lanes form input and creates lane objects with the input parameters and returns them as list."""
-
     def parse_lines(self, station_array):
         lines_original = []
         lines = []
         counter = 0
         line_bool = False
 
+        # iterating over each line of our input file
         for i, line in enumerate(self.input):
+            # setting the parsing boolean to "False" if the line segment ends
             if line.__contains__("[Stations]") or line.__contains__("[Trains]") or line.__contains__("[Passengers]"):
                 line_bool = False
+            # try to parse this line, if it is in a line segment
             if line_bool:
-                splittedLine = line.split(" ")
+                # split the line in order to get the string array needed for the check method
+                splitted_line = line.split(" ")
 
-                if self.check_line_string(splittedLine):
-                    connected_stations = [splittedLine[1], splittedLine[2]]
-                    lines_original.append(Line(splittedLine[0], connected_stations, splittedLine[3], splittedLine[4]))
-                elif line.startswith("#") or line == "[Stations]" or line == "[Trains]" or line == "[Lines]" or line == "[Passengers]" or line == "":
+                # creating a line object, if it is a valid line string
+                if self.check_line_string(splitted_line):
+                    connected_stations = [splitted_line[1], splitted_line[2]]
+                    lines_original.append(Line(splitted_line[0], connected_stations, splitted_line[3],
+                                               splitted_line[4]))
+                # if it is not a valid line string, check if it is another valid line
+                elif line.startswith("#") or line == "[Stations]" or line == "[Trains]" or line == "[Lines]" or \
+                     line == "[Passengers]" or line == "":
                     continue
+                # if it is not a valid line, raise tis exception, because there is a format problem in our input file
                 else:
                     raise CannotParseInputException()
+            # setting the parsing boolean to "True" if a line segment begins
             if line == "[Lines]":
                 line_bool = True
 
-        # setting the actualy used IDs
-        for l in lines_original:
+        # setting the actually used IDs
+        for li in lines_original:
             counter = counter + 1
-            l.set_internal_id("L" + str(counter))
-            original_stations = l.get_original_connected_stations()
+            li.set_internal_id("L" + str(counter))
+            original_stations = li.get_original_connected_stations()
             internal_stations = []
             first_station = ""
             second_station = ""
 
+            # replace the original station IDs used in the original string with the internal IDs of the used stations
             for st in station_array:
 
                 if str(st.get_original_id()).__contains__(original_stations[0]):
@@ -84,12 +100,10 @@ class InputParser:
             internal_stations.append(first_station)
             internal_stations.append(second_station)
 
-            l.set_internal_connected_stations(internal_stations)
-            lines.append(l)
+            li.set_internal_connected_stations(internal_stations)
+            lines.append(li)
 
         return lines
-
-    """Parses trains form input and creates train objects with the input parameters and returns them as list."""
 
     def parse_trains(self, station_array):
         trains_original = []
@@ -97,19 +111,29 @@ class InputParser:
         train = False
         counter = 0
 
+        # iterate over each line of our input file
         for i, line in enumerate(self.input):
+            # setting the parsing boolean to "False" if the train segment ends
             if line.__contains__("[Stations]") or line.__contains__("[Lines]") or line.__contains__("[Passengers]"):
                 train = False
+            # try to parse the line if it is in a train segment
             if train:
-                splittedLine = line.split(" ")
+                # split the line in order to get a string array, which is needed for the check method
+                splitted_line = line.split(" ")
 
-                if self.check_train_string(splittedLine):
-                    trains_original.append(Train(splittedLine[0], splittedLine[1], splittedLine[2], splittedLine[3]))
+                # create a train object with the given information if it is a valid train string
+                if self.check_train_string(splitted_line):
+                    trains_original.append(Train(splitted_line[0], splitted_line[1], splitted_line[2],
+                                                 splitted_line[3]))
+                # if it is not a valid train string, check whether it is another valid string
                 elif line.startswith(
-                    "#") or line == "[Stations]" or line == "[Trains]" or line == "[Lines]" or line == "[Passengers]" or line == "":
+                    "#") or line == "[Stations]" or line == "[Trains]" or line == "[Lines]" or \
+                        line == "[Passengers]" or line == "":
                     continue
+                # if it is not a valid string, raise this exception, because there is a format problem in our input file
                 else:
                     raise CannotParseInputException()
+            # setting the parsing boolean to "True" if a train segment starts
             if line == "[Trains]":
                 train = True
 
@@ -118,10 +142,12 @@ class InputParser:
             counter = counter + 1
             t.set_internal_id("T" + str(counter))
 
+            # if the train is free positionable, just set the internal ID to "*"
             if t.get_original_position() == "*":
                 t.set_internal_position("*")
                 trains.append(t)
                 continue
+            # if it is not free positionable, just replace the original station ID by the internal station ID
             else:
                 for st in station_array:
 
@@ -132,38 +158,46 @@ class InputParser:
 
         return trains
 
-    """Parses passengers form input and creates passenger objects with the input parameters and returns them as list."""
-
     def parse_passengers(self, station_array):
         passengers_original = []
         passengers = []
         counter = 0
         passenger = False
 
+        # iterating over each line of our input file
         for i, line in enumerate(self.input):
+            # setting the parsing boolean to "False" if the passenger segment ends
             if line.__contains__("[Stations]") or line.__contains__("[Trains]") or line.__contains__("[Lines]"):
                 passenger = False
+            # try to parse the line if it is in a passenger segment
             if passenger:
-                splittedLine = line.split(" ")
+                # split the line in order to get a string array, which is needed for the check method
+                splitted_line = line.split(" ")
 
-                if self.check_passenger_string(splittedLine):
-                    passengers_original.append(Passenger(splittedLine[0],
-                                                         splittedLine[1],
-                                                         splittedLine[2],
-                                                         splittedLine[3],
-                                                         splittedLine[4]))
-                elif line.startswith("#") or line == "[Stations]" or line == "[Trains]" or line == "[Lines]" or line == "[Passengers]" or line == "":
+                # creating a passenger object with the given information if it is a valid passenger string
+                if self.check_passenger_string(splitted_line):
+                    passengers_original.append(Passenger(splitted_line[0],
+                                                         splitted_line[1],
+                                                         splitted_line[2],
+                                                         splitted_line[3],
+                                                         splitted_line[4]))
+                # check whether it is another valid string
+                elif line.startswith("#") or line == "[Stations]" or line == "[Trains]" or line == "[Lines]" or \
+                     line == "[Passengers]" or line == "":
                     continue
+                # if it is not a valid string, raise this exception, because there is a format problem in our input file
                 else:
                     raise CannotParseInputException()
+            # setting the parsing boolean to "True" if a passenger segment starts
             if line == "[Passengers]":
                 passenger = True
 
-        # setting the actualy used IDs
+        # setting the actually used IDs
         for p in passengers_original:
             counter = counter + 1
             p.set_internal_id("P" + str(counter))
 
+            # replace the original station IDs with the internal IDs
             for st in station_array:
                 if str(st.get_original_id()).__contains__(str(p.get_original_initial_station())):
                     p.set_initial_station(st.to_string().split(" ")[0])
@@ -174,12 +208,12 @@ class InputParser:
 
         return passengers
 
-    """Checks whether a input line split into an string array is a valid station string"""
-
-    def check_station_string(self, stringList):
-        if stringList.__len__() == 2:
+    def check_station_string(self, string_list):
+        # a station string has only two elements, if there are not two elements, return "False"
+        if string_list.__len__() == 2:
+            # try to cast the elements, which need to be numbers in order to figure out, whether they are valid
             try:
-                cap = int(stringList[1])
+                cap = int(string_list[1])
 
                 return True
             except:
@@ -187,17 +221,13 @@ class InputParser:
         else:
             return False
 
-
-
-    def check_line_string(self, stringList):
-
-        """"Checks wether a input line split into an string array is a valid line string"""
-
-        if stringList.__len__() == 5:
+    def check_line_string(self, string_list):
+        # a line string has only five elements, if there are not five elements, return "False"
+        if string_list.__len__() == 5:
+            # try to cast the elements, which need to be numbers in order to figure out, whether they are valid
             try:
-
-                length = float(stringList[3])
-                cap = int(stringList[4])
+                length = float(string_list[3])
+                cap = int(string_list[4])
 
                 return True
             except:
@@ -205,33 +235,33 @@ class InputParser:
         else:
             return False
 
-    """Checks wether a input line split into an string array is a valid train string"""
-
-    def check_train_string(self, stringList):
-        if stringList.__len__() == 4:
+    def check_train_string(self, string_list):
+        # a train string has only four elements, if there are not four elements, return "False"
+        if string_list.__len__() == 4:
+            # try to cast the elements, which need to be numbers in order to figure out, whether they are valid
             try:
-                speed = float(stringList[2])
-                cap = int(stringList[3])
+                speed = float(string_list[2])
+                cap = int(string_list[3])
+
                 return True
             except:
                 return False
         else:
             return False
 
-    """Checks wether a input line split into an string array is a valid passengers string"""
-
-    def check_passenger_string(self, stringList):
-        if stringList.__len__() == 5:
+    def check_passenger_string(self, string_list):
+        # a passenger string has only five elements, if there are not five elements, return "False"
+        if string_list.__len__() == 5:
+            # try to cast the elements, which need to be numbers in order to figure out, whether they are valid
             try:
-                groupSize = int(stringList[3])
-                time = int(stringList[4])
+                groupSize = int(string_list[3])
+                time = int(string_list[4])
+
                 return True
             except:
                 return False
         else:
             return False
-
-    """Parses stations, lanes, trains and passengers from input and returns a list of those objects as list."""
 
     def parse_input(self):
         station_array = self.parse_stations()
