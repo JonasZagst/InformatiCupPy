@@ -51,8 +51,6 @@ class Train:
         if not self.fixed_start:
             output += "\n0 Start %s" % initial.original_id
 
-        print(self.journey_history)
-
         for key, value in self.journey_history.items():
             output += "\n%s Depart %s" % (str(key), value)
 

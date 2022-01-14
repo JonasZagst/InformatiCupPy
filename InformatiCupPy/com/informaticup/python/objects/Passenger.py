@@ -37,7 +37,7 @@ class Passenger:
 
     def to_output(self, input):
         output = "[Passenger:%s]" % self.original_id
-        print(self.journey_history)
+
         # check if dictionary is empty
         if not self.journey_history:
             return output + "\n\n"
