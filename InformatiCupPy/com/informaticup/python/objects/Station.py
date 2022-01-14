@@ -1,4 +1,5 @@
 class Station:
+    """Class representation for stations"""
 
     def __init__(self, original_id, capacity):
         # station id
@@ -8,6 +9,8 @@ class Station:
         self.capacity = int(capacity)
 
     def to_string(self) -> str:
+        """Returns objects properties as String fitting the input format."""
+
         return "%s %s" % (self.id, self.capacity)
 
     def set_internal_id(self, id):

@@ -2,6 +2,7 @@ from InformatiCupPy.com.informaticup.python.algorithms.Helper import Helper
 
 
 class Passenger:
+    """Class representation for passengers"""
 
     def __init__(self, original_id, original_initial_station, original_target_station, group_size, target_time):
         # id of the passenger
@@ -24,18 +25,18 @@ class Passenger:
         self.reached_target = False
         self.journey_history = {}
 
-    """Returns objects properties as String fitting the input format."""
-
     def to_string(self):
+        """Returns objects properties as String fitting the input format."""
+
         return "%s %s %s %s %s" % (self.id,
                                    self.initial_station,
                                    self.target_station,
                                    self.group_size,
                                    self.target_time)
 
-    """Returns objects properties as String fitting the output format."""
-
     def to_output(self, input):
+        """Returns objects properties as String fitting the output format."""
+
         output = "[Passenger:%s]" % self.original_id
 
         # check if dictionary is empty

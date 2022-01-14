@@ -1,4 +1,5 @@
 class Line:
+    """Class representation for lines"""
 
     def __init__(self, original_id, original_connected_stations, length, capacity):
         self.id = ""
@@ -14,6 +15,7 @@ class Line:
         self.current_capacity = int(capacity)
 
     def to_string(self):
+        """Returns objects properties as String fitting the input format."""
         return "%s %s %s %s %s" % (self.id,
                                    self.connected_stations[0],
                                    self.connected_stations[1],

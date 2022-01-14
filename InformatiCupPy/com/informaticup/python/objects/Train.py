@@ -2,6 +2,7 @@ from InformatiCupPy.com.informaticup.python.algorithms.Helper import Helper
 
 
 class Train:
+    """Class representation for trains"""
 
     def __init__(self, original_id, original_position, speed, capacity):
         # every train has a train ID
@@ -24,14 +25,14 @@ class Train:
         self.fixed_start = True
         self.journey_history = {}
 
-    """Returns objects properties as String fitting the input format."""
-
     def to_string(self):
+        """Returns objects properties as String fitting the input format."""
+
         return "%s %s %s %s" % (self.id, self.position, self.speed, self.capacity)
 
-    """Returns objects properties as String fitting the output format."""
-
     def to_output(self, input):
+        """Returns objects properties as String fitting the output format."""
+
         output = "[Train:%s]" % self.original_id
 
         # check if dictionary is empty
