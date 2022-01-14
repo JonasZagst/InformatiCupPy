@@ -159,7 +159,7 @@ class InputParser:
             if line == "[Passengers]":
                 passenger = True
 
-        # setting the actualy used IDs
+        # setting the actually used IDs
         for p in passengers_original:
             counter = counter + 1
             p.set_internal_id("P" + str(counter))
