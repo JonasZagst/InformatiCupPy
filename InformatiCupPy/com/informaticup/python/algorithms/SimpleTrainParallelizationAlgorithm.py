@@ -24,7 +24,6 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
     # TODO:
     #       -fix bug with station capacity and recursion depth
     #       -add comments
-    #       -parameter for wildcards
     #       -intelligent swap (board passengers before swap), parameter intelligent_swap=True/False
     #       -testing (different inputs)
 
@@ -49,8 +48,6 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
         # starting solving algorithm/loop
         while self.check_break_condition():
             print(self.time)
-            if self.time == 13:
-                print()
             inner_loop_index = 0  # set counter for inner loop = 0
             while self.check_inner_break_condition() and inner_loop_index <= \
                     max(1.0, self.max_parallelization_coefficient * self.parallelization_factor):
@@ -97,7 +94,6 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
                         try:
                             end_time = self.depart_train(chosen_train, chosen_passenger.target_station, self.time)
                             self.detrain_passenger(chosen_passenger, chosen_train, end_time)
-
                         except CannotDepartTrain:
                             pass
                     else:  # if passenger and train are not at the same station
@@ -459,10 +455,27 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
         else:
             raise NoTrainChosen
 
+    def set_a_wildcard_train_to(self, station_id, wildcard_trains):
+        """ Sets a single wildcard train to the specified station. Uses the first wildcard train in the list
+            and performs all changes on the DataFrame (self.df).
+            :param station_id: id of the station on which the wildcard train will be set.
+            :param wildcard_trains: list of all remaining wildcard trains.
+            :returns: wildcard_trains: returns the changed list of wildcard trains (removed the first one, which has
+                                       been set by the method).
+            """
+        self.df[wildcard_trains[0].id + "-position"].iloc[self.time] = station_id
+        self.df[station_id + "-current_capacity"].iloc[self.time] = \
+            self.df[station_id + "-current_capacity"].iloc[self.time] - 1
+        wildcard_trains[0].initial_position = station_id
+        wildcard_trains.pop(0)
+
+        return wildcard_trains
+
     def set_wildcard_trains(self):
         """ Sets wildcard trains. All wildcard trains will be set. First, it loops through the passengers and sets a
             wildcard train to all stations with passenger but without train. After that, the remaining wildcard trains
-            are distributed on the stations with enough capacity left."""
+            are distributed on the stations with enough capacity left.
+        """
         wildcard_trains = []
         for train in self.trains:
             if train.position == "*":
@@ -473,45 +486,36 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
         else:
             wildcard_trains.sort(key=lambda t: t.capacity, reverse=True)
 
+        # specified share of wildcard trains will be set
         wildcards_to_set = int(self.set_wildcards * len(wildcard_trains))
+
+        # there must be at least one train
+        # (if no train with fixed start and no wildcards to set, set one wildcard anyways)
+        if len(wildcard_trains) == len(self.trains) and wildcards_to_set == 0:
+            wildcards_to_set += 1
+
+        # method will set wildcards until length of wildcard_trains (list) is equal to or less than this variable
         set_wildcards_until = len(wildcard_trains) - wildcards_to_set
 
-        if len(wildcard_trains) == len(self.trains):
-            for station in self.stations:
-                if station.capacity > self.df[station.id + "-current_capacity"].iloc[self.time]:
-                    self.df[wildcard_trains[0].id + "-position"] = station.id
-                    self.df[station.id + "-current_capacity"].iloc[self.time] = \
-                        self.df[station.id + "-current_capacity"].iloc[self.time] - 1
-                    wildcard_trains[0].initial_position = station.id
-                    wildcard_trains.pop(0)
-                    break
-
+        # break if enough wildcards have already been set
         if not wildcard_trains or len(wildcard_trains) <= set_wildcards_until:
             return
 
+        # for each passenger, check if his initial station has no train -> set a wildcard there
         for passenger in self.passengers:
             pos = self.df[passenger.id + "-position"].iloc[self.time]
             station = Helper.get_element_from_list_by_id(pos, self.stations)
-            if station.capacity == self.df[pos + "-current_capacity"].iloc[self.time]:
-                self.df[wildcard_trains[0].id + "-position"] = pos
-                self.df[pos + "-current_capacity"].iloc[self.time] = \
-                    self.df[pos + "-current_capacity"].iloc[self.time] - 1
-                wildcard_trains[0].initial_position = pos
-                wildcard_trains.pop(0)
+            if station.capacity == self.df[station.id + "-current_capacity"].iloc[self.time]:
+                wildcard_trains = self.set_a_wildcard_train_to(station.id, wildcard_trains)
                 if not wildcard_trains or len(wildcard_trains) <= set_wildcards_until:
                     return
 
+        # set remaining wildcard trains to stations with enough capacity left
         for station in self.stations:
             if self.df[station.id + "-current_capacity"].iloc[self.time] > 0:
-                self.df[wildcard_trains[0].id + "-position"].iloc[self.time] = station.id
-                self.df[station.id + "-current_capacity"].iloc[self.time] = \
-                    self.df[station.id + "-current_capacity"].iloc[self.time] - 1
-                wildcard_trains[0].initial_position = station.id
-                wildcard_trains.pop(0)
+                wildcard_trains = self.set_a_wildcard_train_to(station.id, wildcard_trains)
                 if not wildcard_trains or len(wildcard_trains) <= set_wildcards_until:
                     return
-
-        return
 
     def get_name(self):
         return f"simple-train-parallelization-algorithm-{str(self.parallelization_factor)}-{str(self.set_wildcards)}"
