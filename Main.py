@@ -30,7 +30,7 @@ def main():
         input = InputParser("InformatiCupPy/com/informaticup/input-output/input.txt").parse_input()
         # input = InputParser(sys.stdin.read()).parse_input()
         solvers = [
-                    # SimpleDijkstraAlgorithm(copy.deepcopy(input)),
+                    SimpleDijkstraAlgorithm(copy.deepcopy(input)),
                     AdvancedPassengerParallelizationAlgorithm(copy.deepcopy(input), capacity_speed_ratio=0),
                     AdvancedPassengerParallelizationAlgorithm(copy.deepcopy(input), capacity_speed_ratio=1),
                    SimplePassengerParallelizationAlgorithm(copy.deepcopy(input), capacity_speed_ratio=0),

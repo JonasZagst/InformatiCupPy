@@ -47,41 +47,35 @@ class SimpleDijkstraAlgorithm(ISolver):
         # setting up the Graph
         graph = Helper.set_up_graph(self.stations, self.lines)
 
-        my_train = self.trains[0]
-
-        # care for wildcard trains
-        if not my_train.fixed_start:
-            # check if there is enough space in the whole graph for an additional wildcard train
-            stations_with_capacity = 0
-            for s in self.stations:
-                if self.check_station_capacity(s) >= 1:
-                    stations_with_capacity += 1
-
-            if stations_with_capacity < 1:
-                file_solvable = False
-
-            train_placed = False
-
-            # first check for initial station of the first passenger
-            for s in self.stations:
-                if s.id == self.passengers[0].initial_station and self.check_station_capacity(s) >= 1:
-                    my_train.initial_position = self.passengers[0].initial_station
-                    my_train.position = self.passengers[0].initial_station
-                    train_placed = True
-                    break
-
-            # evaluate capacity of all other stations
-            if not train_placed:
-                for s in self.stations:
-                    if self.check_station_capacity(s) >= 1:
-                        my_train.initial_position = s.id
-                        my_train.position = s.id
-                        break
-
-        time = 1
+        try:
+            my_train = self.trains[0]
+        except:
+            file_solvable = False
 
         # uses only one train to transport all passengers
         if file_solvable:
+            # care for wildcard trains
+            if not my_train.fixed_start:
+                train_placed = False
+
+                # first check for initial station of the first passenger
+                for s in self.stations:
+                    if s.id == self.passengers[0].initial_station and self.check_station_capacity(s) >= 1:
+                        my_train.initial_position = self.passengers[0].initial_station
+                        my_train.position = self.passengers[0].initial_station
+                        train_placed = True
+                        break
+
+                # evaluate capacity of all other stations
+                if not train_placed:
+                    for s in self.stations:
+                        if self.check_station_capacity(s) >= 1:
+                            my_train.initial_position = s.id
+                            my_train.position = s.id
+                            break
+
+            time = 1
+
             for p in self.passengers:
                 # evaluate if passenger group fits into used train
                 if my_train.capacity < p.group_size:

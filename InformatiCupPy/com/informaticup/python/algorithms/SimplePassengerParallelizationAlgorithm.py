@@ -344,6 +344,9 @@ class SimplePassengerParallelizationAlgorithm(ISolver):
             if train.capacity < biggest_passenger_group:
                 trains.remove(train)
 
+        if len(trains) == 0:
+            return None, False
+
         trains.sort(key=lambda x: (x.capacity, x.speed))
         old_speed = trains[len(trains)-1].speed - 1
         for train in reversed(trains):
