@@ -210,11 +210,11 @@ class inputGenerator:
     def generatePassengers(self):
         self.inputFile.write("\n# Passagiere: str(ID) str(Startbahnhof) str(Zielbahnhof) int(Gruppengroeße) int(Ankunftszeit)\n")
         self.inputFile.write("[Passengers]\n")
-        for x in range(1, self.numberOfLines+1):
+        for x in range(1, self.numberOfPassengers+1):
             passengerString = "P" + str(x) + " "
 
-            passengerStart = random.randint(1, self.numberOfStations)
-            passengerArrival = random.randint(1, self.numberOfStations)
+            passengerStart = random.randint(1, self.numberOfStations-1)
+            passengerArrival = random.randint(1, self.numberOfStations-1)
 
             if passengerStart != passengerArrival:
                 passengerString = passengerString + "S" + str(passengerStart) + " " + "S" + str(passengerArrival) + " "
@@ -226,7 +226,7 @@ class inputGenerator:
                 else:
                     passengerStart = passengerStart + 1
                 passengerString = passengerString + "S" + str(passengerStart) + " " + "S" + str(passengerArrival) + " "
-            passengerString = passengerString + str(random.randint(1, self.passengerMaxGroupSize)) + " " + str(random.randint(1, 200)) + "\n"
+            passengerString = passengerString + str(random.randint(1, self.passengerMaxGroupSize)) + " " + str(random.randint(1, 500)) + "\n"
             self.inputFile.write(passengerString)
 
     def printNumberOfObjects(self):

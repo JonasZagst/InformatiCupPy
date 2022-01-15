@@ -1,5 +1,5 @@
 from InformatiCupPy.com.informaticup.python.algorithms.ISolver import ISolver
-from InformatiCupPy.com.informaticup.python.algorithms.AdvancedDijkstraAlgorithm import AdvancedDijkstraAlgorithm as Dij
+from InformatiCupPy.com.informaticup.python.algorithms.SimplePassengerParallelizationAlgorithm import SimplePassengerParallelizationAlgorithm as Dij
 from InformatiCupPy.com.informaticup.python.algorithms.Helper import Helper
 from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotDepartTrain, NoPassengerChosen, \
     NoTrainChosen, CannotBoardPassenger, CannotSolveInput, ProblemWithPassenger

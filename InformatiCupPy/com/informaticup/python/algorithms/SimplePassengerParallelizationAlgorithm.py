@@ -8,7 +8,7 @@ from InformatiCupPy.com.informaticup.python.algorithms.ISolver import ISolver
 from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotSolveInput, CannotBoardPassenger
 
 
-class AdvancedDijkstraAlgorithm(ISolver):
+class SimplePassengerParallelizationAlgorithm(ISolver):
     """ Algorithm, which iterates through a list of all passengers and uses one train to bring them
         to their distinct destinations. If there are passengers on the way, which want to travel to a target also
         on the path they can be took along. This selection of the train based on a parameter.
@@ -117,7 +117,7 @@ class AdvancedDijkstraAlgorithm(ISolver):
             paths = path_dict[start][1]
             names = path_dict[start][2]
         else:
-            visited, paths, names = AdvancedDijkstraAlgorithm.dijkstra(graph, start)
+            visited, paths, names = SimplePassengerParallelizationAlgorithm.dijkstra(graph, start)
             path_dict[start] = [visited, paths, names]
 
         full_path = deque()
@@ -344,6 +344,9 @@ class AdvancedDijkstraAlgorithm(ISolver):
             if train.capacity < biggest_passenger_group:
                 trains.remove(train)
 
+        if len(trains) == 0:
+            return None, False
+
         trains.sort(key=lambda x: (x.capacity, x.speed))
         old_speed = trains[len(trains)-1].speed - 1
         for train in reversed(trains):
@@ -387,7 +390,7 @@ class AdvancedDijkstraAlgorithm(ISolver):
         name of the algorithm (used to name the output file)
         :return: name of the algorithm
         """
-        return f"advanced-dijkstra-algorithm-{str(self.capacity_speed_ratio)}"
+        return f"simple-train-parallelization-algorithm-{str(self.capacity_speed_ratio)}"
 
     def get_trains_and_passengers(self) -> list:
         """

@@ -20,6 +20,8 @@ class Passenger:
         self.target_time = int(target_time)
         # the current position of the passenger
         self.position = self.initial_station
+        self.interim_target = None
+        self.reached_interim_target = False
         # true if passenger currently in a train, else false
         self.is_in_train = False
         self.reached_target = False
