@@ -14,9 +14,6 @@ class OutputParser:
     def parse_output_files(solvers: list, input):
         """Executes algorithms, takes the output and parses it into the output.txt file."""
 
-        # TODO: catch CannotParseInputException
-        # logging.error("Cannot read input file")
-
         # timeout for algorithms taking to long
         @contextmanager
         def time_limit(seconds, msg=''):
@@ -41,7 +38,7 @@ class OutputParser:
                     delay_accumulated = solver.solve()
 
                     # performance rating of the distinct algorithms used
-                    # print(solver.get_name() + " - accumulated delay time: " + str(delay_accumulated))
+                    print(solver.get_name() + " - accumulated delay time: " + str(delay_accumulated))
 
                     for i in solver.get_trains_and_passengers()[0]:
                         if isinstance(i, Train):
@@ -55,7 +52,7 @@ class OutputParser:
             except CannotSolveInput:
                 delay_accumulated = sys.maxsize
             except TimeoutException:
-                # print(solver.get_name() + " --- execution timed out ----")
+                print(solver.get_name() + " --- execution timed out ----")
                 output_str = "--- execution timed out ---- \n \n"
             except Exception:
                 output_str = "--- an error occurred during execution of the algorithm ---- \n \n"
