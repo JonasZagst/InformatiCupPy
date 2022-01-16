@@ -65,8 +65,8 @@ class AdvancedPassengerParallelizationAlgorithm(ISolver):
         # calculate shortest paths for all passengers
         passenger_dict = {}
         for p in self.passengers:
-            list_of_path, list_of_line, path_dict = self.calculate_shortest_path(graph, p.initial_station, p.target_station, path_dict)
-            passenger_dict[p] = [list_of_path, list_of_line]
+            list_of_path, list_of_lines, path_dict = self.calculate_shortest_path(graph, p.initial_station, p.target_station, path_dict)
+            passenger_dict[p] = [list_of_path, list_of_lines]
 
         # uses only one train to transport all passengers
         if file_solvable:
@@ -76,16 +76,16 @@ class AdvancedPassengerParallelizationAlgorithm(ISolver):
                     raise CannotSolveInput()
                 elif p.position != p.target_station:
                     # moving train to passenger
-                    if my_train.position != p.initial_station:
+                    if my_train.position != p.position:
                         list_of_path, list_of_lines, path_dict = self.calculate_shortest_path(graph,
                                                                                                       my_train.position,
-                                                                                                      p.initial_station,
+                                                                                                      p.position,
                                                                                                       path_dict)
                         time, delay = self.travel_selected_path(time, list_of_path, list_of_lines, my_train, passenger_dict)
                         delay_cumulated += delay
 
                     # getting the passenger to his target station
-                    if my_train.position == p.initial_station:
+                    if my_train.position == p.position:
                         time, delay = self.travel_selected_path(time, passenger_dict[p][0], passenger_dict[p][1], my_train, passenger_dict)
                         delay_cumulated += delay
 
@@ -108,7 +108,7 @@ class AdvancedPassengerParallelizationAlgorithm(ISolver):
         :return: distance as whole, visited stations and visited lines
         """
         if start == target:
-            return 0, list(target), list(), None
+            return list(target), list(), None
 
         path_dict = dict
 
@@ -199,6 +199,9 @@ class AdvancedPassengerParallelizationAlgorithm(ISolver):
 
         passengers_at_path = self.find_passengers_along_the_way(list_of_path, passenger_dict)
 
+        to_remove_path = {}
+        to_remove_lines = {}
+
         # replacing id's with objects
         for n, station_id in enumerate(list_of_path):
             s = Helper.get_element_from_list_by_id(station_id, self.stations)
@@ -245,11 +248,32 @@ class AdvancedPassengerParallelizationAlgorithm(ISolver):
 
             # Swapping to handle capacity issues
             if self.check_station_capacity(list_of_path[count]) < 1:
-                self.check_trains_at_station(list_of_path[count])[0].journey_history[
-                    int(time_old + int(math.ceil(time_temp)) - 1)] = visited_lines.id
-                print([list_of_path[count].id, list_of_path[count-1].id])
-                print(self.find_passengers_along_the_way([list_of_path[count].id, list_of_path[count-1].id], passenger_dict))
-                self.check_trains_at_station(list_of_path[count])[0].position = list_of_path[count]
+                swap_train = self.check_trains_at_station(list_of_path[count])[0]
+                swap_start_time = int(time_old + int(math.ceil(time_temp)) - 1)
+                swap_passengers_dict = self.find_passengers_along_the_way([list_of_path[count].id, list_of_path[count-1].id], passenger_dict)
+                swap_passengers = []
+                for key, value in swap_passengers_dict.items():
+                    swap_passengers = value
+                for swap_passenger in reversed(swap_passengers):
+                    if swap_train.capacity >= swap_passenger.group_size:
+                        swap_passenger.journey_history[swap_start_time-1] = swap_train.id
+                        swap_train.capacity = swap_train.capacity - swap_passenger.group_size
+                        swap_passenger.is_in_train = True
+                    else:
+                        swap_passengers.remove(swap_passenger)
+
+                swap_train.journey_history[swap_start_time] = visited_lines.id
+                swap_train.position = list_of_path[count]
+
+                swap_end_time = swap_start_time + math.ceil(float(visited_lines.length) / float(swap_train.speed))
+
+                for swap_passenger in swap_passengers:
+                    swap_passenger.journey_history[swap_end_time] = "Detrain"
+                    swap_passenger.position = list_of_path[count-1].id
+                    swap_passenger.reached_target = True
+                    swap_passenger.is_in_train = False
+
+
             train.position = list_of_path[count].id
 
             if list_of_path[count].id in passengers_at_path:
@@ -267,7 +291,29 @@ class AdvancedPassengerParallelizationAlgorithm(ISolver):
                     p.is_in_train = True
                     boarded = True
                 elif p.position != p.interim_target and (not p.reached_interim_target or not p.reached_target) and p.is_in_train:
+                    if isinstance(passenger_dict[p][1][0], str):
+                        line_rm = visited_lines.id
+                    else:
+                        line_rm = visited_lines
+
+                    if not (p in to_remove_lines):
+                        to_remove_lines[p] = [line_rm]
+                    else:
+                        to_remove_lines[p].append(line_rm)
+
+                    if isinstance(passenger_dict[p][0][0], str):
+                        path_rm = p.position
+                    else:
+                        path_rm = Helper.get_element_from_list_by_id(p.position, self.stations)
+
+                    if not (p in to_remove_path):
+                        to_remove_path[p] = [path_rm]
+                    else:
+                        to_remove_path[p].append(path_rm)
+
                     p.position = list_of_path[count].id
+
+
 
                 if p.position == p.interim_target and not p.reached_interim_target:
                     train.capacity = train.capacity + p.group_size
@@ -288,6 +334,15 @@ class AdvancedPassengerParallelizationAlgorithm(ISolver):
                 time += 2
             elif detrained or boarded or (count == len(list_of_lines) and jumped):
                 time += 1
+
+
+        for key, value in to_remove_lines.items():
+            for v in value:
+                passenger_dict[key][1].remove(v)
+
+        for key, value in to_remove_path.items():
+            for v in value:
+                passenger_dict[key][0].remove(v)
 
         return int(time), int(delay_cumulated)
 
@@ -401,14 +456,7 @@ class AdvancedPassengerParallelizationAlgorithm(ISolver):
         return my_train, file_solvable
 
     def get_name(self):
-        """
-        name of the algorithm (used to name the output file)
-        :return: name of the algorithm
-        """
         return f"advanced-passenger-parallelization-algorithm-{str(self.capacity_speed_ratio)}"
 
     def get_trains_and_passengers(self) -> list:
-        """
-        :return: list of all trains and passengers
-        """
         return [self.trains, self.passengers]

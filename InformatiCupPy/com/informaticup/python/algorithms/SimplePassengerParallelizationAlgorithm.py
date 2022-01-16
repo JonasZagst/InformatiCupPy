@@ -6,6 +6,7 @@ from collections import deque
 from InformatiCupPy.com.informaticup.python.algorithms.Helper import Helper
 from InformatiCupPy.com.informaticup.python.algorithms.ISolver import ISolver
 from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotSolveInput, CannotBoardPassenger
+from InformatiCupPy.com.informaticup.python.objects.Station import Station
 
 
 class SimplePassengerParallelizationAlgorithm(ISolver):
@@ -196,12 +197,14 @@ class SimplePassengerParallelizationAlgorithm(ISolver):
         delay_cumulated = 0
         passengers = []
 
+
         passengers_at_path = self.find_passengers_along_the_way(list_of_path)
 
         # replacing id's with objects
         for n, station_id in enumerate(list_of_path):
             s = Helper.get_element_from_list_by_id(station_id, self.stations)
             list_of_path[n] = s
+
 
         for n, line_id in enumerate(list_of_lines):
             l = Helper.get_element_from_list_by_id(line_id, self.lines)
@@ -386,14 +389,7 @@ class SimplePassengerParallelizationAlgorithm(ISolver):
         return my_train, file_solvable
 
     def get_name(self):
-        """
-        name of the algorithm (used to name the output file)
-        :return: name of the algorithm
-        """
-        return f"simple-train-parallelization-algorithm-{str(self.capacity_speed_ratio)}"
+        return f"simple-passenger-parallelization-algorithm-{str(self.capacity_speed_ratio)}"
 
     def get_trains_and_passengers(self) -> list:
-        """
-        :return: list of all trains and passengers
-        """
         return [self.trains, self.passengers]

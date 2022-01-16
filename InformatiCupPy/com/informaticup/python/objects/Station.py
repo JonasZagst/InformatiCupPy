@@ -2,10 +2,8 @@ class Station:
     """Class representation for stations"""
 
     def __init__(self, original_id, capacity):
-        # station id
         self.id = ""
         self.original_id = original_id
-        # Capacity in trains at the same time
         self.capacity = int(capacity)
 
     def to_string(self) -> str:

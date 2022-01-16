@@ -201,9 +201,12 @@ class SimpleDijkstraAlgorithm(ISolver):
         helper = Helper()
 
         # putting station objects in instead of id's in resulting string of shortest path algorithm
-        for n, station_id in enumerate(list_of_path):
-            s = helper.get_element_from_list_by_id(station_id, self.stations)
-            list_of_path[n] = s
+        try:
+            for n, station_id in enumerate(list_of_path):
+                s = helper.get_element_from_list_by_id(station_id, self.stations)
+                list_of_path[n] = s
+        except:
+            print("caught")
 
         for visited_lines in list_of_lines:
             count += 1
@@ -245,14 +248,7 @@ class SimpleDijkstraAlgorithm(ISolver):
         return int(station.capacity) - len(self.check_trains_at_station(station))
 
     def get_name(self):
-        """
-        name of the algorithm (used to name the output file)
-        :return: name of the algorithm
-        """
         return "simple-dijkstra-algorithm"
 
     def get_trains_and_passengers(self) -> list:
-        """
-        :return: list of all trains and passengers
-        """
         return [self.trains, self.passengers]

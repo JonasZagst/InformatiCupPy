@@ -5,24 +5,17 @@ class Passenger:
     """Class representation for passengers"""
 
     def __init__(self, original_id, original_initial_station, original_target_station, group_size, target_time):
-        # id of the passenger
         self.id = ""
         self.original_id = original_id
-        # start station of this passenger
         self.initial_station = ""
         self.original_initial_station = original_initial_station
-        # target station of this passenger
         self.target_station = ""
         self.original_target_station = original_target_station
-        # this is the number of persons eventually traveling with this passenger
         self.group_size = int(group_size)
-        # the target time of arrival
         self.target_time = int(target_time)
-        # the current position of the passenger
         self.position = self.initial_station
         self.interim_target = None
         self.reached_interim_target = False
-        # true if passenger currently in a train, else false
         self.is_in_train = False
         self.reached_target = False
         self.journey_history = {}
