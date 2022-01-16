@@ -24,7 +24,7 @@ class InputParser:
         # iterating over each line of our input file
         for i, line in enumerate(self.input):
             # setting the parsing boolean to "False", if the station segment ends
-            if line.__contains__("[Lines]") or line.__contains__("[Trains]") or line.__contains__("[Passengers]"):
+            if line == ("[Lines]") or line == ("[Trains]") or line == ("[Passengers]"):
                 station = False
             # try to parse a line if it is in a station section
             if station:
@@ -67,7 +67,7 @@ class InputParser:
         # iterating over each line of our input file
         for i, line in enumerate(self.input):
             # setting the parsing boolean to "False" if the line segment ends
-            if line.__contains__("[Stations]") or line.__contains__("[Trains]") or line.__contains__("[Passengers]"):
+            if line == ("[Stations]") or line == ("[Trains]") or line == ("[Passengers]"):
                 line_bool = False
             # try to parse this line, if it is in a line segment
             if line_bool:
@@ -102,9 +102,9 @@ class InputParser:
             # replace the original station IDs used in the original string with the internal IDs of the used stations
             for st in station_array:
 
-                if str(st.get_original_id()).__contains__(original_stations[0]):
+                if str(st.get_original_id()) == (original_stations[0]):
                     first_station = st.get_internal_id()
-                elif str(st.get_original_id()).__contains__(original_stations[1]):
+                elif str(st.get_original_id()) == (original_stations[1]):
                     second_station = st.get_internal_id()
 
             internal_stations.append(first_station)
@@ -129,7 +129,7 @@ class InputParser:
         # iterate over each line of our input file
         for i, line in enumerate(self.input):
             # setting the parsing boolean to "False" if the train segment ends
-            if line.__contains__("[Stations]") or line.__contains__("[Lines]") or line.__contains__("[Passengers]"):
+            if line == ("[Stations]") or line == ("[Lines]") or line == ("[Passengers]"):
                 train = False
             # try to parse the line if it is in a train segment
             if train:
@@ -166,7 +166,7 @@ class InputParser:
             else:
                 for st in station_array:
 
-                    if str(st.get_original_id()).__contains__(str(t.get_original_position())):
+                    if str(st.get_original_id()) == (str(t.get_original_position())):
                         t.set_internal_position(st.to_string().split(" ")[0])
 
             trains.append(t)
@@ -187,7 +187,7 @@ class InputParser:
         # iterating over each line of our input file
         for i, line in enumerate(self.input):
             # setting the parsing boolean to "False" if the passenger segment ends
-            if line.__contains__("[Stations]") or line.__contains__("[Trains]") or line.__contains__("[Lines]"):
+            if line == ("[Stations]") or line == ("[Trains]") or line == "[Lines]":
                 passenger = False
             # try to parse the line if it is in a passenger segment
             if passenger:
@@ -219,9 +219,9 @@ class InputParser:
 
             # replace the original station IDs with the internal IDs
             for st in station_array:
-                if str(st.get_original_id()).__contains__(str(p.get_original_initial_station())):
+                if str(st.get_original_id()) == (str(p.get_original_initial_station())):
                     p.set_initial_station(st.to_string().split(" ")[0])
-                elif str(st.get_original_id()).__contains__(str(p.get_original_target_station())):
+                elif str(st.get_original_id()) == (str(p.get_original_target_station())):
                     p.set_target_station(st.to_string().split(" ")[0])
 
             passengers.append(p)

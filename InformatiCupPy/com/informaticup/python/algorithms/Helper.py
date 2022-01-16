@@ -31,6 +31,10 @@ class Helper:
 
     @staticmethod
     def set_up_path_dict(stations):
+        """Method to set up a path dictionary, which contains all stations as keys.
+            :param stations: list of all stations
+            :returns : a dictionary
+        """
         path_dict = {}
 
         for s in stations:

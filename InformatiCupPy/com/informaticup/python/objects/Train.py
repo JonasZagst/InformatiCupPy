@@ -2,36 +2,28 @@ from InformatiCupPy.com.informaticup.python.algorithms.Helper import Helper
 
 
 class Train:
+    """Class representation for trains"""
 
     def __init__(self, original_id, original_position, speed, capacity):
-        # every train has a train ID
         self.id = ""
         self.original_id = original_id
-        # number of passenger, which can travel with this train
         self.capacity = int(capacity)
-        # passengers of this train
         self.passengers = None
-        # speed of this train
         self.speed = float(speed)
-        # current position of this train
         self.position = ""
         self.original_position = original_position
-        # self.position_since
-        # self.position_type
-        # self.plan
-        # self.boarding_possible
         self.initial_position = self.position
         self.fixed_start = True
         self.journey_history = {}
 
-    """Returns objects properties as String fitting the input format."""
-
     def to_string(self):
+        """Returns objects properties as String fitting the input format."""
+
         return "%s %s %s %s" % (self.id, self.position, self.speed, self.capacity)
 
-    """Returns objects properties as String fitting the output format."""
-
     def to_output(self, input):
+        """Returns objects properties as String fitting the output format."""
+
         output = "[Train:%s]" % self.original_id
 
         # check if dictionary is empty
@@ -50,8 +42,6 @@ class Train:
         # if not it isn´t allowed to be in the output file
         if not self.fixed_start:
             output += "\n0 Start %s" % initial.original_id
-
-        print(self.journey_history)
 
         for key, value in self.journey_history.items():
             output += "\n%s Depart %s" % (str(key), value)

@@ -1,21 +1,23 @@
 import _thread
 import sys
 import threading
-import logging
 from contextlib import contextmanager
 
+from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotSolveInput, TimeoutException, \
+    CannotBoardPassenger
 from InformatiCupPy.com.informaticup.python.objects.Passenger import Passenger
 from InformatiCupPy.com.informaticup.python.objects.Train import Train
-from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotSolveInput, TimeoutException
 
 
 class OutputParser:
     @staticmethod
     def parse_output_files(solvers: list, input):
+        """Executes algorithms, takes the output and parses it into the output.txt file."""
 
         # TODO: catch CannotParseInputException
         # logging.error("Cannot read input file")
 
+        # timeout for algorithms taking to long
         @contextmanager
         def time_limit(seconds, msg=''):
             timer = threading.Timer(seconds, lambda: _thread.interrupt_main())
@@ -30,6 +32,7 @@ class OutputParser:
 
         best_delay_time = sys.maxsize
 
+        # running through all algorithms
         for solver in solvers:
             output_str = ""
 
@@ -47,12 +50,15 @@ class OutputParser:
                     for i in solver.get_trains_and_passengers()[1]:
                         if isinstance(i, Passenger):
                             output_str += i.to_output(input)
-
+            except CannotBoardPassenger:
+                delay_accumulated = sys.maxsize
             except CannotSolveInput:
                 delay_accumulated = sys.maxsize
             except TimeoutException:
                 print(solver.get_name() + " --- execution timed out ----")
                 output_str = "--- execution timed out ---- \n \n"
+            except Exception:
+                output_str = "--- an error occurred during execution of the algorithm ---- \n \n"
 
             if best_delay_time > delay_accumulated:
                 best_delay_time = delay_accumulated
@@ -73,6 +79,6 @@ class OutputParser:
 
     @staticmethod
     def parse_output_files_to_stdout(solvers: list, input):
+        """Takes output from algorithms, parses it into the output.txt file and prints it to stdout."""
+
         sys.stdout = OutputParser.parse_output_files(solvers)
-
-
