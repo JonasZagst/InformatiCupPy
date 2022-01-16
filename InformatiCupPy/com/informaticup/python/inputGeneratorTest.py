@@ -1,5 +1,5 @@
-from InformatiCupPy.com.informaticup.python.inputGenerator import inputGenerator
+from InformatiCupPy.com.informaticup.python.InputGenerator import InputGenerator
 
-generator = inputGenerator()
+generator = InputGenerator()
 
-generator.generateInputFile()
+generator.generate_input_file()

@@ -11,6 +11,11 @@ class InputParser:
         self.input = open(input_path).read().split("\n")
 
     def parse_stations(self):
+        """
+        This method creates all station objects with the information given in the input file
+        :return: list of station objects
+        """
+
         stations_original = []
         stations = []
         counter = 0
@@ -49,6 +54,11 @@ class InputParser:
         return stations
 
     def parse_lines(self, station_array):
+        """
+        This method creates all line objects with the information given in the input file
+        :return: list of line objects
+        """
+
         lines_original = []
         lines = []
         counter = 0
@@ -106,6 +116,11 @@ class InputParser:
         return lines
 
     def parse_trains(self, station_array):
+        """
+        This method creates all train objects with the information given in the input file
+        :return: list of train objects
+        """
+
         trains_original = []
         trains = []
         train = False
@@ -159,6 +174,11 @@ class InputParser:
         return trains
 
     def parse_passengers(self, station_array):
+        """
+        This method creates all passenger objects with the information given in the input file
+        :return: list of passenger objects
+        """
+
         passengers_original = []
         passengers = []
         counter = 0
@@ -209,6 +229,11 @@ class InputParser:
         return passengers
 
     def check_station_string(self, string_list):
+        """
+        This method checks, whether a String array is a valid information provider for a station object
+        :return: If it is a valid True, else False
+        """
+
         # a station string has only two elements, if there are not two elements, return "False"
         if string_list.__len__() == 2:
             # try to cast the elements, which need to be numbers in order to figure out, whether they are valid
@@ -222,6 +247,11 @@ class InputParser:
             return False
 
     def check_line_string(self, string_list):
+        """
+        This method checks, whether a String array is a valid information provider for a line object
+        :return: If it is a valid True, else False
+        """
+
         # a line string has only five elements, if there are not five elements, return "False"
         if string_list.__len__() == 5:
             # try to cast the elements, which need to be numbers in order to figure out, whether they are valid
@@ -236,6 +266,11 @@ class InputParser:
             return False
 
     def check_train_string(self, string_list):
+        """
+        This method checks, whether a String array is a valid information provider for a train object
+        :return: If it is a valid True, else False
+        """
+
         # a train string has only four elements, if there are not four elements, return "False"
         if string_list.__len__() == 4:
             # try to cast the elements, which need to be numbers in order to figure out, whether they are valid
@@ -250,6 +285,11 @@ class InputParser:
             return False
 
     def check_passenger_string(self, string_list):
+        """
+        This method checks, whether a String array is a valid information provider for a passenger object
+        :return: If it is a valid True, else False
+        """
+
         # a passenger string has only five elements, if there are not five elements, return "False"
         if string_list.__len__() == 5:
             # try to cast the elements, which need to be numbers in order to figure out, whether they are valid
@@ -264,6 +304,10 @@ class InputParser:
             return False
 
     def parse_input(self):
+        """
+        This method reads the input file in order to crate all objects
+        :return: list of lists, which contains all objects
+        """
         station_array = self.parse_stations()
         objects = [station_array, self.parse_lines(station_array), self.parse_trains(station_array),
                    self.parse_passengers(station_array)]
