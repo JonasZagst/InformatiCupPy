@@ -22,10 +22,10 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
     """
 
     # TODO:
-    #       -fix bug with station capacity and recursion depth
+    #       -fix bug with endless loop
     #       -add comments
     #       -intelligent swap (board passengers before swap), parameter intelligent_swap=True/False
-    #       -testing (different inputs)
+    #       -full use of train capacity
 
     def __init__(self, input_from_file, parallelization_factor=1.0, set_wildcards=1.0):
         self.stations = input_from_file[0]
@@ -47,10 +47,10 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
         """
         # starting solving algorithm/loop
         while self.check_break_condition():
+
             print(self.time)
-            if self.time == 26:
-                print()
             inner_loop_index = 0  # set counter for inner loop = 0
+
             while self.check_inner_break_condition() and inner_loop_index <= \
                     max(1.0, self.max_parallelization_coefficient * self.parallelization_factor):
 
@@ -101,8 +101,12 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
                     else:  # if passenger and train are not at the same station
                         try:
                             # bring train to passenger
-                            self.depart_train(chosen_train, chosen_passenger_pos, self.time)
-                        except CannotDepartTrain:
+                            end_time = self.depart_train(chosen_train, chosen_passenger_pos, self.time)
+                            for i in range(self.time, end_time):
+                                self.df[chosen_passenger.id + "-checked"].iloc[i] = True
+                        except CannotDepartTrain as ex:
+                            for i in range(ex.time, len(self.df)):
+                                self.df[chosen_passenger.id + "-checked"].iloc[i] = False
                             pass
 
                     inner_loop_index += 1
@@ -210,7 +214,7 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
         # next passenger
         for passenger in self.passengers:
             if int(passenger.target_time) < int(next_passenger.target_time) \
-                    and not self.df[passenger.id + "-checked"].iloc[self.time]\
+                    and not self.df[passenger.id + "-checked"].iloc[self.time] \
                     and not passenger.reached_target:
                 next_passenger = passenger
         if next_passenger != dummy_passenger:
@@ -235,7 +239,8 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
         self.add_new_row(start_time)
 
         # if a passenger is currently being boarded/detrained, the train cannot depart
-        if self.df[train.id + "-status"].iloc[start_time] != "" or self.df[train.id + "-position"].iloc[self.time] == target:
+        if self.df[train.id + "-status"].iloc[start_time] != "" \
+                or self.df[train.id + "-position"].iloc[self.time] == target:
             raise CannotDepartTrain(start_time)
 
         # calculate total length of the shortest path to the target and determine stations and lines on the path
@@ -267,21 +272,28 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
                 can_swap = False
                 # try if swap is possible
                 for swap_train in self.trains:
-                    if self.df[swap_train.id + "-position"].iloc[end_time_line] == stations[c + 1] \
-                            and self.df[swap_train.id + "-position"].iloc[end_time_line - 1] == stations[c + 1] \
-                            and self.df[swap_train.id + "-status"].iloc[end_time_line - 1] == "" \
-                            and self.df[swap_train.id + "-status"].iloc[end_time_line] == ""\
+                    if all(self.df[swap_train.id + "-position"].iloc[i] == stations[c + 1]
+                           and self.df[swap_train.id + "-status"].iloc[i] == ""
+                           and self.df[swap_train.id + "-passengers"].iloc[i] == ""
+                           for i in range(end_time_line - 1, len(self.df))) \
                             and not can_swap:
+                        # if self.df[swap_train.id + "-position"].iloc[end_time_line] == stations[c + 1] \
+                        #         and self.df[swap_train.id + "-position"].iloc[end_time_line - 1] == stations[c + 1] \
+                        #         and self.df[swap_train.id + "-status"].iloc[end_time_line - 1] == "" \
+                        #         and self.df[swap_train.id + "-status"].iloc[end_time_line] == ""\
+                        #         and not can_swap:
                         can_swap = True
                         swap_end = int(math.ceil(length / swap_train.speed)) + end_time_line - 1
                         for i in range(end_time_line - 1, swap_end):
                             self.add_new_row(i)
                             if self.df[line.id + "-current_capacity"].iloc[i] < 1:
-                                can_depart = False
+                                can_swap = False
                                 # break
                         self.add_new_row(swap_end)
                         if self.df[stations[c] + "-current_capacity"].iloc[swap_end] < 0:
-                            can_depart = False
+                            can_swap = False
+                        if can_swap:
+                            break
 
             # if line is free, depart train, else raise CannotDepartTrain-Exception
             if not can_depart or not can_swap:
@@ -290,6 +302,7 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
                     self.df[train.id + "-is_on_line"].iloc[start_time_line] = False
                     self.df[stations[c] + "-current_capacity"].iloc[start_time_line] = \
                         self.df[stations[c] + "-current_capacity"].iloc[start_time_line] - 1
+                self.df[train.id + "-checked"].iloc[start_time_line] = True
                 raise CannotDepartTrain(start_time_line)  # if line is not free / has not enough capacity for the train
 
             train.journey_history[start_time_line] = line.id  # add departing to output
@@ -319,7 +332,8 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
 
             # check if target station has enough capacity for train
             # if not enough capacity: depart a train at the station just before the other train arrives ("swap")
-            if self.df[stations[c + 1] + "-current_capacity"].iloc[end_time_line] < 0:
+            if any(station_cap < 0 for station_cap
+                   in self.df[stations[c + 1] + "-current_capacity"].iloc[end_time_line:len(self.df)]):
                 for swap_train in self.trains:
                     if self.df[swap_train.id + "-position"].iloc[end_time_line] == stations[c + 1] \
                             and swap_train.id != train.id \
@@ -423,12 +437,14 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
         for train in self.trains:
             is_free_train = True
             for i in range(self.time, len(self.df)):
-                if self.df[train.id + "-current_capacity"].iloc[self.time] - int(group_size) < 0 \
-                        or self.df[train.id + "-passengers"].iloc[self.time] != "" \
-                        or self.df[train.id + "-is_on_line"].iloc[self.time] \
-                        or self.df[train.id + "-checked"].iloc[self.time] \
-                        or self.df[train.id + "-position"].iloc[self.time] == "*":
+                if self.df[train.id + "-current_capacity"].iloc[i] - int(group_size) < 0 \
+                        or self.df[train.id + "-passengers"].iloc[i] != "" \
+                        or self.df[train.id + "-status"].iloc[i] != "" \
+                        or self.df[train.id + "-is_on_line"].iloc[i] \
+                        or self.df[train.id + "-checked"].iloc[i] \
+                        or self.df[train.id + "-position"].iloc[i] == "*":
                     is_free_train = False
+                    break
             if is_free_train:
                 possible_trains.append(train)
         return possible_trains
