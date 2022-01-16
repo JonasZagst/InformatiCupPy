@@ -1,5 +1,5 @@
 from InformatiCupPy.com.informaticup.python.algorithms.ISolver import ISolver
-from InformatiCupPy.com.informaticup.python.algorithms.SimplePassengerParallelizationAlgorithm import SimplePassengerParallelizationAlgorithm as Dij
+from InformatiCupPy.com.informaticup.python.algorithms.AdvancedDijkstraAlgorithm import AdvancedDijkstraAlgorithm as Dij
 from InformatiCupPy.com.informaticup.python.algorithms.Helper import Helper
 from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotDepartTrain, NoPassengerChosen, \
     NoTrainChosen, CannotBoardPassenger, CannotSolveInput, ProblemWithPassenger
@@ -47,8 +47,7 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
         """
         # starting solving algorithm/loop
         while self.check_break_condition():
-
-            print(self.time)
+            #print(self.time)
             inner_loop_index = 0  # set counter for inner loop = 0
 
             while self.check_inner_break_condition() and inner_loop_index <= \
@@ -96,6 +95,7 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
                         try:
                             end_time = self.depart_train(chosen_train, chosen_passenger.target_station, self.time)
                             self.detrain_passenger(chosen_passenger, chosen_train, end_time)
+
                         except CannotDepartTrain:
                             pass
                     else:  # if passenger and train are not at the same station
