@@ -1,13 +1,15 @@
-from InformatiCupPy.com.informaticup.python.algorithms.ISolver import ISolver
-from InformatiCupPy.com.informaticup.python.algorithms.AdvancedDijkstraAlgorithm import AdvancedDijkstraAlgorithm as Dij
-from InformatiCupPy.com.informaticup.python.algorithms.Helper import Helper
+import math
+import sys
+
+import pandas as pd
+from InformatiCupPy.com.informaticup.python.algorithms.SimplePassengerParallelizationAlgorithm import SimplePassengerParallelizationAlgorithm as Dij
+
 from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotDepartTrain, NoPassengerChosen, \
-    NoTrainChosen, CannotBoardPassenger, CannotSolveInput, ProblemWithPassenger
+    NoTrainChosen, CannotBoardPassenger
+from InformatiCupPy.com.informaticup.python.algorithms.Helper import Helper
+from InformatiCupPy.com.informaticup.python.algorithms.ISolver import ISolver
 from InformatiCupPy.com.informaticup.python.objects.Passenger import Passenger
 from InformatiCupPy.com.informaticup.python.objects.Train import Train
-import sys
-import pandas as pd
-import math
 
 
 class SimpleTrainParallelizationAlgorithm(ISolver):
@@ -47,7 +49,7 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
         """
         # starting solving algorithm/loop
         while self.check_break_condition():
-            #print(self.time)
+            # print(self.time)
             inner_loop_index = 0  # set counter for inner loop = 0
 
             while self.check_inner_break_condition() and inner_loop_index <= \

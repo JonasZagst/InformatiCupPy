@@ -1,11 +1,10 @@
 import copy
 import math
-import sys
 from collections import deque
 
+from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotSolveInput, CannotBoardPassenger
 from InformatiCupPy.com.informaticup.python.algorithms.Helper import Helper
 from InformatiCupPy.com.informaticup.python.algorithms.ISolver import ISolver
-from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotSolveInput, CannotBoardPassenger
 
 
 class AdvancedPassengerParallelizationAlgorithm(ISolver):
@@ -65,7 +64,8 @@ class AdvancedPassengerParallelizationAlgorithm(ISolver):
         # calculate shortest paths for all passengers
         passenger_dict = {}
         for p in self.passengers:
-            list_of_path, list_of_lines, path_dict = self.calculate_shortest_path(graph, p.initial_station, p.target_station, path_dict)
+            list_of_path, list_of_lines, path_dict = self.calculate_shortest_path(graph, p.initial_station,
+                                                                                  p.target_station, path_dict)
             passenger_dict[p] = [list_of_path, list_of_lines]
 
         # uses only one train to transport all passengers
@@ -78,15 +78,17 @@ class AdvancedPassengerParallelizationAlgorithm(ISolver):
                     # moving train to passenger
                     if my_train.position != p.position:
                         list_of_path, list_of_lines, path_dict = self.calculate_shortest_path(graph,
-                                                                                                      my_train.position,
-                                                                                                      p.position,
-                                                                                                      path_dict)
-                        time, delay = self.travel_selected_path(time, list_of_path, list_of_lines, my_train, passenger_dict)
+                                                                                              my_train.position,
+                                                                                              p.position,
+                                                                                              path_dict)
+                        time, delay = self.travel_selected_path(time, list_of_path, list_of_lines, my_train,
+                                                                passenger_dict)
                         delay_cumulated += delay
 
                     # getting the passenger to his target station
                     if my_train.position == p.position:
-                        time, delay = self.travel_selected_path(time, passenger_dict[p][0], passenger_dict[p][1], my_train, passenger_dict)
+                        time, delay = self.travel_selected_path(time, passenger_dict[p][0], passenger_dict[p][1],
+                                                                my_train, passenger_dict)
                         delay_cumulated += delay
 
                     else:
@@ -250,13 +252,14 @@ class AdvancedPassengerParallelizationAlgorithm(ISolver):
             if self.check_station_capacity(list_of_path[count]) < 1:
                 swap_train = self.check_trains_at_station(list_of_path[count])[0]
                 swap_start_time = int(time_old + int(math.ceil(time_temp)) - 1)
-                swap_passengers_dict = self.find_passengers_along_the_way([list_of_path[count].id, list_of_path[count-1].id], passenger_dict)
+                swap_passengers_dict = self.find_passengers_along_the_way(
+                    [list_of_path[count].id, list_of_path[count - 1].id], passenger_dict)
                 swap_passengers = []
                 for key, value in swap_passengers_dict.items():
                     swap_passengers = value
                 for swap_passenger in reversed(swap_passengers):
                     if swap_train.capacity >= swap_passenger.group_size:
-                        swap_passenger.journey_history[swap_start_time-1] = swap_train.id
+                        swap_passenger.journey_history[swap_start_time - 1] = swap_train.id
                         swap_train.capacity = swap_train.capacity - swap_passenger.group_size
                         swap_passenger.is_in_train = True
                     else:
@@ -269,10 +272,9 @@ class AdvancedPassengerParallelizationAlgorithm(ISolver):
 
                 for swap_passenger in swap_passengers:
                     swap_passenger.journey_history[swap_end_time] = "Detrain"
-                    swap_passenger.position = list_of_path[count-1].id
+                    swap_passenger.position = list_of_path[count - 1].id
                     swap_passenger.reached_target = True
                     swap_passenger.is_in_train = False
-
 
             train.position = list_of_path[count].id
 
@@ -290,7 +292,8 @@ class AdvancedPassengerParallelizationAlgorithm(ISolver):
                     train.capacity = train.capacity - p.group_size
                     p.is_in_train = True
                     boarded = True
-                elif p.position != p.interim_target and (not p.reached_interim_target or not p.reached_target) and p.is_in_train:
+                elif p.position != p.interim_target and (
+                        not p.reached_interim_target or not p.reached_target) and p.is_in_train:
                     if isinstance(passenger_dict[p][1][0], str):
                         line_rm = visited_lines.id
                     else:
@@ -313,8 +316,6 @@ class AdvancedPassengerParallelizationAlgorithm(ISolver):
 
                     p.position = list_of_path[count].id
 
-
-
                 if p.position == p.interim_target and not p.reached_interim_target:
                     train.capacity = train.capacity + p.group_size
                     if time - int(p.target_time) > 0:
@@ -324,7 +325,7 @@ class AdvancedPassengerParallelizationAlgorithm(ISolver):
                         p.reached_target = True
                     detrained = True
                     if jumped:
-                        p.journey_history[time+1] = "Detrain"
+                        p.journey_history[time + 1] = "Detrain"
                         p.is_in_train = False
                     else:
                         p.journey_history[time] = "Detrain"
@@ -334,7 +335,6 @@ class AdvancedPassengerParallelizationAlgorithm(ISolver):
                 time += 2
             elif detrained or boarded or (count == len(list_of_lines) and jumped):
                 time += 1
-
 
         for key, value in to_remove_lines.items():
             for v in value:
@@ -418,14 +418,14 @@ class AdvancedPassengerParallelizationAlgorithm(ISolver):
             return None, False
 
         trains.sort(key=lambda x: (x.capacity, x.speed))
-        old_speed = trains[len(trains)-1].speed - 1
+        old_speed = trains[len(trains) - 1].speed - 1
         for train in reversed(trains):
             if train.speed <= old_speed:
                 trains.remove(train)
             else:
                 old_speed = train.speed
 
-        my_train = trains[int(capacity_speed_ratio*(len(trains)-1))]
+        my_train = trains[int(capacity_speed_ratio * (len(trains) - 1))]
 
         my_train = Helper.get_element_from_list_by_id(my_train.id, self.trains)
 

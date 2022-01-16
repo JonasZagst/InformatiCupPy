@@ -35,8 +35,8 @@ class InputParser:
                 if self.check_station_string(splitted_line):
                     stations_original.append(Station(splitted_line[0], splitted_line[1]))
                 # checking if it is another valid string
-                elif line.startswith("#") or line == "" or line == "[Trains]" or line == "[Lines]" or\
-                     line == "[Stations]" or line == "[Passengers]":
+                elif line.startswith("#") or line == "" or line == "[Trains]" or line == "[Lines]" or \
+                        line == "[Stations]" or line == "[Passengers]":
                     continue
                 # if it is not another valid string, raise this exception, because there is a format problem in the file
                 else:
@@ -81,7 +81,7 @@ class InputParser:
                                                splitted_line[4]))
                 # if it is not a valid line string, check if it is another valid line
                 elif line.startswith("#") or line == "[Stations]" or line == "[Trains]" or line == "[Lines]" or \
-                     line == "[Passengers]" or line == "":
+                        line == "[Passengers]" or line == "":
                     continue
                 # if it is not a valid line, raise tis exception, because there is a format problem in our input file
                 else:
@@ -142,7 +142,7 @@ class InputParser:
                                                  splitted_line[3]))
                 # if it is not a valid train string, check whether it is another valid string
                 elif line.startswith(
-                    "#") or line == "[Stations]" or line == "[Trains]" or line == "[Lines]" or \
+                        "#") or line == "[Stations]" or line == "[Trains]" or line == "[Lines]" or \
                         line == "[Passengers]" or line == "":
                     continue
                 # if it is not a valid string, raise this exception, because there is a format problem in our input file
@@ -203,7 +203,7 @@ class InputParser:
                                                          splitted_line[4]))
                 # check whether it is another valid string
                 elif line.startswith("#") or line == "[Stations]" or line == "[Trains]" or line == "[Lines]" or \
-                     line == "[Passengers]" or line == "":
+                        line == "[Passengers]" or line == "":
                     continue
                 # if it is not a valid string, raise this exception, because there is a format problem in our input file
                 else:
