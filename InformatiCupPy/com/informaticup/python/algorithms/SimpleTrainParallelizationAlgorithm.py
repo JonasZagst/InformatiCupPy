@@ -23,12 +23,6 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
         the target station).
     """
 
-    # TODO:
-    #       -fix bug with endless loop
-    #       -add comments
-    #       -intelligent swap (board passengers before swap), parameter intelligent_swap=True/False
-    #       -full use of train capacity
-
     def __init__(self, input_from_file, parallelization_factor=1.0, set_wildcards=1.0):
         self.stations = input_from_file[0]
         self.lines = input_from_file[1]
@@ -49,7 +43,7 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
         """
         # starting solving algorithm/loop
         while self.check_break_condition():
-            # print(self.time)
+            print(self.time)
             inner_loop_index = 0  # set counter for inner loop = 0
 
             while self.check_inner_break_condition() and inner_loop_index <= \
@@ -118,7 +112,6 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
 
             self.time += 1  # go to next time step
             self.add_new_row(self.time)  # add row (if needed) for new time step
-            self.df.to_csv("InformatiCupPy/com/informaticup/python/algorithms/df.csv")
 
         # calculate total delay of the timetable
         delay = 0
@@ -279,11 +272,6 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
                            and self.df[swap_train.id + "-passengers"].iloc[i] == ""
                            for i in range(end_time_line - 1, len(self.df))) \
                             and not can_swap:
-                        # if self.df[swap_train.id + "-position"].iloc[end_time_line] == stations[c + 1] \
-                        #         and self.df[swap_train.id + "-position"].iloc[end_time_line - 1] == stations[c + 1] \
-                        #         and self.df[swap_train.id + "-status"].iloc[end_time_line - 1] == "" \
-                        #         and self.df[swap_train.id + "-status"].iloc[end_time_line] == ""\
-                        #         and not can_swap:
                         can_swap = True
                         swap_end = int(math.ceil(length / swap_train.speed)) + end_time_line - 1
                         for i in range(end_time_line - 1, swap_end):
@@ -317,7 +305,7 @@ class SimpleTrainParallelizationAlgorithm(ISolver):
                 self.df[train.id + "-position"].iloc[i] = line.id
 
             # increase station capacity after the train departs
-            for i in range(start_time_line, len(self.df)):
+            for i in range(start_time_line+1, len(self.df)):
                 self.df[stations[c] + "-current_capacity"].iloc[i] = \
                     self.df[stations[c] + "-current_capacity"].iloc[i] + 1
 

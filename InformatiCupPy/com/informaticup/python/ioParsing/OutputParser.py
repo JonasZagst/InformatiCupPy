@@ -1,4 +1,5 @@
 import _thread
+from datetime import datetime
 import sys
 import threading
 from contextlib import contextmanager
@@ -28,6 +29,7 @@ class OutputParser:
                 timer.cancel()
 
         best_delay_time = sys.maxsize
+        delay_accumulated = sys.maxsize
 
         # running through all algorithms
         for solver in solvers:
