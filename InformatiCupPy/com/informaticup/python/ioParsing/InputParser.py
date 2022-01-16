@@ -8,7 +8,11 @@ from InformatiCupPy.com.informaticup.python.objects.Train import Train
 class InputParser:
 
     def __init__(self, input_str):
-        self.input = input_str.split("\n")
+        untrimmed_input = input_str.split("\n")
+        self.input = []
+
+        for i in untrimmed_input:
+            self.input.append(i.strip())
 
     def parse_stations(self):
         """

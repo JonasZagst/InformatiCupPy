@@ -40,7 +40,7 @@ class OutputParser:
                     delay_accumulated = solver.solve()
 
                     # performance rating of the distinct algorithms used
-                    print(solver.get_name() + " - accumulated delay time: " + str(delay_accumulated))
+                    # print(solver.get_name() + " - accumulated delay time: " + str(delay_accumulated))
 
                     for i in solver.get_trains_and_passengers()[0]:
                         if isinstance(i, Train):
@@ -61,16 +61,16 @@ class OutputParser:
 
             if best_delay_time > delay_accumulated:
                 best_delay_time = delay_accumulated
-                output_file = open("InformatiCupPy/com/informaticup/input-output/output.txt", "w+")
+                output_file = open("InformatiCupPy/com/informaticup/output_data/output.txt", "w+")
                 output_file.write(output_str)
                 output_file.close()
 
-            file = open("InformatiCupPy/com/informaticup/input-output/output-" + solver.get_name() + ".txt", "w+")
+            file = open("InformatiCupPy/com/informaticup/output_data/output-" + solver.get_name() + ".txt", "w+")
             file.write(output_str)
             file.close()
 
         if best_delay_time == sys.maxsize:
-            output_file = open("InformatiCupPy/com/informaticup/input-output/output.txt", "w+")
+            output_file = open("InformatiCupPy/com/informaticup/output_data/output.txt", "w+")
             output_file.write("input file is not solvable")
             output_file.close()
 
@@ -81,4 +81,4 @@ class OutputParser:
         """Takes output from algorithms, parses it into the output.txt file and prints it to stdout."""
 
         OutputParser.parse_output_files(solvers, input)
-        print(open("InformatiCupPy/com/informaticup/input-output/output.txt", "r").read())
+        print(open("InformatiCupPy/com/informaticup/output_data/output.txt", "r").read())

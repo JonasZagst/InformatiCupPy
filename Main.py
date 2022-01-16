@@ -26,12 +26,9 @@ def main():
             id, initial_station, target_station, group_size, target_time
     """
 
-
     # creates a list (length 4) of lists (length x), which contains several object parsed from the input file
     try:
-        input_str = open("InformatiCupPy/com/informaticup/input-output/input.txt", "r").read()
-        input = InputParser(input_str).parse_input()
-        # input = InputParser(sys.stdin.read()).parse_input()
+        input = InputParser(sys.stdin.read()).parse_input()
         solvers = [
             SimpleDijkstraAlgorithm(copy.deepcopy(input)),
             SimplePassengerParallelizationAlgorithm(copy.deepcopy(input), capacity_speed_ratio=0),
@@ -47,8 +44,7 @@ def main():
             SimpleTrainParallelizationAlgorithm(copy.deepcopy(input), parallelization_factor=0.2),
             SimpleTrainParallelizationAlgorithm(copy.deepcopy(input))
         ]
-        OutputParser.parse_output_files(solvers, input)
-        # OutputParser.parse_output_files_to_stdout(solvers, input)
+        OutputParser.parse_output_files_to_stdout(solvers, input)
     except CannotParseInputException as ex:
         ex.print_message()
 
