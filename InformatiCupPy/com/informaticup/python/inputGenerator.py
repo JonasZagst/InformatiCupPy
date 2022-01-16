@@ -219,7 +219,7 @@ class InputGenerator:
         self.input_file.write("[Passengers]\n")
 
         # generate passengers based on user requirements
-        for x in range(1, self.number_of_passengers + 1):
+        for x in range(1, self.number_of_lines + 1):
             passenger_string = "P" + str(x) + " "
 
             passenger_start = random.randint(1, self.number_of_stations)
