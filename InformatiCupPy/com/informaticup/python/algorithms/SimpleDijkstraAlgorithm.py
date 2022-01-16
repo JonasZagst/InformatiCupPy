@@ -2,8 +2,8 @@ import math
 from collections import deque
 
 from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotSolveInput, CannotBoardPassenger
-from InformatiCupPy.com.informaticup.python.algorithms.ISolver import ISolver
 from InformatiCupPy.com.informaticup.python.algorithms.Helper import Helper
+from InformatiCupPy.com.informaticup.python.algorithms.ISolver import ISolver
 
 
 class SimpleDijkstraAlgorithm(ISolver):

@@ -1,12 +1,10 @@
 import copy
 import math
-import sys
 from collections import deque
 
+from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotSolveInput, CannotBoardPassenger
 from InformatiCupPy.com.informaticup.python.algorithms.Helper import Helper
 from InformatiCupPy.com.informaticup.python.algorithms.ISolver import ISolver
-from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotSolveInput, CannotBoardPassenger
-from InformatiCupPy.com.informaticup.python.objects.Station import Station
 
 
 class SimplePassengerParallelizationAlgorithm(ISolver):
@@ -197,14 +195,12 @@ class SimplePassengerParallelizationAlgorithm(ISolver):
         delay_cumulated = 0
         passengers = []
 
-
         passengers_at_path = self.find_passengers_along_the_way(list_of_path)
 
         # replacing id's with objects
         for n, station_id in enumerate(list_of_path):
             s = Helper.get_element_from_list_by_id(station_id, self.stations)
             list_of_path[n] = s
-
 
         for n, line_id in enumerate(list_of_lines):
             l = Helper.get_element_from_list_by_id(line_id, self.lines)
@@ -276,7 +272,7 @@ class SimplePassengerParallelizationAlgorithm(ISolver):
                     p.reached_target = True
                     detrained = True
                     if jumped:
-                        p.journey_history[time+1] = "Detrain"
+                        p.journey_history[time + 1] = "Detrain"
                     else:
                         p.journey_history[time] = "Detrain"
 
@@ -351,14 +347,14 @@ class SimplePassengerParallelizationAlgorithm(ISolver):
             return None, False
 
         trains.sort(key=lambda x: (x.capacity, x.speed))
-        old_speed = trains[len(trains)-1].speed - 1
+        old_speed = trains[len(trains) - 1].speed - 1
         for train in reversed(trains):
             if train.speed <= old_speed:
                 trains.remove(train)
             else:
                 old_speed = train.speed
 
-        my_train = trains[int(capacity_speed_ratio*(len(trains)-1))]
+        my_train = trains[int(capacity_speed_ratio * (len(trains) - 1))]
 
         my_train = Helper.get_element_from_list_by_id(my_train.id, self.trains)
 

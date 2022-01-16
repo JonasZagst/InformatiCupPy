@@ -82,7 +82,7 @@ class InputGenerator:
 
         # generate a station based on user requirements  for each required station
         for x in range(1, self.number_of_stations + 1):
-            station_string = "S" + str(x) +" " + str(random.randint(1, self.station_max_cap)) + " \n"
+            station_string = "S" + str(x) + " " + str(random.randint(1, self.station_max_cap)) + " \n"
             self.station_cap_list.append(int(station_string[3:station_string.__len__()]))
             self.input_file.write(station_string)
 
@@ -105,17 +105,18 @@ class InputGenerator:
             line_ending = random.randint(1, self.number_of_stations)
 
             if line_beginning != line_ending:
-                line_string = line_string+"S"+str(line_beginning)+" "+"S"+str(line_ending)+" "
+                line_string = line_string + "S" + str(line_beginning) + " " + "S" + str(line_ending) + " "
             else:
-                if line_beginning == self.number_of_stations-1:
-                    line_beginning = line_beginning-1
+                if line_beginning == self.number_of_stations - 1:
+                    line_beginning = line_beginning - 1
                 elif line_beginning == 0:
-                    line_beginning = line_beginning+1
+                    line_beginning = line_beginning + 1
                 else:
-                    line_beginning = line_beginning+1
+                    line_beginning = line_beginning + 1
                 line_string = line_string + "S" + str(line_beginning) + " " + "S" + str(line_ending) + " "
 
-            line_string = line_string + str(random.randint(1, self.line_max_length)) + " " + str(random.randint(1, self.line_max_cap)) + "\n"
+            line_string = line_string + str(random.randint(1, self.line_max_length)) + " " + str(
+                random.randint(1, self.line_max_cap)) + "\n"
             line_list.append(line_string)
 
         all_lines = ""
@@ -124,7 +125,7 @@ class InputGenerator:
 
         # getting all stations now connected
         for i in line_list:
-            all_lines = all_lines + i[4]+i[7]
+            all_lines = all_lines + i[4] + i[7]
 
         # getting all missing lines (station not connected)
         for i in range(1, self.number_of_stations + 1):
@@ -133,7 +134,9 @@ class InputGenerator:
 
         # appending all missing line strings (of not connected stations) to the line_list
         for i in missing_station:
-            missing_line_string = "L" + str(self.number_of_lines + int(i)) + " " + "S" + str(i) + " " + "S" + str(random.randint(1, self.number_of_stations)) + " " + str(random.randint(1, self.line_max_length)) + " " + str(random.randint(1, self.line_max_cap)) + "\n"
+            missing_line_string = "L" + str(self.number_of_lines + int(i)) + " " + "S" + str(i) + " " + "S" + str(
+                random.randint(1, self.number_of_stations)) + " " + str(
+                random.randint(1, self.line_max_length)) + " " + str(random.randint(1, self.line_max_cap)) + "\n"
             line_list.append(missing_line_string)
 
         # deletes duplicates
@@ -159,7 +162,7 @@ class InputGenerator:
             counter = counter + 1
             index = i.find(" ")
             current_line_id = i[0:index]
-            a = i.replace(current_line_id, "L"+str(counter))
+            a = i.replace(current_line_id, "L" + str(counter))
             temporary_line_list3.append(a)
         line_list = temporary_line_list3
 
@@ -182,28 +185,32 @@ class InputGenerator:
             first_station = random.randint(1, self.number_of_stations)
 
             if first_station != self.number_of_stations:
-                train_string = "T" + str(x) + " " + "S" + str(first_station) + " " + str(random.randint(1, self.train_max_max_speed - 1)) + " " + str(random.randint(1, self.train_max_cap - 1)) + "\n"
+                train_string = "T" + str(x) + " " + "S" + str(first_station) + " " + str(
+                    random.randint(1, self.train_max_max_speed - 1)) + " " + str(
+                    random.randint(1, self.train_max_cap - 1)) + "\n"
             else:
-                train_string = "T" + str(x) + " " + "*" + " " + str(random.randint(1, self.train_max_max_speed - 1)) + " " + str(random.randint(1, self.train_max_cap - 1)) + "\n"
+                train_string = "T" + str(x) + " " + "*" + " " + str(
+                    random.randint(1, self.train_max_max_speed - 1)) + " " + str(
+                    random.randint(1, self.train_max_cap - 1)) + "\n"
             train_list.append(train_string)
 
         # checking capacity of first station
         for i in range(1, self.number_of_stations + 1):
             for a in train_list:
                 counter = 0
-                if a.__contains__("S"+str(i)):
+                if a.__contains__("S" + str(i)):
                     counter = counter + 1
             if counter > self.station_cap_list[i - 1]:
                 number_of_wrong_trains = counter - self.station_cap_list[i - 1]
                 counter2 = 0
                 for c in train_list:
                     if counter2 < number_of_wrong_trains:
-                        if c.contains("S"+str(i)):
+                        if c.contains("S" + str(i)):
                             index_c = train_list.index(c)
                             new_string = c
                             train_list.remove(c)
                             counter2 = counter2 + 1
-                            new_string = new_string.replace("S"+str(i), "*")
+                            new_string = new_string.replace("S" + str(i), "*")
                             train_list.remove(c)
                             train_list.insert(index_c, new_string)
 
@@ -215,7 +222,8 @@ class InputGenerator:
         This method is used to generate the passenger strings randomly but based on user specifications
         and write them into the input file
         """
-        self.input_file.write("\n# Passagiere: str(ID) str(Startbahnhof) str(Zielbahnhof) int(Gruppengroeße) int(Ankunftszeit)\n")
+        self.input_file.write(
+            "\n# Passagiere: str(ID) str(Startbahnhof) str(Zielbahnhof) int(Gruppengroeße) int(Ankunftszeit)\n")
         self.input_file.write("[Passengers]\n")
 
         # generate passengers based on user requirements
@@ -226,7 +234,8 @@ class InputGenerator:
             passenger_arrival = random.randint(1, self.number_of_stations)
 
             if passenger_start != passenger_arrival:
-                passenger_string = passenger_string + "S" + str(passenger_start) + " " + "S" + str(passenger_arrival) + " "
+                passenger_string = passenger_string + "S" + str(passenger_start) + " " + "S" + str(
+                    passenger_arrival) + " "
             else:
                 if passenger_start == self.number_of_stations - 1:
                     passenger_start = passenger_start - 1
@@ -234,6 +243,8 @@ class InputGenerator:
                     passenger_start = passenger_start + 1
                 else:
                     passenger_start = passenger_start + 1
-                passenger_string = passenger_string + "S" + str(passenger_start) + " " + "S" + str(passenger_arrival) + " "
-            passenger_string = passenger_string + str(random.randint(1, self.passenger_max_group_size)) + " " + str(random.randint(1, 200)) + "\n"
+                passenger_string = passenger_string + "S" + str(passenger_start) + " " + "S" + str(
+                    passenger_arrival) + " "
+            passenger_string = passenger_string + str(random.randint(1, self.passenger_max_group_size)) + " " + str(
+                random.randint(1, 200)) + "\n"
             self.input_file.write(passenger_string)

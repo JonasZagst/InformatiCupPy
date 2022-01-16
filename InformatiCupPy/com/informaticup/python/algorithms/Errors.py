@@ -27,6 +27,7 @@ class TimeoutException(Exception):
     def __init__(self, msg=''):
         self.msg = msg
 
+
 class CannotParseInputException(Exception):
 
     def print_message(self):

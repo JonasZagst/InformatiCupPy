@@ -3,8 +3,8 @@ import sys
 import threading
 from contextlib import contextmanager
 
-from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotSolveInput, TimeoutException, \
-    CannotBoardPassenger
+from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotBoardPassenger
+from InformatiCupPy.com.informaticup.python.algorithms.Errors import CannotSolveInput, TimeoutException
 from InformatiCupPy.com.informaticup.python.objects.Passenger import Passenger
 from InformatiCupPy.com.informaticup.python.objects.Train import Train
 
@@ -41,7 +41,7 @@ class OutputParser:
                     delay_accumulated = solver.solve()
 
                     # performance rating of the distinct algorithms used
-                    print(solver.get_name() + " - accumulated delay time: " + str(delay_accumulated))
+                    # print(solver.get_name() + " - accumulated delay time: " + str(delay_accumulated))
 
                     for i in solver.get_trains_and_passengers()[0]:
                         if isinstance(i, Train):
@@ -55,7 +55,7 @@ class OutputParser:
             except CannotSolveInput:
                 delay_accumulated = sys.maxsize
             except TimeoutException:
-                print(solver.get_name() + " --- execution timed out ----")
+                # print(solver.get_name() + " --- execution timed out ----")
                 output_str = "--- execution timed out ---- \n \n"
             except Exception:
                 output_str = "--- an error occurred during execution of the algorithm ---- \n \n"
@@ -81,4 +81,5 @@ class OutputParser:
     def parse_output_files_to_stdout(solvers: list, input):
         """Takes output from algorithms, parses it into the output.txt file and prints it to stdout."""
 
-        sys.stdout = OutputParser.parse_output_files(solvers)
+        OutputParser.parse_output_files(solvers, input)
+        print(open("InformatiCupPy/com/informaticup/input-output/output.txt", "r").read())
